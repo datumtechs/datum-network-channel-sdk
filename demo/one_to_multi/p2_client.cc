@@ -53,7 +53,7 @@ int main(int argc, char *argv[])
         
     if(is_start_server)
     {
-        io_impl.Wait_Server();
+        io_impl.WaitServer();
     }
     
     return 0;

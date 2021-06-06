@@ -19,10 +19,11 @@
 
 cmake_minimum_required(VERSION 3.5.1)
 
-project(io_channel C CXX)
+project(channel_sdk C CXX)
 
 include(../cmake/common.cmake)
 add_definitions(-std=c++11)
+set(LIBRARY_OUTPUT_PATH ./lib)
 # Proto file
 get_filename_component(io_proto "../protos/io_channel.proto" ABSOLUTE)
 get_filename_component(io_proto_path "${io_proto}" PATH)
@@ -60,28 +61,45 @@ set(netio_cc "${CMAKE_CURRENT_BINARY_DIR}/src/net_io.cc")
 set(impl_h "${CMAKE_CURRENT_BINARY_DIR}/include/io_channel_impl.h")
 set(impl_cc "${CMAKE_CURRENT_BINARY_DIR}/src/io_channel_impl.cc")
 
-# hw_grpc_proto
-add_library(hw_grpc_proto
-  ${config_cc}  ${config_h}  ${conn_h} ${conn_cc} ${io_channel_h} ${netio_cc} ${netio_h} 
+# io_grpc_proto
+add_library(io_grpc_proto
+  ${config_cc}  ${config_h} ${conn_h} ${conn_cc} ${io_channel_h} ${netio_cc} ${netio_h} 
   ${impl_cc} ${impl_h}
   ${io_grpc_srcs} ${io_grpc_hdrs} ${io_proto_srcs} ${io_proto_hdrs})
 
-target_link_libraries(hw_grpc_proto
+target_link_libraries(io_grpc_proto
   ${_REFLECTION}
   ${_GRPC_GRPCPP}
-  ${_PROTOBUF_LIBPROTOBUF}
-  -lstdc++)
+  ${_PROTOBUF_LIBPROTOBUF})
 
-# Targets greeter_[async_](client|server)
-foreach(_target
-  #test_client server)
-  #server client)
-  #p0_server p1_client)
-  #p0_server p1_client p2_client p9_client)
-  p0_cs p1_cs p2_cs p9_cs)
-  add_executable(${_target} "${_target}.cc")
-  target_link_libraries(${_target}
-    hw_grpc_proto
+set(io_include_files
+  ${config_cc}  ${config_h} ${conn_h} ${conn_cc} ${io_channel_h} ${netio_cc} ${netio_h} 
+  ${impl_cc} ${impl_h}
+  ${io_grpc_srcs}
+  ${io_grpc_hdrs}
+  ${io_proto_srcs}
+  ${io_proto_hdrs})
+
+# Targets demo(client|server)
+# foreach(_target
+#   #test_client server)
+#   #server client)
+#   #p0_server p1_client)
+#   #p0_server p1_client p2_client p9_client)
+#   p0_cs p1_cs p2_cs p9_cs)
+#   add_executable(${_target} "${_target}.cc")
+#   target_link_libraries(${_target}
+#     io_grpc_proto
+#     ${_REFLECTION}
+#     ${_GRPC_GRPCPP}
+#     ${_PROTOBUF_LIBPROTOBUF})
+# endforeach()
+
+# targets pybind11
+add_subdirectory("../third_party/pybind11/" pybind11)
+foreach(_target io_channel)
+  pybind11_add_module(${_target} ${_target}.cc ${io_include_files})
+  target_link_libraries(${_target} PRIVATE
     ${_REFLECTION}
     ${_GRPC_GRPCPP}
     ${_PROTOBUF_LIBPROTOBUF})

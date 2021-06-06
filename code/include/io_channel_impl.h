@@ -37,7 +37,7 @@ public:
       error_callback error_cb=nullptr);
 
   // 等待服务器结束
-  void Wait_Server(){if(server_) server_->wait();}
+  void WaitServer(){if(server_) server_->wait();}
 private:
   shared_ptr<BasicIO> CreateViaChannel(const NodeInfo& node_idInfo, 
       const vector<ViaInfo>& serverInfos, map<string, string>* share_data_map_=nullptr, 

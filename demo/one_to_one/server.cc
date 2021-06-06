@@ -10,7 +10,7 @@ int main(int argc, char *argv[])
 
     // cout << "start to get recv!" << endl;
 
-    server.Wait_Server();
+    server.WaitServer();
     
     return 0;
 }

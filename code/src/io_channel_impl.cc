@@ -1,47 +1,7 @@
 #include "include/io_channel_impl.h"
 #include "include/net_io.h"
-#include "include/config.h"
+#include "include/common.h"
 #include <set>
-
-void CopyNodeInfo(NodeInfo& node_idInfo, const Node& nodeInfo) {
-  node_idInfo.id = nodeInfo.NODE_ID;
-  node_idInfo.address = nodeInfo.HOST;
-  node_idInfo.port = nodeInfo.PORT;
-}
-
-static int get_hex_index(char c) {
-  if (c >= '0' && c <= '9') {
-    return c - '0';
-  } else if (c >= 'A' && c <= 'Z') {
-    return 10 + c - 'A';
-  } else if (c >= 'a' && c <= 'z') {
-    return 10 + c - 'a';
-  }
-  return 0;
-}
-static char get_char(char c1, char c2) {
-  return get_hex_index(c1) << 4 | get_hex_index(c2);
-}
-static string get_binary_string(const string& str) {
-  string ret;
-  ret.resize(str.size() / 2);
-  for (int i = 0; i < str.size(); i += 2) {
-    ret[i / 2] = get_char(str[i], str[i + 1]);
-  }
-  return ret;
-}
-
-bool isNodeType(const vector<NODE_TYPE>& vec_node_types, const NODE_TYPE nodeType)
-{
-  for(int i=0; i < vec_node_types.size(); ++i)
-  {
-    if(vec_node_types[i] == nodeType)
-    {
-      return true;
-    }
-  }
-  return false;
-}
 
 bool IoChannelImpl::StartServer(const string& server_addr)
 {
@@ -160,12 +120,12 @@ shared_ptr<BasicIO> IoChannelImpl::CreateChannel(const string& node_id, const st
 }
 
 ssize_t GRpcChannel::Recv(const string& node_id, const string& id, string& data, int64_t timeout) {
-  // return _net_io->recv(node_id, data, get_binary_string(id), timeout); 
-  return _net_io->recv(node_id, data, id, timeout); 
+  return _net_io->recv(node_id, data, get_binary_string(id), timeout); 
+  // return _net_io->recv(node_id, data, id, timeout); 
 }
 
 ssize_t GRpcChannel::Send(const string& node_id, const string& id, const string& data, int64_t timeout) {
-  cout << "GRPC send, id====" << id << endl;
-  return _net_io->send(node_id, data, id, timeout);
+  // cout << "GRPC send, id====" << id << endl;
+  return _net_io->send(node_id, data, get_binary_string(id), timeout);
 }
 
