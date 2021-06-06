@@ -19,7 +19,6 @@ using namespace std;
 using io_channel::IoChannel;
 using io_channel::SendRequest;
 using io_channel::RetCode;
-using io_channel::TestReply;
 
 class ClientConnection
 {

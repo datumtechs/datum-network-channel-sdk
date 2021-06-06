@@ -43,20 +43,6 @@ class IoChannel final {
     std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::io_channel::RetCode>> PrepareAsyncSend(::grpc::ClientContext* context, const ::io_channel::SendRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::io_channel::RetCode>>(PrepareAsyncSendRaw(context, request, cq));
     }
-    virtual ::grpc::Status Recv(::grpc::ClientContext* context, const ::io_channel::RecvRequest& request, ::io_channel::RetData* response) = 0;
-    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::io_channel::RetData>> AsyncRecv(::grpc::ClientContext* context, const ::io_channel::RecvRequest& request, ::grpc::CompletionQueue* cq) {
-      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::io_channel::RetData>>(AsyncRecvRaw(context, request, cq));
-    }
-    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::io_channel::RetData>> PrepareAsyncRecv(::grpc::ClientContext* context, const ::io_channel::RecvRequest& request, ::grpc::CompletionQueue* cq) {
-      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::io_channel::RetData>>(PrepareAsyncRecvRaw(context, request, cq));
-    }
-    virtual ::grpc::Status Test(::grpc::ClientContext* context, const ::google::protobuf::Empty& request, ::io_channel::TestReply* response) = 0;
-    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::io_channel::TestReply>> AsyncTest(::grpc::ClientContext* context, const ::google::protobuf::Empty& request, ::grpc::CompletionQueue* cq) {
-      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::io_channel::TestReply>>(AsyncTestRaw(context, request, cq));
-    }
-    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::io_channel::TestReply>> PrepareAsyncTest(::grpc::ClientContext* context, const ::google::protobuf::Empty& request, ::grpc::CompletionQueue* cq) {
-      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::io_channel::TestReply>>(PrepareAsyncTestRaw(context, request, cq));
-    }
     class experimental_async_interface {
      public:
       virtual ~experimental_async_interface() {}
@@ -65,18 +51,6 @@ class IoChannel final {
       virtual void Send(::grpc::ClientContext* context, const ::io_channel::SendRequest* request, ::io_channel::RetCode* response, ::grpc::ClientUnaryReactor* reactor) = 0;
       #else
       virtual void Send(::grpc::ClientContext* context, const ::io_channel::SendRequest* request, ::io_channel::RetCode* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
-      #endif
-      virtual void Recv(::grpc::ClientContext* context, const ::io_channel::RecvRequest* request, ::io_channel::RetData* response, std::function<void(::grpc::Status)>) = 0;
-      #ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
-      virtual void Recv(::grpc::ClientContext* context, const ::io_channel::RecvRequest* request, ::io_channel::RetData* response, ::grpc::ClientUnaryReactor* reactor) = 0;
-      #else
-      virtual void Recv(::grpc::ClientContext* context, const ::io_channel::RecvRequest* request, ::io_channel::RetData* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
-      #endif
-      virtual void Test(::grpc::ClientContext* context, const ::google::protobuf::Empty* request, ::io_channel::TestReply* response, std::function<void(::grpc::Status)>) = 0;
-      #ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
-      virtual void Test(::grpc::ClientContext* context, const ::google::protobuf::Empty* request, ::io_channel::TestReply* response, ::grpc::ClientUnaryReactor* reactor) = 0;
-      #else
-      virtual void Test(::grpc::ClientContext* context, const ::google::protobuf::Empty* request, ::io_channel::TestReply* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
       #endif
     };
     #ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
@@ -89,10 +63,6 @@ class IoChannel final {
   private:
     virtual ::grpc::ClientAsyncResponseReaderInterface< ::io_channel::RetCode>* AsyncSendRaw(::grpc::ClientContext* context, const ::io_channel::SendRequest& request, ::grpc::CompletionQueue* cq) = 0;
     virtual ::grpc::ClientAsyncResponseReaderInterface< ::io_channel::RetCode>* PrepareAsyncSendRaw(::grpc::ClientContext* context, const ::io_channel::SendRequest& request, ::grpc::CompletionQueue* cq) = 0;
-    virtual ::grpc::ClientAsyncResponseReaderInterface< ::io_channel::RetData>* AsyncRecvRaw(::grpc::ClientContext* context, const ::io_channel::RecvRequest& request, ::grpc::CompletionQueue* cq) = 0;
-    virtual ::grpc::ClientAsyncResponseReaderInterface< ::io_channel::RetData>* PrepareAsyncRecvRaw(::grpc::ClientContext* context, const ::io_channel::RecvRequest& request, ::grpc::CompletionQueue* cq) = 0;
-    virtual ::grpc::ClientAsyncResponseReaderInterface< ::io_channel::TestReply>* AsyncTestRaw(::grpc::ClientContext* context, const ::google::protobuf::Empty& request, ::grpc::CompletionQueue* cq) = 0;
-    virtual ::grpc::ClientAsyncResponseReaderInterface< ::io_channel::TestReply>* PrepareAsyncTestRaw(::grpc::ClientContext* context, const ::google::protobuf::Empty& request, ::grpc::CompletionQueue* cq) = 0;
   };
   class Stub final : public StubInterface {
    public:
@@ -104,20 +74,6 @@ class IoChannel final {
     std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::io_channel::RetCode>> PrepareAsyncSend(::grpc::ClientContext* context, const ::io_channel::SendRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::io_channel::RetCode>>(PrepareAsyncSendRaw(context, request, cq));
     }
-    ::grpc::Status Recv(::grpc::ClientContext* context, const ::io_channel::RecvRequest& request, ::io_channel::RetData* response) override;
-    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::io_channel::RetData>> AsyncRecv(::grpc::ClientContext* context, const ::io_channel::RecvRequest& request, ::grpc::CompletionQueue* cq) {
-      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::io_channel::RetData>>(AsyncRecvRaw(context, request, cq));
-    }
-    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::io_channel::RetData>> PrepareAsyncRecv(::grpc::ClientContext* context, const ::io_channel::RecvRequest& request, ::grpc::CompletionQueue* cq) {
-      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::io_channel::RetData>>(PrepareAsyncRecvRaw(context, request, cq));
-    }
-    ::grpc::Status Test(::grpc::ClientContext* context, const ::google::protobuf::Empty& request, ::io_channel::TestReply* response) override;
-    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::io_channel::TestReply>> AsyncTest(::grpc::ClientContext* context, const ::google::protobuf::Empty& request, ::grpc::CompletionQueue* cq) {
-      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::io_channel::TestReply>>(AsyncTestRaw(context, request, cq));
-    }
-    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::io_channel::TestReply>> PrepareAsyncTest(::grpc::ClientContext* context, const ::google::protobuf::Empty& request, ::grpc::CompletionQueue* cq) {
-      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::io_channel::TestReply>>(PrepareAsyncTestRaw(context, request, cq));
-    }
     class experimental_async final :
       public StubInterface::experimental_async_interface {
      public:
@@ -126,18 +82,6 @@ class IoChannel final {
       void Send(::grpc::ClientContext* context, const ::io_channel::SendRequest* request, ::io_channel::RetCode* response, ::grpc::ClientUnaryReactor* reactor) override;
       #else
       void Send(::grpc::ClientContext* context, const ::io_channel::SendRequest* request, ::io_channel::RetCode* response, ::grpc::experimental::ClientUnaryReactor* reactor) override;
-      #endif
-      void Recv(::grpc::ClientContext* context, const ::io_channel::RecvRequest* request, ::io_channel::RetData* response, std::function<void(::grpc::Status)>) override;
-      #ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
-      void Recv(::grpc::ClientContext* context, const ::io_channel::RecvRequest* request, ::io_channel::RetData* response, ::grpc::ClientUnaryReactor* reactor) override;
-      #else
-      void Recv(::grpc::ClientContext* context, const ::io_channel::RecvRequest* request, ::io_channel::RetData* response, ::grpc::experimental::ClientUnaryReactor* reactor) override;
-      #endif
-      void Test(::grpc::ClientContext* context, const ::google::protobuf::Empty* request, ::io_channel::TestReply* response, std::function<void(::grpc::Status)>) override;
-      #ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
-      void Test(::grpc::ClientContext* context, const ::google::protobuf::Empty* request, ::io_channel::TestReply* response, ::grpc::ClientUnaryReactor* reactor) override;
-      #else
-      void Test(::grpc::ClientContext* context, const ::google::protobuf::Empty* request, ::io_channel::TestReply* response, ::grpc::experimental::ClientUnaryReactor* reactor) override;
       #endif
      private:
       friend class Stub;
@@ -152,13 +96,7 @@ class IoChannel final {
     class experimental_async async_stub_{this};
     ::grpc::ClientAsyncResponseReader< ::io_channel::RetCode>* AsyncSendRaw(::grpc::ClientContext* context, const ::io_channel::SendRequest& request, ::grpc::CompletionQueue* cq) override;
     ::grpc::ClientAsyncResponseReader< ::io_channel::RetCode>* PrepareAsyncSendRaw(::grpc::ClientContext* context, const ::io_channel::SendRequest& request, ::grpc::CompletionQueue* cq) override;
-    ::grpc::ClientAsyncResponseReader< ::io_channel::RetData>* AsyncRecvRaw(::grpc::ClientContext* context, const ::io_channel::RecvRequest& request, ::grpc::CompletionQueue* cq) override;
-    ::grpc::ClientAsyncResponseReader< ::io_channel::RetData>* PrepareAsyncRecvRaw(::grpc::ClientContext* context, const ::io_channel::RecvRequest& request, ::grpc::CompletionQueue* cq) override;
-    ::grpc::ClientAsyncResponseReader< ::io_channel::TestReply>* AsyncTestRaw(::grpc::ClientContext* context, const ::google::protobuf::Empty& request, ::grpc::CompletionQueue* cq) override;
-    ::grpc::ClientAsyncResponseReader< ::io_channel::TestReply>* PrepareAsyncTestRaw(::grpc::ClientContext* context, const ::google::protobuf::Empty& request, ::grpc::CompletionQueue* cq) override;
     const ::grpc::internal::RpcMethod rpcmethod_Send_;
-    const ::grpc::internal::RpcMethod rpcmethod_Recv_;
-    const ::grpc::internal::RpcMethod rpcmethod_Test_;
   };
   static std::unique_ptr<Stub> NewStub(const std::shared_ptr< ::grpc::ChannelInterface>& channel, const ::grpc::StubOptions& options = ::grpc::StubOptions());
 
@@ -167,8 +105,6 @@ class IoChannel final {
     Service();
     virtual ~Service();
     virtual ::grpc::Status Send(::grpc::ServerContext* context, const ::io_channel::SendRequest* request, ::io_channel::RetCode* response);
-    virtual ::grpc::Status Recv(::grpc::ServerContext* context, const ::io_channel::RecvRequest* request, ::io_channel::RetData* response);
-    virtual ::grpc::Status Test(::grpc::ServerContext* context, const ::google::protobuf::Empty* request, ::io_channel::TestReply* response);
   };
   template <class BaseClass>
   class WithAsyncMethod_Send : public BaseClass {
@@ -190,47 +126,7 @@ class IoChannel final {
       ::grpc::Service::RequestAsyncUnary(0, context, request, response, new_call_cq, notification_cq, tag);
     }
   };
-  template <class BaseClass>
-  class WithAsyncMethod_Recv : public BaseClass {
-   private:
-    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
-   public:
-    WithAsyncMethod_Recv() {
-      ::grpc::Service::MarkMethodAsync(1);
-    }
-    ~WithAsyncMethod_Recv() override {
-      BaseClassMustBeDerivedFromService(this);
-    }
-    // disable synchronous version of this method
-    ::grpc::Status Recv(::grpc::ServerContext* /*context*/, const ::io_channel::RecvRequest* /*request*/, ::io_channel::RetData* /*response*/) override {
-      abort();
-      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
-    }
-    void RequestRecv(::grpc::ServerContext* context, ::io_channel::RecvRequest* request, ::grpc::ServerAsyncResponseWriter< ::io_channel::RetData>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
-      ::grpc::Service::RequestAsyncUnary(1, context, request, response, new_call_cq, notification_cq, tag);
-    }
-  };
-  template <class BaseClass>
-  class WithAsyncMethod_Test : public BaseClass {
-   private:
-    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
-   public:
-    WithAsyncMethod_Test() {
-      ::grpc::Service::MarkMethodAsync(2);
-    }
-    ~WithAsyncMethod_Test() override {
-      BaseClassMustBeDerivedFromService(this);
-    }
-    // disable synchronous version of this method
-    ::grpc::Status Test(::grpc::ServerContext* /*context*/, const ::google::protobuf::Empty* /*request*/, ::io_channel::TestReply* /*response*/) override {
-      abort();
-      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
-    }
-    void RequestTest(::grpc::ServerContext* context, ::google::protobuf::Empty* request, ::grpc::ServerAsyncResponseWriter< ::io_channel::TestReply>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
-      ::grpc::Service::RequestAsyncUnary(2, context, request, response, new_call_cq, notification_cq, tag);
-    }
-  };
-  typedef WithAsyncMethod_Send<WithAsyncMethod_Recv<WithAsyncMethod_Test<Service > > > AsyncService;
+  typedef WithAsyncMethod_Send<Service > AsyncService;
   template <class BaseClass>
   class ExperimentalWithCallbackMethod_Send : public BaseClass {
    private:
@@ -278,105 +174,11 @@ class IoChannel final {
     #endif
       { return nullptr; }
   };
-  template <class BaseClass>
-  class ExperimentalWithCallbackMethod_Recv : public BaseClass {
-   private:
-    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
-   public:
-    ExperimentalWithCallbackMethod_Recv() {
-    #ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
-      ::grpc::Service::
-    #else
-      ::grpc::Service::experimental().
-    #endif
-        MarkMethodCallback(1,
-          new ::grpc::internal::CallbackUnaryHandler< ::io_channel::RecvRequest, ::io_channel::RetData>(
-            [this](
-    #ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
-                   ::grpc::CallbackServerContext*
-    #else
-                   ::grpc::experimental::CallbackServerContext*
-    #endif
-                     context, const ::io_channel::RecvRequest* request, ::io_channel::RetData* response) { return this->Recv(context, request, response); }));}
-    void SetMessageAllocatorFor_Recv(
-        ::grpc::experimental::MessageAllocator< ::io_channel::RecvRequest, ::io_channel::RetData>* allocator) {
-    #ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
-      ::grpc::internal::MethodHandler* const handler = ::grpc::Service::GetHandler(1);
-    #else
-      ::grpc::internal::MethodHandler* const handler = ::grpc::Service::experimental().GetHandler(1);
-    #endif
-      static_cast<::grpc::internal::CallbackUnaryHandler< ::io_channel::RecvRequest, ::io_channel::RetData>*>(handler)
-              ->SetMessageAllocator(allocator);
-    }
-    ~ExperimentalWithCallbackMethod_Recv() override {
-      BaseClassMustBeDerivedFromService(this);
-    }
-    // disable synchronous version of this method
-    ::grpc::Status Recv(::grpc::ServerContext* /*context*/, const ::io_channel::RecvRequest* /*request*/, ::io_channel::RetData* /*response*/) override {
-      abort();
-      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
-    }
-    #ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
-    virtual ::grpc::ServerUnaryReactor* Recv(
-      ::grpc::CallbackServerContext* /*context*/, const ::io_channel::RecvRequest* /*request*/, ::io_channel::RetData* /*response*/)
-    #else
-    virtual ::grpc::experimental::ServerUnaryReactor* Recv(
-      ::grpc::experimental::CallbackServerContext* /*context*/, const ::io_channel::RecvRequest* /*request*/, ::io_channel::RetData* /*response*/)
-    #endif
-      { return nullptr; }
-  };
-  template <class BaseClass>
-  class ExperimentalWithCallbackMethod_Test : public BaseClass {
-   private:
-    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
-   public:
-    ExperimentalWithCallbackMethod_Test() {
-    #ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
-      ::grpc::Service::
-    #else
-      ::grpc::Service::experimental().
-    #endif
-        MarkMethodCallback(2,
-          new ::grpc::internal::CallbackUnaryHandler< ::google::protobuf::Empty, ::io_channel::TestReply>(
-            [this](
-    #ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
-                   ::grpc::CallbackServerContext*
-    #else
-                   ::grpc::experimental::CallbackServerContext*
-    #endif
-                     context, const ::google::protobuf::Empty* request, ::io_channel::TestReply* response) { return this->Test(context, request, response); }));}
-    void SetMessageAllocatorFor_Test(
-        ::grpc::experimental::MessageAllocator< ::google::protobuf::Empty, ::io_channel::TestReply>* allocator) {
-    #ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
-      ::grpc::internal::MethodHandler* const handler = ::grpc::Service::GetHandler(2);
-    #else
-      ::grpc::internal::MethodHandler* const handler = ::grpc::Service::experimental().GetHandler(2);
-    #endif
-      static_cast<::grpc::internal::CallbackUnaryHandler< ::google::protobuf::Empty, ::io_channel::TestReply>*>(handler)
-              ->SetMessageAllocator(allocator);
-    }
-    ~ExperimentalWithCallbackMethod_Test() override {
-      BaseClassMustBeDerivedFromService(this);
-    }
-    // disable synchronous version of this method
-    ::grpc::Status Test(::grpc::ServerContext* /*context*/, const ::google::protobuf::Empty* /*request*/, ::io_channel::TestReply* /*response*/) override {
-      abort();
-      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
-    }
-    #ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
-    virtual ::grpc::ServerUnaryReactor* Test(
-      ::grpc::CallbackServerContext* /*context*/, const ::google::protobuf::Empty* /*request*/, ::io_channel::TestReply* /*response*/)
-    #else
-    virtual ::grpc::experimental::ServerUnaryReactor* Test(
-      ::grpc::experimental::CallbackServerContext* /*context*/, const ::google::protobuf::Empty* /*request*/, ::io_channel::TestReply* /*response*/)
-    #endif
-      { return nullptr; }
-  };
   #ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
-  typedef ExperimentalWithCallbackMethod_Send<ExperimentalWithCallbackMethod_Recv<ExperimentalWithCallbackMethod_Test<Service > > > CallbackService;
+  typedef ExperimentalWithCallbackMethod_Send<Service > CallbackService;
   #endif
 
-  typedef ExperimentalWithCallbackMethod_Send<ExperimentalWithCallbackMethod_Recv<ExperimentalWithCallbackMethod_Test<Service > > > ExperimentalCallbackService;
+  typedef ExperimentalWithCallbackMethod_Send<Service > ExperimentalCallbackService;
   template <class BaseClass>
   class WithGenericMethod_Send : public BaseClass {
    private:
@@ -390,40 +192,6 @@ class IoChannel final {
     }
     // disable synchronous version of this method
     ::grpc::Status Send(::grpc::ServerContext* /*context*/, const ::io_channel::SendRequest* /*request*/, ::io_channel::RetCode* /*response*/) override {
-      abort();
-      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
-    }
-  };
-  template <class BaseClass>
-  class WithGenericMethod_Recv : public BaseClass {
-   private:
-    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
-   public:
-    WithGenericMethod_Recv() {
-      ::grpc::Service::MarkMethodGeneric(1);
-    }
-    ~WithGenericMethod_Recv() override {
-      BaseClassMustBeDerivedFromService(this);
-    }
-    // disable synchronous version of this method
-    ::grpc::Status Recv(::grpc::ServerContext* /*context*/, const ::io_channel::RecvRequest* /*request*/, ::io_channel::RetData* /*response*/) override {
-      abort();
-      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
-    }
-  };
-  template <class BaseClass>
-  class WithGenericMethod_Test : public BaseClass {
-   private:
-    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
-   public:
-    WithGenericMethod_Test() {
-      ::grpc::Service::MarkMethodGeneric(2);
-    }
-    ~WithGenericMethod_Test() override {
-      BaseClassMustBeDerivedFromService(this);
-    }
-    // disable synchronous version of this method
-    ::grpc::Status Test(::grpc::ServerContext* /*context*/, const ::google::protobuf::Empty* /*request*/, ::io_channel::TestReply* /*response*/) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
@@ -446,46 +214,6 @@ class IoChannel final {
     }
     void RequestSend(::grpc::ServerContext* context, ::grpc::ByteBuffer* request, ::grpc::ServerAsyncResponseWriter< ::grpc::ByteBuffer>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
       ::grpc::Service::RequestAsyncUnary(0, context, request, response, new_call_cq, notification_cq, tag);
-    }
-  };
-  template <class BaseClass>
-  class WithRawMethod_Recv : public BaseClass {
-   private:
-    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
-   public:
-    WithRawMethod_Recv() {
-      ::grpc::Service::MarkMethodRaw(1);
-    }
-    ~WithRawMethod_Recv() override {
-      BaseClassMustBeDerivedFromService(this);
-    }
-    // disable synchronous version of this method
-    ::grpc::Status Recv(::grpc::ServerContext* /*context*/, const ::io_channel::RecvRequest* /*request*/, ::io_channel::RetData* /*response*/) override {
-      abort();
-      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
-    }
-    void RequestRecv(::grpc::ServerContext* context, ::grpc::ByteBuffer* request, ::grpc::ServerAsyncResponseWriter< ::grpc::ByteBuffer>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
-      ::grpc::Service::RequestAsyncUnary(1, context, request, response, new_call_cq, notification_cq, tag);
-    }
-  };
-  template <class BaseClass>
-  class WithRawMethod_Test : public BaseClass {
-   private:
-    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
-   public:
-    WithRawMethod_Test() {
-      ::grpc::Service::MarkMethodRaw(2);
-    }
-    ~WithRawMethod_Test() override {
-      BaseClassMustBeDerivedFromService(this);
-    }
-    // disable synchronous version of this method
-    ::grpc::Status Test(::grpc::ServerContext* /*context*/, const ::google::protobuf::Empty* /*request*/, ::io_channel::TestReply* /*response*/) override {
-      abort();
-      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
-    }
-    void RequestTest(::grpc::ServerContext* context, ::grpc::ByteBuffer* request, ::grpc::ServerAsyncResponseWriter< ::grpc::ByteBuffer>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
-      ::grpc::Service::RequestAsyncUnary(2, context, request, response, new_call_cq, notification_cq, tag);
     }
   };
   template <class BaseClass>
@@ -527,82 +255,6 @@ class IoChannel final {
       { return nullptr; }
   };
   template <class BaseClass>
-  class ExperimentalWithRawCallbackMethod_Recv : public BaseClass {
-   private:
-    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
-   public:
-    ExperimentalWithRawCallbackMethod_Recv() {
-    #ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
-      ::grpc::Service::
-    #else
-      ::grpc::Service::experimental().
-    #endif
-        MarkMethodRawCallback(1,
-          new ::grpc::internal::CallbackUnaryHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
-            [this](
-    #ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
-                   ::grpc::CallbackServerContext*
-    #else
-                   ::grpc::experimental::CallbackServerContext*
-    #endif
-                     context, const ::grpc::ByteBuffer* request, ::grpc::ByteBuffer* response) { return this->Recv(context, request, response); }));
-    }
-    ~ExperimentalWithRawCallbackMethod_Recv() override {
-      BaseClassMustBeDerivedFromService(this);
-    }
-    // disable synchronous version of this method
-    ::grpc::Status Recv(::grpc::ServerContext* /*context*/, const ::io_channel::RecvRequest* /*request*/, ::io_channel::RetData* /*response*/) override {
-      abort();
-      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
-    }
-    #ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
-    virtual ::grpc::ServerUnaryReactor* Recv(
-      ::grpc::CallbackServerContext* /*context*/, const ::grpc::ByteBuffer* /*request*/, ::grpc::ByteBuffer* /*response*/)
-    #else
-    virtual ::grpc::experimental::ServerUnaryReactor* Recv(
-      ::grpc::experimental::CallbackServerContext* /*context*/, const ::grpc::ByteBuffer* /*request*/, ::grpc::ByteBuffer* /*response*/)
-    #endif
-      { return nullptr; }
-  };
-  template <class BaseClass>
-  class ExperimentalWithRawCallbackMethod_Test : public BaseClass {
-   private:
-    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
-   public:
-    ExperimentalWithRawCallbackMethod_Test() {
-    #ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
-      ::grpc::Service::
-    #else
-      ::grpc::Service::experimental().
-    #endif
-        MarkMethodRawCallback(2,
-          new ::grpc::internal::CallbackUnaryHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
-            [this](
-    #ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
-                   ::grpc::CallbackServerContext*
-    #else
-                   ::grpc::experimental::CallbackServerContext*
-    #endif
-                     context, const ::grpc::ByteBuffer* request, ::grpc::ByteBuffer* response) { return this->Test(context, request, response); }));
-    }
-    ~ExperimentalWithRawCallbackMethod_Test() override {
-      BaseClassMustBeDerivedFromService(this);
-    }
-    // disable synchronous version of this method
-    ::grpc::Status Test(::grpc::ServerContext* /*context*/, const ::google::protobuf::Empty* /*request*/, ::io_channel::TestReply* /*response*/) override {
-      abort();
-      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
-    }
-    #ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
-    virtual ::grpc::ServerUnaryReactor* Test(
-      ::grpc::CallbackServerContext* /*context*/, const ::grpc::ByteBuffer* /*request*/, ::grpc::ByteBuffer* /*response*/)
-    #else
-    virtual ::grpc::experimental::ServerUnaryReactor* Test(
-      ::grpc::experimental::CallbackServerContext* /*context*/, const ::grpc::ByteBuffer* /*request*/, ::grpc::ByteBuffer* /*response*/)
-    #endif
-      { return nullptr; }
-  };
-  template <class BaseClass>
   class WithStreamedUnaryMethod_Send : public BaseClass {
    private:
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
@@ -629,63 +281,9 @@ class IoChannel final {
     // replace default version of method with streamed unary
     virtual ::grpc::Status StreamedSend(::grpc::ServerContext* context, ::grpc::ServerUnaryStreamer< ::io_channel::SendRequest,::io_channel::RetCode>* server_unary_streamer) = 0;
   };
-  template <class BaseClass>
-  class WithStreamedUnaryMethod_Recv : public BaseClass {
-   private:
-    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
-   public:
-    WithStreamedUnaryMethod_Recv() {
-      ::grpc::Service::MarkMethodStreamed(1,
-        new ::grpc::internal::StreamedUnaryHandler<
-          ::io_channel::RecvRequest, ::io_channel::RetData>(
-            [this](::grpc::ServerContext* context,
-                   ::grpc::ServerUnaryStreamer<
-                     ::io_channel::RecvRequest, ::io_channel::RetData>* streamer) {
-                       return this->StreamedRecv(context,
-                         streamer);
-                  }));
-    }
-    ~WithStreamedUnaryMethod_Recv() override {
-      BaseClassMustBeDerivedFromService(this);
-    }
-    // disable regular version of this method
-    ::grpc::Status Recv(::grpc::ServerContext* /*context*/, const ::io_channel::RecvRequest* /*request*/, ::io_channel::RetData* /*response*/) override {
-      abort();
-      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
-    }
-    // replace default version of method with streamed unary
-    virtual ::grpc::Status StreamedRecv(::grpc::ServerContext* context, ::grpc::ServerUnaryStreamer< ::io_channel::RecvRequest,::io_channel::RetData>* server_unary_streamer) = 0;
-  };
-  template <class BaseClass>
-  class WithStreamedUnaryMethod_Test : public BaseClass {
-   private:
-    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
-   public:
-    WithStreamedUnaryMethod_Test() {
-      ::grpc::Service::MarkMethodStreamed(2,
-        new ::grpc::internal::StreamedUnaryHandler<
-          ::google::protobuf::Empty, ::io_channel::TestReply>(
-            [this](::grpc::ServerContext* context,
-                   ::grpc::ServerUnaryStreamer<
-                     ::google::protobuf::Empty, ::io_channel::TestReply>* streamer) {
-                       return this->StreamedTest(context,
-                         streamer);
-                  }));
-    }
-    ~WithStreamedUnaryMethod_Test() override {
-      BaseClassMustBeDerivedFromService(this);
-    }
-    // disable regular version of this method
-    ::grpc::Status Test(::grpc::ServerContext* /*context*/, const ::google::protobuf::Empty* /*request*/, ::io_channel::TestReply* /*response*/) override {
-      abort();
-      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
-    }
-    // replace default version of method with streamed unary
-    virtual ::grpc::Status StreamedTest(::grpc::ServerContext* context, ::grpc::ServerUnaryStreamer< ::google::protobuf::Empty,::io_channel::TestReply>* server_unary_streamer) = 0;
-  };
-  typedef WithStreamedUnaryMethod_Send<WithStreamedUnaryMethod_Recv<WithStreamedUnaryMethod_Test<Service > > > StreamedUnaryService;
+  typedef WithStreamedUnaryMethod_Send<Service > StreamedUnaryService;
   typedef Service SplitStreamedService;
-  typedef WithStreamedUnaryMethod_Send<WithStreamedUnaryMethod_Recv<WithStreamedUnaryMethod_Test<Service > > > StreamedService;
+  typedef WithStreamedUnaryMethod_Send<Service > StreamedService;
 };
 
 }  // namespace io_channel

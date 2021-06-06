@@ -5,13 +5,8 @@ import "google/protobuf/empty.proto";
 
 service IoChannel {
     rpc Send(SendRequest) returns (RetCode) {}         // 发送消息
-    rpc Recv(RecvRequest) returns (RetData) {}  // 接收消息
-    rpc Test(google.protobuf.Empty) returns (TestReply) {}
+    // rpc Recv(RecvRequest) returns (RetData) {}  // 接收消息
 }
-
-message TestReply {
-    string node_type = 1;
-}  
 
 message SendRequest {
     string nodeid = 1;
@@ -24,6 +19,7 @@ message RetCode {
 	int32 code = 1;
 }
 
+/*
 message RecvRequest {
     string nodeid = 1;
     string id = 2;
@@ -33,3 +29,4 @@ message RecvRequest {
 message RetData {
 	string data = 1;
 }
+*/

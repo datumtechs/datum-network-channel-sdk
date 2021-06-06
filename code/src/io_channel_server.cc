@@ -16,9 +16,6 @@ using namespace std;
 using io_channel::IoChannel;
 using io_channel::SendRequest;
 using io_channel::RetCode;
-using io_channel::RecvRequest;
-using io_channel::RetData;
-using io_channel::TestReply;
 
 class IoChannelServer final : public IoChannel::Service
 {
@@ -86,15 +83,7 @@ public:
 		respond->set_data(send_req.data());
 
         return grpc::Status::OK;
-	}
-
-    grpc::Status Test(grpc::ServerContext* context, const google::protobuf::Empty* request, 
-                      TestReply* response)
-    {
-        cout << "call test succeed!" << endl;;
-        response->set_node_type("this is test node");
-        return grpc::Status::OK;
-    }*/
+	}*/
 
     // 异步方式
 private:
