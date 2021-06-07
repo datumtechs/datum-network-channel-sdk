@@ -1,0 +1,34 @@
+{
+  "PASS_VIA": true,
+  "NODE_INFO": [
+    {
+      "NODE_ID" : "p0",
+      "NAME": "PartyA(P0)",
+      "VIA": "VIA1"
+    },
+    {
+      "NODE_ID" : "p1",
+      "NAME": "PartyB(P1)",
+      "VIA": "VIA2"
+    },
+    {
+      "NODE_ID" : "p2",
+      "NAME": "PartyC(P2)",
+      "VIA": "VIA3"
+    },
+    {
+      "NODE_ID" : "p9",
+      "NAME": "PartyI(P9)",
+      "VIA": "VIA4"
+    }
+  ],
+  "VIA_INFO": {
+		"VIA1": "127.0.0.1:11111",
+		"VIA2": "127.0.0.1:11112",
+    "VIA3": "127.0.0.1:11113",
+    "VIA4": "127.0.0.1:11114"
+	},
+  "DATA_NODES": ["p0", "p2", "p9"],
+  "COMPUTATION_NODES": {"p0":"P0", "p1":"P1", "p2":"P2"},
+  "RESULT_NODES": ["p1", "p2", "p9"]
+}
