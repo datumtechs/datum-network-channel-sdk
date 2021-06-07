@@ -33,11 +33,14 @@ using namespace std;
 class BasicIO {
  public:
   virtual ~BasicIO();
-  BasicIO() = default;
+  // BasicIO() = default;
+
+  // BasicIO(const NodeInfo &node_id, const vector<ViaInfo>& server_infos, 
+  //   map<string, string>* share_data_map_=nullptr,
+  //   error_callback error_callback=nullptr);
 
   BasicIO(const NodeInfo &node_id, const vector<ViaInfo>& server_infos, 
-    map<string, string>* share_data_map_=nullptr,
-    error_callback error_callback=nullptr);
+    map<string, string>* share_data_map_=nullptr);
 
  protected:
   virtual bool init_inner() { return true; }

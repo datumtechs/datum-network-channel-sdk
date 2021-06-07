@@ -74,11 +74,12 @@ target_link_libraries(io_grpc_proto
 
 # Targets demo(client|server)
 # foreach(_target
+#   client)
 #   #test_client server)
 #   #server client)
 #   #p0_server p1_client)
 #   #p0_server p1_client p2_client p9_client)
-#   p0_cs p1_cs p2_cs p9_cs)
+#   #p0_cs p1_cs p2_cs p9_cs)
 #   add_executable(${_target} "${_target}.cc")
 #   target_link_libraries(${_target}
 #     io_grpc_proto

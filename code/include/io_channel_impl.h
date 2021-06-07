@@ -27,7 +27,7 @@ using namespace std;
 class IoChannelImpl {
 public:
   IoChannelImpl(){}
-  ~IoChannelImpl(){ CloseServer(); }
+  ~IoChannelImpl(){CloseServer();}
 
   bool CloseServer() { if(server_) server_->close(); return true;}
 
@@ -52,8 +52,8 @@ private:
 
 class GRpcChannel : public IChannel {
 public:
-    GRpcChannel(shared_ptr<BasicIO> net_io) {_net_io = net_io; }
-
+    GRpcChannel(shared_ptr<BasicIO> net_io) {_net_io = net_io;}
+    ~GRpcChannel(){}
     virtual void SetErrorCallback(error_callback error_cb) {}
     virtual int64_t Recv(const string& node_id, const string& id, string& data, int64_t timeout = -1);
     virtual int64_t Send(const string& node_id, const string& id, const string& data, int64_t timeout = -1);

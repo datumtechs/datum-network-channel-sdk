@@ -21,7 +21,8 @@ shared_ptr<BasicIO> IoChannelImpl::CreateViaChannel(const NodeInfo& node_idInfo,
       error_callback error_callback) 
 {      
   shared_ptr<BasicIO> net_io =  nullptr;
-  net_io = make_shared<ViaNetIO>(node_idInfo, serverInfos, share_data_map_, error_callback);
+  // net_io = make_shared<ViaNetIO>(node_idInfo, serverInfos, share_data_map_, error_callback);
+  net_io = make_shared<BasicIO>(node_idInfo, serverInfos, share_data_map_);
   if (net_io->init()) 
   {
     // return std::dynamic_pointer_cast<IChannel>(make_shared<GRpcChannel>(net_io));
