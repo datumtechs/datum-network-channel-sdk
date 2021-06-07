@@ -53,7 +53,7 @@ include_directories(${THIRD_PARTY_DIR}/rapidjson/include)
 # add io files
 set(config_h "${CMAKE_CURRENT_BINARY_DIR}/include/config.h")
 set(config_cc "${CMAKE_CURRENT_BINARY_DIR}/src/config.cc")
-set(io_channel_h "${CMAKE_CURRENT_BINARY_DIR}/include/io_channel.h")
+set(io_channel_h "${CMAKE_CURRENT_BINARY_DIR}/include/IChannel.h")
 set(conn_h "${CMAKE_CURRENT_BINARY_DIR}/include/connection.h")
 set(conn_cc "${CMAKE_CURRENT_BINARY_DIR}/src/connection.cc")
 set(netio_h "${CMAKE_CURRENT_BINARY_DIR}/include/net_io.h")

@@ -2,7 +2,7 @@
 
 #include "connection.h"
 #include "config.h"
-#include "io_channel.h"
+#include "IChannel.h"
 #include <atomic>
 #include <condition_variable>
 #include <iostream>
