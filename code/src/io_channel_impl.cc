@@ -31,8 +31,9 @@ shared_ptr<BasicIO> IoChannelImpl::CreateViaChannel(const NodeInfo& node_idInfo,
 }
 
 shared_ptr<BasicIO> IoChannelImpl::CreateChannel(const string& node_id, const string &config_str, 
-      const bool& is_start_server, const string& server_addr, error_callback error_cb) 
+      const bool& is_start_server, const string& server_addr) 
 {
+  error_callback error_cb = nullptr;
   // 启动服务器
   if(is_start_server)
   {
