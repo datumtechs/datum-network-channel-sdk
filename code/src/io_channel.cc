@@ -1,5 +1,6 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
+#include <pybind11/functional.h>
 namespace py = pybind11;
 // 类文件
 #include "include/io_channel_impl.h"
@@ -9,8 +10,6 @@ PYBIND11_MODULE(io_channel, m) {
   m.doc() = R"pbdoc(
       Rosetta backend entry for python API.
     )pbdoc";
-
-  py::class_<IChannel, shared_ptr<IChannel>>(m, "IChannel");
 
   // 定义绑定类
   py::module m_impl = m.def_submodule("impl");
@@ -24,7 +23,7 @@ PYBIND11_MODULE(io_channel, m) {
 
   py::class_<BasicIO, shared_ptr<BasicIO>>(m, "basicio");
 
-  // send/recv
+  // 用于测试：send/recv
   py::class_<GRpcChannel, shared_ptr<GRpcChannel>>(m_impl, "grpc")
     .def(py::init<shared_ptr<BasicIO>>())
     .def("send", &GRpcChannel::Send)

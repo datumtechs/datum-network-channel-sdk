@@ -6,14 +6,10 @@ void BasicIO::close() {}
 
 BasicIO::~BasicIO(){close();}
 
-// BasicIO::BasicIO(const NodeInfo &node_id, const vector<ViaInfo>& server_infos,
-//     map<string, string>* share_data_map, error_callback error_callback)
-//   : node_info_(node_id), via_server_infos_(server_infos), share_data_map_(share_data_map),
-//     handler(error_callback) {}
-
 BasicIO::BasicIO(const NodeInfo &node_id, const vector<ViaInfo>& server_infos,
-    map<string, string>* share_data_map)
-  : node_info_(node_id), via_server_infos_(server_infos), share_data_map_(share_data_map){}
+    map<string, string>* share_data_map, error_callback error_callback)
+  : node_info_(node_id), via_server_infos_(server_infos), share_data_map_(share_data_map),
+    handler(error_callback) {}
 
 bool BasicIO::init() 
 {

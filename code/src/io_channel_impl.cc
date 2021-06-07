@@ -21,20 +21,20 @@ shared_ptr<BasicIO> IoChannelImpl::CreateViaChannel(const NodeInfo& node_idInfo,
       error_callback error_callback) 
 {      
   shared_ptr<BasicIO> net_io =  nullptr;
-  // net_io = make_shared<ViaNetIO>(node_idInfo, serverInfos, share_data_map_, error_callback);
-  net_io = make_shared<BasicIO>(node_idInfo, serverInfos, share_data_map_);
+  net_io = make_shared<ViaNetIO>(node_idInfo, serverInfos, share_data_map_, error_callback);
   if (net_io->init()) 
   {
     // return std::dynamic_pointer_cast<IChannel>(make_shared<GRpcChannel>(net_io));
     return net_io;
   }
+ 
+  error_callback(node_idInfo.id, "", -1, "init io failed!", (void*)"user_data");
   return nullptr;
 }
 
 shared_ptr<BasicIO> IoChannelImpl::CreateChannel(const string& node_id, const string &config_str, 
-      const bool& is_start_server, const string& server_addr) 
+      const bool& is_start_server, const string& server_addr, error_callback error_cb) 
 {
-  error_callback error_cb = nullptr;
   // 启动服务器
   if(is_start_server)
   {
