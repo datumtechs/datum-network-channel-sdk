@@ -16,17 +16,15 @@ struct Node {
   string DESC;
   string NODE_ID;
   string NAME;
-  string HOST;
+  string Address;
   string VIA;
-  int PORT;
   public:
     void copy_from(const Node& node) {
       DESC.assign(node.DESC);
       NODE_ID.assign(node.NODE_ID);
       NAME.assign(node.NAME);
-      HOST.assign(node.HOST);
-      PORT = node.PORT;
-      VIA = node.VIA;
+      Address.assign(node.Address);
+      VIA.assign(node.VIA);
     }
 };
 
@@ -92,11 +90,10 @@ class ComputeNodeConfig : public _Config {
 struct NodeInfo {
   string id;
   string address;
-  int port;
 
   NodeInfo() = default;
   NodeInfo(const string& node_id, const string& addr, int _port) 
-    : id(node_id), address(addr), port(_port){}
+    : id(node_id), address(addr){}
 };
 
 struct ViaInfo {

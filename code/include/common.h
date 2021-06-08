@@ -5,8 +5,7 @@ using namespace std;
 void CopyNodeInfo(NodeInfo& node_idInfo, const Node& nodeInfo) 
 {
   node_idInfo.id = nodeInfo.NODE_ID;
-  node_idInfo.address = nodeInfo.HOST;
-  node_idInfo.port = nodeInfo.PORT;
+  node_idInfo.address = nodeInfo.Address;
 }
 
 static int get_hex_index(char c) 

@@ -74,8 +74,7 @@ std::string ComputeNodeConfig::to_string() {
 
   for (int i = 0; i < P.size(); i++) {
     sss << "\n        P" << i << " NAME: " << P[i].NAME;
-    sss << "\n        P" << i << " HOST: " << P[i].HOST;
-    sss << "\n        P" << i << " PORT: " << P[i].PORT;
+    sss << "\n        P" << i << " Address: " << P[i].Address;
   }
   sss << "\n";
   return sss.str();
@@ -94,8 +93,7 @@ std::string ResultNodeConfig::to_string() {
 
   for (int i = 0; i < P.size(); i++) {
     sss << "\n        P" << i << " NAME: " << P[i].NAME;
-    sss << "\n        P" << i << " HOST: " << P[i].HOST;
-    sss << "\n        P" << i << " PORT: " << P[i].PORT;
+    sss << "\n        P" << i << " HOST: " << P[i].Address;
   }
   sss << "\n";
   return sss.str();
@@ -106,8 +104,7 @@ std::string DataNodeConfig::to_string() {
 
   for (int i = 0; i < P.size(); i++) {
     sss << "\n        P" << i << " NAME: " << P[i].NAME;
-    sss << "\n        P" << i << " HOST: " << P[i].HOST;
-    sss << "\n        P" << i << " PORT: " << P[i].PORT;
+    sss << "\n        P" << i << " HOST: " << P[i].Address;
   }
   sss << "\n";
   return sss.str();
@@ -211,37 +208,42 @@ bool ChannelConfig::load(const string& node_id, const string& config_file) {
   return true;
 }
 
-bool ChannelConfig::parse_node_info(Document& doc, bool pass_via) {
-  if (doc.HasMember("NODE_INFO") && doc["NODE_INFO"].IsArray()) {
+bool ChannelConfig::parse_node_info(Document& doc, bool pass_via) 
+{
+  if (doc.HasMember("NODE_INFO") && doc["NODE_INFO"].IsArray()) 
+  {
     Value& Nodes = doc["NODE_INFO"];
 
     // nodes
-    for (int i = 0; i < Nodes.Size(); i++) {
+    for (int i = 0; i < Nodes.Size(); i++) 
+    {
       NodeInfoConfig cfg;
       Value& Node = Nodes[i];
       cfg.node_.NODE_ID = GetString(Node, "NODE_ID", "", false);
       cout << "node info parse:" << cfg.node_.NODE_ID << endl;
       cfg.node_.NAME = GetString(Node, "NAME", (std::string("P") + std::to_string(i)).c_str(), false);
-      cfg.node_.HOST = GetString(Node, "HOST", "127.0.0.1", false);
-      cfg.node_.PORT = GetInt(Node, "PORT", 9999, false);
+      cfg.node_.Address = GetString(Node, "Address", "127.0.0.1:9999", false);
       cfg.node_.VIA = GetString(Node, "VIA", "", false);
       node_info_config_.insert(std::pair<string, NodeInfoConfig>(cfg.node_.NODE_ID, cfg));
-      if(pass_via_) {
+      if(pass_via_) 
+      {
         nodeid_to_via_.insert(std::pair<string, string>(cfg.node_.NODE_ID, cfg.node_.VIA));
       }
     }
-    cout << "parse " << Nodes.Size() << " node info success" << endl;
+    // cout << "parse " << Nodes.Size() << " node info success" << endl;
 
-    if (pass_via && doc.HasMember("VIA_INFO") && doc["VIA_INFO"].IsObject()) {
+    if (pass_via && doc.HasMember("VIA_INFO") && doc["VIA_INFO"].IsObject()) 
+    {
       Value& Vias = doc["VIA_INFO"];
 
-      for (auto iter = Vias.MemberBegin(); iter != Vias.MemberEnd(); iter++) {
+      for (auto iter = Vias.MemberBegin(); iter != Vias.MemberEnd(); iter++) 
+      {
         string name = iter->name.GetString();
         string value = iter->value.GetString();
         via_to_info_.insert(std::pair<string, string>(name, value));
       }
 
-      cout << "parse via info success" << endl;
+    //  cout << "parse via info success" << endl;
     }
   }
   return true;

@@ -96,7 +96,7 @@ shared_ptr<BasicIO> IoChannelImpl::CreateChannel(const string& node_id, const st
     }  
   }
 
-  string strNodeInfo = node_info.address + ":" + to_string(node_info.port) + ", id:" + node_info.id;
+  string strNodeInfo = "address: " + node_info.address + ", id:" + node_info.id;
   cout << "node_info=========:" << strNodeInfo << endl;
 
   string strServerInfo = "";
