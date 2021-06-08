@@ -8,7 +8,7 @@ import traceback
 faulthandler.enable()
 
 file_path = os.path.split(os.path.realpath(__file__))[0]
-config_file = os.path.join(file_path, 'config.json')
+config_file = os.path.join(file_path, 'config/config.json')
 with open(config_file, 'r') as load_f:
     strJson = load_f.read()
 

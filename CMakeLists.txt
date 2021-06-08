@@ -21,14 +21,19 @@ cmake_minimum_required(VERSION 3.5.1)
 
 project(channel_sdk C CXX)
 
-include(../cmake/common.cmake)
+include(./cmake/common.cmake)
 add_definitions(-std=c++11)
-set(LIBRARY_OUTPUT_PATH ./lib)
+
+get_filename_component(lib_dir "." ABSOLUTE)
+get_filename_component(lib_path "${lib_dir}" PATH)
+file(MAKE_DIRECTORY ${lib_path}/lib)  
+set(LIBRARY_OUTPUT_PATH ${lib_path}/lib)
 # Proto file
-get_filename_component(io_proto "../protos/io_channel.proto" ABSOLUTE)
+get_filename_component(io_proto "./protos/io_channel.proto" ABSOLUTE)
 get_filename_component(io_proto_path "${io_proto}" PATH)
 
 # Generated sources
+file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/protos)  
 set(out_proto_dirs "${CMAKE_CURRENT_BINARY_DIR}/protos")
 set(io_proto_srcs "${out_proto_dirs}/io_channel.pb.cc")
 set(io_proto_hdrs "${out_proto_dirs}/io_channel.pb.h")
@@ -47,19 +52,20 @@ add_custom_command(
 # Include generated *.pb.h files
 include_directories("${CMAKE_CURRENT_BINARY_DIR}")
 # third party
-SET(THIRD_PARTY_DIR "../third_party")
+SET(THIRD_PARTY_DIR "./third_party")
 include_directories(${THIRD_PARTY_DIR}/rapidjson/include)
 
-# add io files
-set(config_h "${CMAKE_CURRENT_BINARY_DIR}/include/config.h")
-set(config_cc "${CMAKE_CURRENT_BINARY_DIR}/src/config.cc")
-set(io_channel_h "${CMAKE_CURRENT_BINARY_DIR}/include/IChannel.h")
-set(conn_h "${CMAKE_CURRENT_BINARY_DIR}/include/connection.h")
-set(conn_cc "${CMAKE_CURRENT_BINARY_DIR}/src/connection.cc")
-set(netio_h "${CMAKE_CURRENT_BINARY_DIR}/include/net_io.h")
-set(netio_cc "${CMAKE_CURRENT_BINARY_DIR}/src/net_io.cc")
-set(impl_h "${CMAKE_CURRENT_BINARY_DIR}/include/io_channel_impl.h")
-set(impl_cc "${CMAKE_CURRENT_BINARY_DIR}/src/io_channel_impl.cc")
+# add code path
+SET(code_path "./code")
+set(config_h "${code_path}/include/config.h")
+set(config_cc "${code_path}/src/config.cc")
+set(io_channel_h "${code_path}/include/IChannel.h")
+set(conn_h "${code_path}/include/connection.h")
+set(conn_cc "${code_path}/src/connection.cc")
+set(netio_h "${code_path}/include/net_io.h")
+set(netio_cc "${code_path}/src/net_io.cc")
+set(impl_h "${code_path}/include/io_channel_impl.h")
+set(impl_cc "${code_path}/src/io_channel_impl.cc")
 
 # io_grpc_proto
 add_library(io_grpc_proto
@@ -89,7 +95,7 @@ target_link_libraries(io_grpc_proto
 # endforeach()
 
 # targets pybind11
-add_subdirectory("../third_party/pybind11/" pybind11)
+add_subdirectory("./third_party/pybind11/" pybind11)
 set(io_include_files
   ${config_cc}  ${config_h} ${conn_h} ${conn_cc} ${io_channel_h} ${netio_cc} ${netio_h} 
   ${impl_cc} ${impl_h}
@@ -97,8 +103,9 @@ set(io_include_files
   ${io_grpc_hdrs}
   ${io_proto_srcs}
   ${io_proto_hdrs})
-  
-pybind11_add_module(io_channel ./src/io_channel.cc ${io_include_files})
+
+include_directories("${code_path}")
+pybind11_add_module(io_channel ${code_path}/src/io_channel.cc ${io_include_files})
 target_link_libraries(io_channel PRIVATE
 	${_REFLECTION}
 	${_GRPC_GRPCPP}

@@ -3,7 +3,7 @@
 #include <pybind11/functional.h>
 namespace py = pybind11;
 // 类文件
-#include "include/io_channel_impl.h"
+#include "../include/io_channel_impl.h"
 
 // 定义模块名称(io_channel)
 PYBIND11_MODULE(io_channel, m) {
