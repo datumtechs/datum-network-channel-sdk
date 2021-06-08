@@ -17,12 +17,32 @@ sudo make install
 ## 编译
 
 ```bash
-mkdir channel-sdk/build
+cd channel-sdk && mkdir build && cd build
 cmake ..
 make
 ```
 
-> 编译成功后在channel-sdk/lib下生成so文件；
+> 编译成功后在channel-sdk/lib下生成so文件，如：`io_channel.cpython-37m-x86_64-linux-gnu.so`，表示对应的python版本号为python3.7；
 
 
+
+## 测试
+
+可将`channel-sdk/test/python`下的例子拷贝到channel-sdk目录下，或者将lib目录拷贝到python实例目录下，
+
+进行测试：
+
+- 启动服务器
+
+  ```bash
+  python3 server.py
+  ```
+
+- 启动客户端
+
+  ```bash
+  python3 client.py
+  ```
+
+  
 
