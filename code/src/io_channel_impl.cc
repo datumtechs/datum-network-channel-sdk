@@ -122,12 +122,12 @@ shared_ptr<BasicIO> IoChannelImpl::CreateChannel(const string& node_id, const st
 }
 
 ssize_t GRpcChannel::Recv(const string& node_id, const string& id, string& data, int64_t timeout) {
-  return _net_io->recv(node_id, data, get_binary_string(id), timeout); 
-  // return _net_io->recv(node_id, data, id, timeout); 
+  // return _net_io->recv(node_id, data, get_binary_string(id), timeout); 
+  return _net_io->recv(node_id, data, id, timeout); 
 }
 
 ssize_t GRpcChannel::Send(const string& node_id, const string& id, const string& data, int64_t timeout) {
-  // cout << "GRPC send, id====" << id << endl;
-  return _net_io->send(node_id, data, get_binary_string(id), timeout);
+  // return _net_io->send(node_id, data, get_binary_string(id), timeout);
+  return _net_io->send(node_id, data, id, timeout);
 }
 

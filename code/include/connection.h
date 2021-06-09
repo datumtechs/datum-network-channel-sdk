@@ -5,20 +5,25 @@
 #include "src/io_channel_server.cc"
 #include <unordered_map>
 #include <mutex>
+// #include <grpc++/server.h>
+// #include <grpc++/server_builder.h>
+// #include <grpc++/server_context.h>
 #include <grpc/grpc.h>
-#include <grpc++/server.h>
-#include <grpc++/server_builder.h>
-#include <grpc++/server_context.h>
-#include <grpc++/security/server_credentials.h>
-#include <grpc++/channel.h>
-#include <grpc++/client_context.h>
-#include <grpc++/create_channel.h>
-#include <grpc++/security/credentials.h>
+#include <grpcpp/channel.h>
+#include <grpcpp/client_context.h>
+#include <grpcpp/create_channel.h>
+#include <grpcpp/security/credentials.h>
 #include <iostream>
 using namespace std;
+
+//using grpc::ClientContext;
+// using grpc::ClientReader;
+// using grpc::ClientReaderWriter;
+// using grpc::ClientWriter;
 using io_channel::IoChannel;
 using io_channel::SendRequest;
 using io_channel::RetCode;
+
 
 class ClientConnection
 {

@@ -78,36 +78,36 @@ target_link_libraries(io_grpc_proto
   ${_GRPC_GRPCPP}
   ${_PROTOBUF_LIBPROTOBUF})
 
+include_directories("${code_path}")
 # Targets demo(client|server)
-# foreach(_target
-#   client)
-#   #test_client server)
-#   #server client)
-#   #p0_server p1_client)
-#   #p0_server p1_client p2_client p9_client)
-#   #p0_cs p1_cs p2_cs p9_cs)
-#   add_executable(${_target} "${_target}.cc")
-#   target_link_libraries(${_target}
-#     io_grpc_proto
-#     ${_REFLECTION}
-#     ${_GRPC_GRPCPP}
-#     ${_PROTOBUF_LIBPROTOBUF})
-# endforeach()
+foreach(_target
+  #client)
+  #test_client server)
+  #server client)
+  #p0_server p1_client)
+  p0_server p1_client p2_client)
+  #p0_cs p1_cs p2_cs p9_cs)
+  add_executable(${_target} "${_target}.cc")
+  target_link_libraries(${_target}
+    io_grpc_proto
+    ${_REFLECTION}
+    ${_GRPC_GRPCPP}
+    ${_PROTOBUF_LIBPROTOBUF})
+endforeach()
 
 # targets pybind11
-add_subdirectory("./third_party/pybind11/" pybind11)
-set(io_include_files
-  ${config_cc}  ${config_h} ${conn_h} ${conn_cc} ${io_channel_h} ${netio_cc} ${netio_h} 
-  ${impl_cc} ${impl_h}
-  ${io_grpc_srcs}
-  ${io_grpc_hdrs}
-  ${io_proto_srcs}
-  ${io_proto_hdrs})
+# add_subdirectory("./third_party/pybind11/" pybind11)
+# set(io_include_files
+#   ${config_cc}  ${config_h} ${conn_h} ${conn_cc} ${io_channel_h} ${netio_cc} ${netio_h} 
+#   ${impl_cc} ${impl_h}
+#   ${io_grpc_srcs}
+#   ${io_grpc_hdrs}
+#   ${io_proto_srcs}
+#   ${io_proto_hdrs})
 
-include_directories("${code_path}")
-pybind11_add_module(io_channel ${code_path}/src/io_channel.cc ${io_include_files})
-target_link_libraries(io_channel PRIVATE
-	${_REFLECTION}
-	${_GRPC_GRPCPP}
-	${_PROTOBUF_LIBPROTOBUF})
+# pybind11_add_module(io_channel ${code_path}/src/io_channel.cc ${io_include_files})
+# target_link_libraries(io_channel PRIVATE
+# 	${_REFLECTION}
+# 	${_GRPC_GRPCPP}
+# 	${_PROTOBUF_LIBPROTOBUF})
 	

@@ -12,11 +12,20 @@
 #include <iostream>
 #include<chrono>
 #include<thread>
+
 using namespace std;
 using io_channel::IoChannel;
 using io_channel::SendRequest;
 using io_channel::RetCode;
 
+using grpc::Server;
+using grpc::ServerBuilder;
+using grpc::ServerContext;
+// using grpc::ServerReader;
+// using grpc::ServerReaderWriter;
+// using grpc::ServerWriter;
+
+// 服务器
 class IoChannelServer final : public IoChannel::Service
 {
 public:
@@ -40,13 +49,15 @@ public:
 
     IoChannelServer(const string& server_addr) 
     {
-        // 服务器
-		grpc::ServerBuilder builder;
-		builder.AddListeningPort(server_addr, grpc::InsecureServerCredentials());
-		builder.RegisterService(this);
-		server_ = builder.BuildAndStart();
-		cout << "Server listening on " << server_addr << endl;
-		// server_->Wait();
+        grpc::ServerBuilder builder;
+        // 调整消息大小限制(默认最大为4M, 设置最大为2G)
+        builder.SetMaxReceiveMessageSize(INT_MAX);
+        builder.AddListeningPort(server_addr, grpc::InsecureServerCredentials());
+        builder.RegisterService(this);
+        server_ = builder.BuildAndStart();
+
+        cout << "Server listening on " << server_addr << endl;
+        // server_->Wait();
     }
     // 同步方式
 	grpc::Status Send(grpc::ServerContext* context, const SendRequest* request, RetCode* response)
@@ -62,16 +73,28 @@ public:
         save_data_map_.insert(std::pair<string, string>(strSaveId, request->data()));
         response->set_code(100);
         cout << "save_data_map_.size == " << save_data_map_.size() << endl;
-        /*
-        // req_id = id + nodeid
-        string req_id = request->id() + request->nodeid();
-        __requests[req_id] = *request;
 
-		response->set_code(100);
-        this_thread::sleep_for(std::chrono::milliseconds(10000));
-        cout << "Sleep over" << endl;*/
         return grpc::Status::OK;
 	}
+
+    /*
+    // stream方式发送
+    grpc::Status Send(grpc::ServerContext* context, ServerReader<SendRequest>* request, 
+            RetCode* response)
+	{
+		std::lock_guard<std::mutex> guard(mtx_);
+        SendRequest req;
+        int i = 0;
+        while (request->Read(&req)) {
+            i++;
+            cout << "i: " << i << ", send request nodeid:" << req.nodeid() << ", id:" 
+                << req.id() << ", data:" << req.data() <<  ", timeout:" << req.timeout() << endl;
+        }
+
+        response->set_code(100);
+        return grpc::Status::OK;
+	}
+    */
 	
     /*
     grpc::Status Recv(grpc::ServerContext* context, const RecvRequest* request, RetData* respond)
@@ -85,17 +108,8 @@ public:
         return grpc::Status::OK;
 	}*/
 
-    // 异步方式
 private:
     std::mutex                    mtx_;
     std::unique_ptr<grpc::Server> server_;
     std::map<string, string> save_data_map_;
 };
-/*
-int main(int argc, char *argv[])
-{
-    std::string addr = "0.0.0.0:6000";
-    IoChannelServer server(addr);
-    return 0;
-}
-*/
