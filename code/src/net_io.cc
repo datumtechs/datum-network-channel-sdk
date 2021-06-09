@@ -13,32 +13,42 @@ BasicIO::BasicIO(const NodeInfo &node_id, const vector<ViaInfo>& server_infos,
 
 bool BasicIO::init() 
 {
-  // init_inner();
+  cout << "BasicIO::init()" << endl;
+  // init_inner(); 
   // 创建多线程
   vector<thread> client_threads(via_server_infos_.size());
-  vector<shared_ptr<ClientConnection>> clietns(via_server_infos_.size());
+  vector<shared_ptr<ClientConnection>> clients(via_server_infos_.size());
+  
   auto conn_f = [&](const ViaInfo &info, int i) -> bool {
     // // 创建io通道
     cout << "create io channel, sids:" << info.id << endl;
-    clietns[i] = make_shared<ClientConnection>(node_info_.id, 
+    clients[i] = make_shared<ClientConnection>(node_info_.id, 
         info.address);
     return true;
   };
-
+  cout << "BasicIO::init2()" << endl;
   for (int i = 0; i < via_server_infos_.size(); i++) {
+    
     client_threads[i] = thread(conn_f, via_server_infos_[i], i);
-  }
 
+    /*
+    clients[i] = make_shared<ClientConnection>(node_info_.id, 
+        via_server_infos_[i].address);
+
+    client_threads[i] = thread(&ClientConnection::AsyncCompleteRpc, clients[i]);
+    */
+  }
+  cout << "BasicIO::init3()" << endl;
   for (int i = 0; i < via_server_infos_.size(); i++) {
     client_threads[i].join();
   }
-
+  cout << "BasicIO::init4()" << endl;
   for (int i = 0; i < via_server_infos_.size(); i++)
   {
     string ser_node_id =  via_server_infos_[i].id;
     // 保存到connection_map
     cout << "save io channel sids:" << via_server_infos_[i].id << endl;
-    connection_map[ser_node_id] = clietns[i];
+    connection_map[ser_node_id] = clients[i];
   }
   
   cout << "init all network connections succeed!" << endl;

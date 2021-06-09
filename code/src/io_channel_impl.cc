@@ -5,13 +5,14 @@
 
 bool IoChannelImpl::StartServer(const string& server_addr)
 {
-  auto start_f = [&](const string& _addr) -> bool {
+  auto start_server_f = [&](const string& _addr) -> bool {
     // // 创建io通道
+    // server_ = make_shared<IoChannelAsyncServer>(_addr);
     server_ = make_shared<IoChannelServer>(_addr);
     return true;
   };
   
-  thread server_thread = thread(start_f, server_addr);
+  thread server_thread = thread(start_server_f, server_addr);
   server_thread.join();
   return true;
 }

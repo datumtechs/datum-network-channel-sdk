@@ -21,9 +21,9 @@ using io_channel::RetCode;
 using grpc::Server;
 using grpc::ServerBuilder;
 using grpc::ServerContext;
-// using grpc::ServerReader;
-// using grpc::ServerReaderWriter;
-// using grpc::ServerWriter;
+using grpc::ServerReader;
+using grpc::ServerReaderWriter;
+using grpc::ServerWriter;
 
 // 服务器
 class IoChannelServer final : public IoChannel::Service
@@ -59,12 +59,13 @@ public:
         cout << "Server listening on " << server_addr << endl;
         // server_->Wait();
     }
+
     // 同步方式
 	grpc::Status Send(grpc::ServerContext* context, const SendRequest* request, RetCode* response)
 	{
 		std::lock_guard<std::mutex> guard(mtx_);
 		cout << "send request nodeid:" << request->nodeid() << ", id:" << request->id() 
-             << ", data:" << request->data() <<  ", timeout:" << request->timeout() << endl;
+             << ", data:" << request->data().length() <<  ", timeout:" << request->timeout() << endl;
 
         // key = nodeid:msg_id
         string strSaveId = request->nodeid() + ":" + request->id();
@@ -85,7 +86,8 @@ public:
 		std::lock_guard<std::mutex> guard(mtx_);
         SendRequest req;
         int i = 0;
-        while (request->Read(&req)) {
+        while (request->Read(&req)) 
+        {
             i++;
             cout << "i: " << i << ", send request nodeid:" << req.nodeid() << ", id:" 
                 << req.id() << ", data:" << req.data() <<  ", timeout:" << req.timeout() << endl;

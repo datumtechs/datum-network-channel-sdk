@@ -24,10 +24,8 @@ project(channel_sdk C CXX)
 include(./cmake/common.cmake)
 add_definitions(-std=c++11)
 
-get_filename_component(lib_dir "." ABSOLUTE)
-get_filename_component(lib_path "${lib_dir}" PATH)
-file(MAKE_DIRECTORY ${lib_path}/lib)  
-set(LIBRARY_OUTPUT_PATH ${lib_path}/lib)
+#file(MAKE_DIRECTORY ${lib_path})
+set(LIBRARY_OUTPUT_PATH ${CMAKE_CURRENT_SOURCE_DIR}/lib)
 # Proto file
 get_filename_component(io_proto "./protos/io_channel.proto" ABSOLUTE)
 get_filename_component(io_proto_path "${io_proto}" PATH)
@@ -56,7 +54,7 @@ SET(THIRD_PARTY_DIR "./third_party")
 include_directories(${THIRD_PARTY_DIR}/rapidjson/include)
 
 # add code path
-SET(code_path "./code")
+SET(code_path "${CMAKE_CURRENT_SOURCE_DIR}/code")
 set(config_h "${code_path}/include/config.h")
 set(config_cc "${code_path}/src/config.cc")
 set(io_channel_h "${code_path}/include/IChannel.h")
@@ -70,7 +68,7 @@ set(impl_cc "${code_path}/src/io_channel_impl.cc")
 # io_grpc_proto
 add_library(io_grpc_proto
   ${config_cc}  ${config_h} ${conn_h} ${conn_cc} ${io_channel_h} ${netio_cc} ${netio_h} 
-  ${impl_cc} ${impl_h}
+  ${impl_cc} ${impl_h} 
   ${io_grpc_srcs} ${io_grpc_hdrs} ${io_proto_srcs} ${io_proto_hdrs})
 
 target_link_libraries(io_grpc_proto
@@ -80,34 +78,37 @@ target_link_libraries(io_grpc_proto
 
 include_directories("${code_path}")
 # Targets demo(client|server)
-foreach(_target
-  #client)
-  #test_client server)
-  #server client)
-  #p0_server p1_client)
-  p0_server p1_client p2_client)
-  #p0_cs p1_cs p2_cs p9_cs)
-  add_executable(${_target} "${_target}.cc")
-  target_link_libraries(${_target}
-    io_grpc_proto
-    ${_REFLECTION}
-    ${_GRPC_GRPCPP}
-    ${_PROTOBUF_LIBPROTOBUF})
-endforeach()
+# foreach(_target
+#   #client)
+#   #test_client server)
+#   #server client)
+#   #p0_server p1_client)
+#   # p0_server p1_client p2_client)
+#   # io_channel_async_server io_channel_async_client io_channel_async_client2 
+#   p0_server p1_client p2_client
+#   #p0_cs p1_cs p2_cs p9_cs
+#   )
+#   add_executable(${_target} "${_target}.cc")
+#   target_link_libraries(${_target}
+#     io_grpc_proto
+#     ${_REFLECTION}
+#     ${_GRPC_GRPCPP}
+#     ${_PROTOBUF_LIBPROTOBUF})
+# endforeach()
 
 # targets pybind11
-# add_subdirectory("./third_party/pybind11/" pybind11)
-# set(io_include_files
-#   ${config_cc}  ${config_h} ${conn_h} ${conn_cc} ${io_channel_h} ${netio_cc} ${netio_h} 
-#   ${impl_cc} ${impl_h}
-#   ${io_grpc_srcs}
-#   ${io_grpc_hdrs}
-#   ${io_proto_srcs}
-#   ${io_proto_hdrs})
+add_subdirectory("./third_party/pybind11/" pybind11)
+set(io_include_files
+  ${config_cc}  ${config_h} ${conn_h} ${conn_cc} ${io_channel_h} ${netio_cc} ${netio_h} 
+  ${impl_cc} ${impl_h}
+  ${io_grpc_srcs}
+  ${io_grpc_hdrs}
+  ${io_proto_srcs}
+  ${io_proto_hdrs})
 
-# pybind11_add_module(io_channel ${code_path}/src/io_channel.cc ${io_include_files})
-# target_link_libraries(io_channel PRIVATE
-# 	${_REFLECTION}
-# 	${_GRPC_GRPCPP}
-# 	${_PROTOBUF_LIBPROTOBUF})
+pybind11_add_module(io_channel ${code_path}/src/io_channel.cc ${io_include_files})
+target_link_libraries(io_channel PRIVATE
+	${_REFLECTION}
+	${_GRPC_GRPCPP}
+	${_PROTOBUF_LIBPROTOBUF})
 	
