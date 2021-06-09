@@ -1,6 +1,7 @@
 #pragma once
 #include "IChannel.h"
 #include "src/io_channel_server.cc"
+// #include "src/io_channel_async_server.cc"
 #include "net_io.h"
 #include <atomic>
 #include <condition_variable>
@@ -45,6 +46,7 @@ private:
 
 private:
   shared_ptr<IoChannelServer> server_ = nullptr;
+  // shared_ptr<IoChannelAsyncServer> server_ = nullptr;
 };
 
 
