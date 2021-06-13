@@ -25,7 +25,6 @@ shared_ptr<BasicIO> IoChannelImpl::CreateViaChannel(const NodeInfo& node_idInfo,
   net_io = make_shared<ViaNetIO>(node_idInfo, serverInfos, share_data_map_, error_callback);
   if (net_io->init()) 
   {
-    // return std::dynamic_pointer_cast<IChannel>(make_shared<GRpcChannel>(net_io));
     return net_io;
   }
  
@@ -34,23 +33,36 @@ shared_ptr<BasicIO> IoChannelImpl::CreateViaChannel(const NodeInfo& node_idInfo,
 }
 
 shared_ptr<BasicIO> IoChannelImpl::CreateChannel(const string& node_id, const string &config_str, 
-      const bool& is_start_server, const string& server_addr, error_callback error_cb) 
+      const bool& is_start_server, error_callback error_cb) 
 {
-  // 启动服务器
-  if(is_start_server)
-  {
-    StartServer(server_addr);
-  }
   shared_ptr<ChannelConfig> config = make_shared<ChannelConfig>(config_str);
   NodeInfo node_info;
   vector<ViaInfo> serverInfos;
   // 根据nodeid获取数据节点或计算节点或接收结果节点信息
   const Node& node = config->GetNode(node_id);
+
   vector<NODE_TYPE> node_types = config->GetNodeType(node_id);
   // 获取节点信息
   CopyNodeInfo(node_info, node);
-  set<string> nodeid_set;
 
+  // 获取本节点对应的via地址
+  string via_name = config->nodeid_to_via_[node_info.id];
+  node_info.via_address = config->via_to_address_[via_name];
+
+  // 启动服务器
+  if(is_start_server)
+  {
+    if("" == node_info.via_address)
+      throw ("The service node " + node_info.id + " does not have a VIA address!");
+
+    if("" == node.ADDRESS)
+      throw ("The address corresponding to the " + node_info.id + " node server is empty!");
+
+    cout << "start server, node.ADDRESS: " << node.ADDRESS << endl;
+    StartServer(node.ADDRESS);
+  }
+  
+  set<string> nodeid_set;
   if(isNodeType(node_types, NODE_TYPE_DATA) || isNodeType(node_types, NODE_TYPE_COMPUTE))
   {
     // 遍历计算节点
@@ -64,7 +76,7 @@ shared_ptr<BasicIO> IoChannelImpl::CreateChannel(const string& node_id, const st
         ViaInfo viaTmp;
         viaTmp.id = nid;
         viaTmp.via = via;
-        viaTmp.address = config->via_to_info_[via];
+        viaTmp.address = config->via_to_address_[via];
         cout << "id: " << nid << ", via: " << viaTmp.via << ", address: " << viaTmp.address << endl;
         serverInfos.push_back(viaTmp);
         // 保存除自身外的计算节点
@@ -89,7 +101,7 @@ shared_ptr<BasicIO> IoChannelImpl::CreateChannel(const string& node_id, const st
         // 节点所在via
         viaTmp.via = via;
         // via信息
-        viaTmp.address = config->via_to_info_[viaTmp.via];
+        viaTmp.address = config->via_to_address_[viaTmp.via];
         cout << "id: " << nid << ", via: " << viaTmp.via << ", address: " << viaTmp.address << endl;
         serverInfos.push_back(viaTmp);
         nodeid_set.insert(nid);
@@ -119,16 +131,70 @@ shared_ptr<BasicIO> IoChannelImpl::CreateChannel(const string& node_id, const st
   {
     share_data_map_ = &(server_->get_data_map());
   }
-  return CreateViaChannel(node_info, serverInfos, share_data_map_, error_cb);
+
+  shared_ptr<BasicIO> net_io = CreateViaChannel(node_info, serverInfos, share_data_map_, error_cb);
+  if(nullptr != net_io)
+  {
+     net_io->set_channel_config(config);
+  }
+ 
+  return net_io;
 }
 
+// GRpcChannel
 ssize_t GRpcChannel::Recv(const string& node_id, const string& id, string& data, int64_t timeout) {
   // return _net_io->recv(node_id, data, get_binary_string(id), timeout); 
+  if(nullptr == _net_io){cout << "create io failed!" << endl; return 0;}
   return _net_io->recv(node_id, data, id, timeout); 
 }
 
 ssize_t GRpcChannel::Send(const string& node_id, const string& id, const string& data, int64_t timeout) {
   // return _net_io->send(node_id, data, get_binary_string(id), timeout);
+  if(nullptr == _net_io){cout << "create io failed!" << endl; return 0;}
   return _net_io->send(node_id, data, id, timeout);
+}
+
+string GRpcChannel::GetCurrentVia()
+{
+  return _net_io->get_current_via();
+}
+
+string GRpcChannel::GetCurrentAddress()
+{
+  return _net_io->get_current_address();
+}
+
+string GRpcChannel::GetTaskId()
+{
+  shared_ptr<ChannelConfig> channel_config = _net_io->get_channel_config();
+  return channel_config->task_id_;
+}
+
+vector<string> GRpcChannel::GetDataNodeIDs()
+{
+  shared_ptr<ChannelConfig> channel_config = _net_io->get_channel_config();
+  return channel_config->data_nodes_;
+}
+
+map<string, int> GRpcChannel::GetComputationNodeIDs()
+{
+  shared_ptr<ChannelConfig> channel_config = _net_io->get_channel_config();
+  return channel_config->compute_nodes_;
+}
+
+vector<string> GRpcChannel::GetResultNodeIDs()
+{
+  shared_ptr<ChannelConfig> channel_config = _net_io->get_channel_config();
+  return channel_config->result_nodes_;
+}
+
+string GRpcChannel::GetCurrentNodeID()
+{
+  return _net_io->get_current_nodeid();
+}
+
+vector<string> GRpcChannel::GetConnectedNodeIDs()
+{
+  return _net_io->get_connected_nodeids();
 }
 

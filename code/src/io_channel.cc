@@ -28,5 +28,13 @@ PYBIND11_MODULE(io_channel, m) {
     .def(py::init<shared_ptr<BasicIO>>())
     .def("send", &GRpcChannel::Send)
     .def("recv", &GRpcChannel::Recv)
+    .def("GetCurrentVia", &GRpcChannel::GetCurrentVia)
+    .def("GetCurrentAddress", &GRpcChannel::GetCurrentAddress)
+    .def("GetTaskId", &GRpcChannel::GetTaskId)
+    .def("GetDataNodeIDs", &GRpcChannel::GetDataNodeIDs)
+    .def("GetComputationNodeIDs", &GRpcChannel::GetComputationNodeIDs)
+    .def("GetResultNodeIDs", &GRpcChannel::GetResultNodeIDs)
+    .def("GetCurrentNodeID", &GRpcChannel::GetCurrentNodeID)
+    .def("GetConnectedNodeIDs", &GRpcChannel::GetConnectedNodeIDs)
 	  ;
 }

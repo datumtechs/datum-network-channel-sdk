@@ -74,7 +74,7 @@ std::string ComputeNodeConfig::to_string() {
 
   for (int i = 0; i < P.size(); i++) {
     sss << "\n        P" << i << " NAME: " << P[i].NAME;
-    sss << "\n        P" << i << " Address: " << P[i].Address;
+    sss << "\n        P" << i << " ADDRESS: " << P[i].ADDRESS;
   }
   sss << "\n";
   return sss.str();
@@ -93,7 +93,7 @@ std::string ResultNodeConfig::to_string() {
 
   for (int i = 0; i < P.size(); i++) {
     sss << "\n        P" << i << " NAME: " << P[i].NAME;
-    sss << "\n        P" << i << " HOST: " << P[i].Address;
+    sss << "\n        P" << i << " ADDRESS: " << P[i].ADDRESS;
   }
   sss << "\n";
   return sss.str();
@@ -104,7 +104,7 @@ std::string DataNodeConfig::to_string() {
 
   for (int i = 0; i < P.size(); i++) {
     sss << "\n        P" << i << " NAME: " << P[i].NAME;
-    sss << "\n        P" << i << " HOST: " << P[i].Address;
+    sss << "\n        P" << i << " ADDRESS: " << P[i].ADDRESS;
   }
   sss << "\n";
   return sss.str();
@@ -122,7 +122,8 @@ ChannelConfig::ChannelConfig(const string& config_json) {
   //! @attention use node_id__ID in config_json
   const string node_id = "";
   bool ret = load(node_id, config_json);
-  if (!ret) {
+  if (!ret) 
+  {
     throw "ChannelConfig load3 config json failed!";
   }
 }
@@ -222,7 +223,7 @@ bool ChannelConfig::parse_node_info(Document& doc, bool pass_via)
       cfg.node_.NODE_ID = GetString(Node, "NODE_ID", "", false);
       cout << "node info parse:" << cfg.node_.NODE_ID << endl;
       cfg.node_.NAME = GetString(Node, "NAME", (std::string("P") + std::to_string(i)).c_str(), false);
-      cfg.node_.Address = GetString(Node, "Address", "127.0.0.1:9999", false);
+      cfg.node_.ADDRESS = GetString(Node, "ADDRESS", "", false);
       cfg.node_.VIA = GetString(Node, "VIA", "", false);
       node_info_config_.insert(std::pair<string, NodeInfoConfig>(cfg.node_.NODE_ID, cfg));
       if(pass_via_) 
@@ -240,7 +241,7 @@ bool ChannelConfig::parse_node_info(Document& doc, bool pass_via)
       {
         string name = iter->name.GetString();
         string value = iter->value.GetString();
-        via_to_info_.insert(std::pair<string, string>(name, value));
+        via_to_address_.insert(std::pair<string, string>(name, value));
       }
 
     //  cout << "parse via info success" << endl;
@@ -287,16 +288,16 @@ bool ChannelConfig::parse_compute(Document& doc) {
       } else if (value == "P2") {
         party = 2;
       }
-      compute_nodes_.insert(std::pair<int, string>(party, name));
+      compute_nodes_.insert(std::pair<string, int>(name, party));
     }
 
     compute_config_.P.resize(compute_nodes_.size());
     int i = 0;
     for (auto iter = compute_nodes_.begin(); iter != compute_nodes_.end(); iter++, i++) {
-      if (node_info_config_.find(iter->second) != node_info_config_.end()) {
-        compute_config_.P[i].copy_from(node_info_config_[iter->second].node_);
+      if (node_info_config_.find(iter->first) != node_info_config_.end()) {
+        compute_config_.P[i].copy_from(node_info_config_[iter->first].node_);
       } else {
-        cout << "can not find node info, node id:" << iter->second << endl;
+        cout << "can not find node info, node id:" << iter->first << endl;
       }
     }
     cout << "parse " << " computation success" << endl;
@@ -327,8 +328,9 @@ bool ChannelConfig::parse_result(Document& doc) {
 
 bool ChannelConfig::parse(Document& doc) {
   //! @todo the node_id__ID field in CONFIG.json have not yet used
-  node_id_ = GetString(doc, "NODE_ID", "", false);
+  // node_id_ = GetString(doc, "NODE_ID", "", false);
   pass_via_ = GetBool(doc, "PASS_VIA", true, false);
+  task_id_ = GetString(doc, "TASK_ID", "", false);
   if (!parse_node_info(doc, pass_via_)) {
     cout << "parse node info error" << endl;
   }

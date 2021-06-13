@@ -2,6 +2,7 @@
 
 #include <string>
 #include <vector>
+#include <map>
 #include <functional>
 #include <cstdint>
 using namespace std;
@@ -50,4 +51,39 @@ public:
    *  -1 if gets exceptions or error
   */
   virtual int64_t Send(const string& node_id, const std::string& id,const std::string& data, int64_t timeout=-1) = 0;
+
+  /**
+   * @brief get node id of all the data nodes
+   * @return
+   * return node id of all the data nodes
+  */
+  virtual vector<string> GetDataNodeIDs() = 0;
+
+  /**
+   * @brief get node id and party id of all the computation nodes
+   * @return
+   * return node id and party id of all the computation nodes
+   * string  indicates node id and int indicates party id
+  */
+  virtual map<string, int> GetComputationNodeIDs() = 0;
+
+  /**
+   * @brief get node id of all the result nodes
+   * @return
+   * return node id of all the result nodes
+  */
+  virtual vector<string> GetResultNodeIDs() = 0;
+  /**
+   * @brief get node id of the current node
+   * @return
+   * return node id of the current node
+  */
+  virtual string GetCurrentNodeID() = 0;
+
+  /**
+   * @brief get node id of all the nodes establishing connection with the current node
+   * @return
+   * return node id of all the nodes establishing connection with the current node
+  */
+  virtual vector<string> GetConnectedNodeIDs() = 0;
 };

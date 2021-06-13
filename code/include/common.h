@@ -2,10 +2,10 @@
 #include "config.h"
 using namespace std;
 
-void CopyNodeInfo(NodeInfo& node_idInfo, const Node& nodeInfo) 
+void CopyNodeInfo(NodeInfo& node_info, const Node& nodeInfo) 
 {
-  node_idInfo.id = nodeInfo.NODE_ID;
-  node_idInfo.address = nodeInfo.Address;
+  node_info.id = nodeInfo.NODE_ID;
+  node_info.address = nodeInfo.ADDRESS;
 }
 
 static int get_hex_index(char c) 

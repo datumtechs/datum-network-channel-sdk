@@ -18,7 +18,7 @@ using namespace std;
 /**
  * Users only need to include this one header file.
  * 
- * Provides NetIOInterface/SSLNetIO/ParallelNetIO/SSLParallelNetIO
+ * Provides ViaNetIO
  * 
  * Note:
  * 
@@ -33,49 +33,64 @@ using namespace std;
 class BasicIO {
  public:
   virtual ~BasicIO();
-  // BasicIO() = default;
 
-  BasicIO(const NodeInfo &node_id, const vector<ViaInfo>& server_infos, 
+  BasicIO(const NodeInfo &node_info, const vector<ViaInfo>& server_infos, 
     map<string, string>* share_data_map_=nullptr,
     error_callback error_callback=nullptr);
 
- protected:
-  virtual bool init_inner() { return true; }
-
  public:
   /**
-   * init the server and clients.
+   * Initialize the client connection.
    */
-  bool init();
-  /**
-   * close the connections.
+  virtual bool init() = 0;
+  virtual ssize_t recv(const string& remote_nodeid, string& data, const string& id, int64_t timeout) = 0;
+  virtual ssize_t send(const string& remote_nodeid, const string& data, const string& id, int64_t timeout) = 0;
+
+ public:
+
+   /**
+   * close the connections(reserved interface).
    */
   void close();
+  
+  void set_channel_config(const shared_ptr<ChannelConfig> channel_config){
+    channel_config_ = channel_config;
+  }
 
- public:
-  ssize_t recv(const string& node_id, string& data, const string& id, int64_t timeout);
-  ssize_t send(const string& node_id, const string& data, const string& id, int64_t timeout);
+  shared_ptr<ChannelConfig> get_channel_config(){
+    return channel_config_;
+  }
+
+  const string get_current_nodeid() {
+    return node_info_.id;
+  }
+
+  const string get_current_via() {
+    return node_info_.via_address;
+  }
+
+  const string get_current_address() {
+    return node_info_.address;
+  }
+
+  const vector<string> get_connected_nodeids() {
+    vector<string> vec_conn_nid(via_server_infos_.size());
+    for(int i = 0; i < via_server_infos_.size(); i++) 
+    {
+      vec_conn_nid[i] = via_server_infos_[i].id;
+    }
+    return vec_conn_nid;
+  }
 
  protected:
-
   NodeInfo node_info_;
   vector<ViaInfo> via_server_infos_;
-
- protected:
+  shared_ptr<ChannelConfig> channel_config_ = nullptr;
   map<string, shared_ptr<ClientConnection>> connection_map;
-  map<string, string>* share_data_map_;
-  string self_nodeid_;
+  map<string, string>* share_data_map_ = nullptr;
   error_callback handler;
 };
 
-/**
- * General Net IO.
- */
-class NetIOInterface : public BasicIO {
- public:
-  using BasicIO::BasicIO;
-  virtual ~NetIOInterface() = default;
-};
 
 /**
  * Via Net IO.
@@ -85,9 +100,8 @@ class ViaNetIO : public BasicIO {
   using BasicIO::BasicIO;
   virtual ~ViaNetIO() = default;
 
- protected:
-  bool init_inner() {
-    return true;
-  }
+  bool init();
+  ssize_t recv(const string& remote_nodeid, string& data, const string& id, int64_t timeout);
+  ssize_t send(const string& remote_nodeid, const string& data, const string& id, int64_t timeout);
 };
 

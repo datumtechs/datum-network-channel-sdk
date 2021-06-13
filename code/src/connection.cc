@@ -1,9 +1,8 @@
 // file connection.cc
 #include "include/connection.h"
 
-ClientConnection::ClientConnection(const string& self_nodeid, const string& server_addr)
+ClientConnection::ClientConnection(const string& server_addr)
 {
-	self_nodeid_ = self_nodeid;
 	auto channel = grpc::CreateChannel(server_addr, grpc::InsecureChannelCredentials());
 	stub_ = IoChannel::NewStub(channel);
 
@@ -84,12 +83,13 @@ ssize_t ClientConnection::send(const string& msg_id, const string& data, int64_t
 }
 */
 
-ssize_t ClientConnection::send(const string& msg_id, const string& data, int64_t timeout)
+ssize_t ClientConnection::send(const string& self_nodeid, const string& remote_nodeid, 
+	const string& task_id, const string& msg_id, const string& data, int64_t timeout)
 {
 	cout << "ClientConnection::send" << endl;
 	SendRequest req_info;
 	// 发送客户端的nodeid到服务器
-	req_info.set_nodeid(self_nodeid_);
+	req_info.set_nodeid(self_nodeid);
 	req_info.set_id(msg_id);
 	req_info.set_data(data);
 	req_info.set_timeout(timeout);
@@ -114,13 +114,19 @@ ssize_t ClientConnection::send(const string& msg_id, const string& data, int64_t
     // object.
     call->response_reader->Finish(&call->reply, &call->status, (void*)call);
 	*/
+
 	grpc::ClientContext context;
+	// 添加注册到via的参数
+    // context.AddMetadata("node_id", remote_nodeid);
+	context.AddMetadata("task_id", task_id);
+	context.AddMetadata("party_id", remote_nodeid);
+	
 	RetCode ret_code;
 	stub_->Send(&context, req_info, &ret_code);
 	
 	cout << "Send message() - ret code: " << ret_code.code() << endl;
 	
-	return 0;
+	return data.length();
 }
 
 /*

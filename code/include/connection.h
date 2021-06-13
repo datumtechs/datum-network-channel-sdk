@@ -30,10 +30,11 @@ using io_channel::RetCode;
 class ClientConnection
 {
 public:
-	ClientConnection(const string& server_nodeid, const string& server_addr);
+	ClientConnection(const string& server_addr);
 	virtual ~ClientConnection(){}
 
-  	ssize_t send(const string& id, const string& data, int64_t timeout = -1L);
+  	ssize_t send(const string& self_nodeid, const string& remote_nodeid, 
+	  	const string& task_id,  const string& id, const string& data, int64_t timeout = -1L);
   	// ssize_t recv(const string& id, string& data, int64_t timeout = -1L);
 
 	// bool AsyncCompleteRpc();
@@ -55,7 +56,7 @@ private:
 		std::unique_ptr<ClientAsyncResponseReader<RetCode>> response_reader;
 	};
 	*/
-	string self_nodeid_ = "";
+
 	unique_ptr<IoChannel::Stub> stub_;
 	// The producer-consumer queue we use to communicate asynchronously with the
 	// gRPC runtime.
