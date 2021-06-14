@@ -53,17 +53,17 @@ include_directories("${CMAKE_CURRENT_BINARY_DIR}")
 SET(THIRD_PARTY_DIR "./third_party")
 include_directories(${THIRD_PARTY_DIR}/rapidjson/include)
 
-# add code path
-SET(code_path "${CMAKE_CURRENT_SOURCE_DIR}/code")
-set(config_h "${code_path}/include/config.h")
-set(config_cc "${code_path}/src/config.cc")
-set(io_channel_h "${code_path}/include/IChannel.h")
-set(conn_h "${code_path}/include/connection.h")
-set(conn_cc "${code_path}/src/connection.cc")
-set(netio_h "${code_path}/include/net_io.h")
-set(netio_cc "${code_path}/src/net_io.cc")
-set(impl_h "${code_path}/include/io_channel_impl.h")
-set(impl_cc "${code_path}/src/io_channel_impl.cc")
+# add core path
+SET(core_path "${CMAKE_CURRENT_SOURCE_DIR}/core")
+set(config_h "${core_path}/include/config.h")
+set(config_cc "${core_path}/src/config.cc")
+set(io_channel_h "${core_path}/include/IChannel.h")
+set(conn_h "${core_path}/include/connection.h")
+set(conn_cc "${core_path}/src/connection.cc")
+set(netio_h "${core_path}/include/net_io.h")
+set(netio_cc "${core_path}/src/net_io.cc")
+set(impl_h "${core_path}/include/io_channel_impl.h")
+set(impl_cc "${core_path}/src/io_channel_impl.cc")
 
 # io_grpc_proto
 add_library(io_grpc_proto
@@ -76,7 +76,7 @@ target_link_libraries(io_grpc_proto
   ${_GRPC_GRPCPP}
   ${_PROTOBUF_LIBPROTOBUF})
 
-include_directories("${code_path}")
+include_directories("${core_path}")
 # Targets demo(client|server)
 # foreach(_target
 #   #client)
@@ -106,7 +106,7 @@ set(io_include_files
   ${io_proto_srcs}
   ${io_proto_hdrs})
 
-pybind11_add_module(io_channel ${code_path}/src/io_channel.cc ${io_include_files})
+pybind11_add_module(io_channel ${core_path}/src/io_channel.cc ${io_include_files})
 target_link_libraries(io_channel PRIVATE
 	${_REFLECTION}
 	${_GRPC_GRPCPP}
