@@ -12,7 +12,7 @@ message SendRequest {
     string nodeid = 1;
     string id = 2;
     string data = 3;
-    int32  timeout  = 4;
+    // int32  timeout  = 4;
 }
 
 message RetCode {

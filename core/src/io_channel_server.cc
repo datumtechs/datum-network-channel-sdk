@@ -24,6 +24,7 @@ using grpc::ServerContext;
 using grpc::ServerReader;
 using grpc::ServerReaderWriter;
 using grpc::ServerWriter;
+using grpc::Status;
 
 // 服务器
 class IoChannelServer final : public IoChannel::Service
@@ -65,17 +66,17 @@ public:
 	{
 		std::lock_guard<std::mutex> guard(mtx_);
 		cout << "send request nodeid:" << request->nodeid() << ", id:" << request->id() 
-             << ", data:" << request->data().length() <<  ", timeout:" << request->timeout() << endl;
+             << ", data length:" << request->data().length() << endl;
 
         // key = nodeid:msg_id
         string strSaveId = request->nodeid() + ":" + request->id();
         cout << "send strSaveId:" << strSaveId << endl;
         // 保存数据
         save_data_map_.insert(std::pair<string, string>(strSaveId, request->data()));
-        response->set_code(100);
-        cout << "save_data_map_.size == " << save_data_map_.size() << endl;
+        response->set_code(0);
+        // cout << "save_data_map_.size == " << save_data_map_.size() << endl;
 
-        return grpc::Status::OK;
+        return Status::OK;
 	}
 
     /*

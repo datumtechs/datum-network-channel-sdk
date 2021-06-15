@@ -1,6 +1,8 @@
 #include "include/net_io.h"
 #include "include/IChannel.h"
 #include <set>
+#include <chrono>   
+using namespace chrono;
 
 void BasicIO::close() {}
 
@@ -53,20 +55,41 @@ bool ViaNetIO::init()
 
 ssize_t ViaNetIO::recv(const string& remote_nodeid, string& data, const string& id, int64_t timeout) 
 {
-  mutex mtx_;
-  lock_guard<mutex> guard(mtx_);
   string strSaveId = remote_nodeid + ":" + id;
-  cout << "recv strSaveId:" << strSaveId << endl;
-  cout << "share_data_map_->size == " << share_data_map_->size() << endl;
+  // cout << "recv strSaveId:" << strSaveId << endl;
+  // cout << "share_data_map_->size == " << share_data_map_->size() << endl;
   // 从本地缓存中获取
   data = "";
-  if(share_data_map_->find(strSaveId) != share_data_map_->end())
+  // 计时
+  auto start_time = system_clock::now();
+	auto end_time   = start_time;
+  while(true)
   {
-    data = (*share_data_map_)[strSaveId];
-    // cout << "recv data = " << data << endl;
-    // 删除数据
-    share_data_map_->erase(strSaveId);
+    if(share_data_map_->find(strSaveId) != share_data_map_->end())
+    {
+      mutex mtx_;
+      lock_guard<mutex> guard(mtx_);
+      data = (*share_data_map_)[strSaveId];
+      cout << "ViaNetIO::recv data = " << data << endl;
+      // 删除数据
+      share_data_map_->erase(strSaveId);
+      break;
+    }
+    else
+    {
+      end_time = system_clock::now();
+			auto duration = duration_cast<microseconds>(end_time - start_time);
+			auto cost_time = double(duration.count()) * 
+				microseconds::period::num / microseconds::period::den;
+
+			cout << "recv data from " << remote_nodeid << " failed, cost " 
+				 << cost_time << " seconds." << endl;
+			if(cost_time >= timeout)
+				break;
+      sleep(1);
+    }
   }
+  
   return data.length();
 }
 

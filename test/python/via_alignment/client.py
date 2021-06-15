@@ -12,11 +12,9 @@ config_file = os.path.join(file_path, 'config/config.json')
 with open(config_file, 'r') as load_f:
     strJson = load_f.read()
 
-
 def fun(a, b, c, d, e):
     print("nodeid:{}, id:{}, errno:{}, error_msg:{}, ext_data:{}".format(a, b, c, d, e))
     return
-
 
 if __name__ == '__main__':
     try:
@@ -26,21 +24,22 @@ if __name__ == '__main__':
 
         api = io_channel.impl.api()
         # 创建网络拓扑
-        io_ = api.create_channel("p2", strJson, is_start_server, fun)
+        channel_ = api.create_channel("p1", strJson, is_start_server, fun)
 
         # time.sleep(1000)
         # print(io_)
 
-        print("start to send========")
+    
+        print("start to send========" )
         # 
-        # 获取io接口
-        channel_ = io_channel.impl.grpc(io_)
-        channel_.send("p1", "id_111", "this is test p2", 1)
+        # 发送数据
+        channel_.send("p0", "2", "this is test p1", 100)
+
 
         # 获取via地址
         via_address = channel_.GetCurrentVia()
         print("current via address:{}".format(via_address))
-
+        
         # 测试io接口
         # GetDataNodeIDs
         '''
@@ -63,8 +62,8 @@ if __name__ == '__main__':
         list_conn_nids = channel_.GetConnectedNodeIDs()
         print("get connected nodes id:{}".format(list_conn_nids))
         '''
-        if (is_start_server):
+        if(is_start_server):
             api.wait_server()
-
+            
     except Exception as e:
         print(traceback.format_exc())
