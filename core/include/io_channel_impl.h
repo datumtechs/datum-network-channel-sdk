@@ -22,7 +22,7 @@ public:
   bool CloseServer() { if(server_) server_->close(); return true;}
 
   bool StartServer(const string& server_addr);
-  shared_ptr<BasicIO> CreateChannel(const string& node_id, const string &config_str, 
+  shared_ptr<IChannel> CreateChannel(const string& node_id, const string &config_str, 
       const bool& is_start_server=false, error_callback error_cb=nullptr);
 
   // 等待服务器结束

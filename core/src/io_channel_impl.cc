@@ -32,7 +32,7 @@ shared_ptr<BasicIO> IoChannelImpl::CreateViaChannel(const NodeInfo& node_idInfo,
   return nullptr;
 }
 
-shared_ptr<BasicIO> IoChannelImpl::CreateChannel(const string& node_id, const string &config_str, 
+shared_ptr<IChannel> IoChannelImpl::CreateChannel(const string& node_id, const string &config_str, 
       const bool& is_start_server, error_callback error_cb) 
 {
   shared_ptr<ChannelConfig> config = make_shared<ChannelConfig>(config_str);
@@ -136,9 +136,11 @@ shared_ptr<BasicIO> IoChannelImpl::CreateChannel(const string& node_id, const st
   if(nullptr != net_io)
   {
      net_io->set_channel_config(config);
+     shared_ptr<GRpcChannel> grpc_channel = make_shared<GRpcChannel>(net_io);
+     return std::dynamic_pointer_cast<IChannel>(grpc_channel);
   }
  
-  return net_io;
+  return nullptr;
 }
 
 // GRpcChannel
