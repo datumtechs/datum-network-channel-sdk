@@ -28,7 +28,7 @@ shared_ptr<BasicIO> IoChannelImpl::CreateViaChannel(const NodeInfo& node_idInfo,
     return net_io;
   }
  
-  error_callback(node_idInfo.id, "", -1, "init io failed!", (void*)"user_data");
+  error_callback(node_idInfo.id.c_str(), "", -1, "init io failed!", (void*)"user_data");
   return nullptr;
 }
 
@@ -144,13 +144,17 @@ shared_ptr<IChannel> IoChannelImpl::CreateChannel(const string& node_id, const s
 }
 
 // GRpcChannel
-ssize_t GRpcChannel::Recv(const string& node_id, const string& id, string& data, int64_t timeout) {
+ssize_t GRpcChannel::Recv(const char* node_id, const char* id, char* data, uint64_t length, int64_t timeout) {
   // return _net_io->recv(node_id, data, get_binary_string(id), timeout); 
   if(nullptr == _net_io){cout << "create io failed!" << endl; return 0;}
-  return _net_io->recv(node_id, data, id, timeout); 
+  if(nullptr == data){cout << "data is nullptr!" << endl; return 0;}
+  string strData = "";
+  uint16_t nLen =  _net_io->recv(node_id, strData, id, timeout);
+  memcpy(data, strData.c_str(), length);
+  return nLen;
 }
 
-ssize_t GRpcChannel::Send(const string& node_id, const string& id, const string& data, int64_t timeout) {
+ssize_t GRpcChannel::Send(const char* node_id, const char* id, const char* data, uint64_t length, int64_t timeout) {
   // return _net_io->send(node_id, data, get_binary_string(id), timeout);
   if(nullptr == _net_io){cout << "create io failed!" << endl; return 0;}
   return _net_io->send(node_id, data, id, timeout);

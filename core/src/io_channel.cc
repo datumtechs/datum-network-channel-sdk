@@ -23,8 +23,18 @@ PYBIND11_MODULE(io_channel, m) {
 
   py::class_<BasicIO, shared_ptr<BasicIO>>(m, "basicio");
 
+  py::class_<IChannel,  shared_ptr<IChannel> >(m_impl, "IChannel")
+  .def("recv", &IChannel::Recv)
+  .def("send", &IChannel::Send)
+  .def("get_data_node_ids", &IChannel::GetDataNodeIDs)
+  .def("get_computation_node_ids", &IChannel::GetComputationNodeIDs)
+  .def("get_result_node_ids", &IChannel::GetResultNodeIDs)
+  .def("get_current_node_id", &IChannel::GetCurrentNodeID)
+  .def("get_connected_node_ids", &IChannel::GetConnectedNodeIDs)
+  ;
+
   // 用于测试：send/recv
-  py::class_<GRpcChannel, shared_ptr<GRpcChannel>>(m_impl, "grpc")
+  py::class_<GRpcChannel, shared_ptr<GRpcChannel>, IChannel>(m_impl, "GRpcChannel")
     .def(py::init<shared_ptr<BasicIO>>())
     .def("send", &GRpcChannel::Send)
     .def("recv", &GRpcChannel::Recv)

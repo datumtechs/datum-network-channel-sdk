@@ -7,9 +7,7 @@
 #include <cstdint>
 using namespace std;
 
-
-typedef std::function<void(const string& node_id, const string& id, int errorno, 
-  const string& errormsg, void* user_data)> error_callback;
+typedef std::function<void(const char*, const char*, int, const char*, void*)> error_callback;
 
 
 /// Channel interface definition
@@ -17,7 +15,6 @@ typedef std::function<void(const string& node_id, const string& id, int errorno,
 /// receiving a message from peer
 class IChannel {
 public:
-  IChannel()=default;
   virtual ~IChannel()=default;
 
    /**
@@ -28,29 +25,31 @@ public:
   virtual void SetErrorCallback(error_callback error_cb)= 0;
 
   /**
-   * @brief RecvMessage receive a message from message queue， for the target node (blocking for timeout microseconds, default waiting forever)
-   * @param party_id target node id for message receiving.
+   * @brief Recv receive a message from message queue， for the target node (blocking for timeout microseconds, default waiting forever)
+   * @param node_id target node id for message receiving.
    * @param id identity of a message, could be a task id or message id.
    * @param data buffer to receive a message.
-   * @param timeout timeout to receive a message(microseconds).
+   * @param length data length expect to receive
+   * @param timeout timeout to receive a message.
    * @return 
    *  return message length if receive a message successfully
    *  0 if peer is disconnected  
    *  -1 if it gets a exception or error
-   * if SetMessageHandler is called, then RecvMessage is desired to be disabled.
   */
-  virtual int64_t Recv(const string& node_id, const std::string& id, std::string& data, int64_t timeout=-1) = 0;
+  virtual int64_t Recv(const char* node_id, const char* id, char* data, uint64_t length, int64_t timeout=-1) = 0;
 
   /**
-   * @brief SendMessage send a message to target node
-   * @param party_id target node id for message receiving
+   * @brief Send send a message to target node
+   * @param node_id target node id for message receiving
    * @param id identity of a message, could be a task id or message id.
-   * @param data buffer to receive a message(microseconds)
+   * @param data buffer to send
+   * @param length data length expect to send
+   * @param timeout timeout to receive a message.
    * @return 
-   *  return 0 if send a message successfully
+   *  return length of data has been sent if send a message successfully
    *  -1 if gets exceptions or error
   */
-  virtual int64_t Send(const string& node_id, const std::string& id,const std::string& data, int64_t timeout=-1) = 0;
+  virtual int64_t Send(const char* node_id, const char* id, const char* data, uint64_t length, int64_t timeout=-1) = 0;
 
   /**
    * @brief get node id of all the data nodes
@@ -86,4 +85,4 @@ public:
    * return node id of all the nodes establishing connection with the current node
   */
   virtual vector<string> GetConnectedNodeIDs() = 0;
-};
+};// IChannel
