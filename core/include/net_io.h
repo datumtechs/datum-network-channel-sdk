@@ -43,8 +43,10 @@ class BasicIO {
    * Initialize the client connection.
    */
   virtual bool init(const string& taskid) = 0;
-  virtual ssize_t recv(const string& remote_nodeid, string& data, const string& id, int64_t timeout) = 0;
-  virtual ssize_t send(const string& remote_nodeid, const string& data, const string& id, int64_t timeout) = 0;
+  virtual ssize_t recv(const string& remote_nodeid, const char* id, char* data, 
+      uint64_t length, int64_t timeout) = 0;
+  virtual ssize_t send(const string& remote_nodeid, const char* id, const char* data, 
+      uint64_t length, int64_t timeout) = 0;
 
  public:
 
@@ -81,7 +83,9 @@ class ViaNetIO : public BasicIO {
   virtual ~ViaNetIO() = default;
 
   bool init(const string& taskid);
-  ssize_t recv(const string& remote_nodeid, string& data, const string& id, int64_t timeout);
-  ssize_t send(const string& remote_nodeid, const string& data, const string& id, int64_t timeout);
+  ssize_t recv(const string& remote_nodeid, const char* id, char* data, uint64_t length, 
+      int64_t timeout=-1);
+  ssize_t send(const string& remote_nodeid, const char* id, const char* data, uint64_t length, 
+      int64_t timeout=-1);
 };
 

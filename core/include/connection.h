@@ -28,7 +28,7 @@ public:
 	virtual ~ClientConnection(){}
 
   	ssize_t send(const string& self_nodeid, const string& remote_nodeid, 
-	  	const string& task_id,  const string& id, const string& data, int64_t timeout = -1L);
+	  	const string& task_id, const string& id, const char* data, const size_t nLen, int64_t timeout = -1L);
   	// ssize_t recv(const string& id, string& data, int64_t timeout = -1L);
 public:
 	string task_id_;

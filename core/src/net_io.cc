@@ -48,24 +48,28 @@ bool ViaNetIO::init(const string& taskid)
   return true;
 }
 
-ssize_t ViaNetIO::recv(const string& remote_nodeid, string& data, const string& id, int64_t timeout) 
+ssize_t ViaNetIO::recv(const string& remote_nodeid, const char* id, char* data,
+      uint64_t length, int64_t timeout) 
 {
-  string strSaveId = remote_nodeid + ":" + id;
+  string msg_id(id);
+  string strSaveId = remote_nodeid + ":" + msg_id;
   // cout << "recv strSaveId:" << strSaveId << endl;
   // cout << "share_data_map_->size == " << share_data_map_->size() << endl;
   // 从本地缓存中获取
-  data = "";
   // 计时
   auto start_time = system_clock::now();
 	auto end_time   = start_time;
   while(true)
   {
+    
     if(share_data_map_->find(strSaveId) != share_data_map_->end())
     {
+      cout << "ViaNetIO::recv data111111 = " << data << endl;
       mutex mtx_;
       lock_guard<mutex> guard(mtx_);
-      data = (*share_data_map_)[strSaveId];
-      cout << "ViaNetIO::recv data = " << data << endl;
+      memcpy(data, (*share_data_map_)[strSaveId].c_str(), length);
+      // data = (*share_data_map_)[strSaveId];
+      cout << "ViaNetIO::recv data222222 = " << data << endl;
       // 删除数据
       share_data_map_->erase(strSaveId);
       break;
@@ -81,19 +85,21 @@ ssize_t ViaNetIO::recv(const string& remote_nodeid, string& data, const string& 
 				 << cost_time << " seconds." << endl;
 			if(cost_time >= timeout)
 				break;
-      sleep(1);
+      std::this_thread::yield();
+      sleep(SLEEP_TIME);
     }
   }
   
-  return data.length();
+  return length;
 }
 
-ssize_t ViaNetIO::send(const string& remote_nodeid, const string& data, const string& id, int64_t timeout) 
+ssize_t ViaNetIO::send(const string& remote_nodeid, const char* id, const char* data, 
+      uint64_t length, int64_t timeout) 
 {
   cout << "ViaNetIO::send, remote node_id: " << remote_nodeid << ", task id: " 
        << connection_map[remote_nodeid]->task_id_ << ", id: " << id << endl;
   
   ssize_t ret = connection_map[remote_nodeid]->send(node_info_.id, remote_nodeid, 
-      connection_map[remote_nodeid]->task_id_, id, data, timeout);
+      connection_map[remote_nodeid]->task_id_, id, data, length, timeout);
   return ret;
 }

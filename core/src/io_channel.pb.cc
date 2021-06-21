@@ -77,7 +77,7 @@ static ::PROTOBUF_NAMESPACE_ID::Message const * const file_default_instances[] =
 const char descriptor_table_protodef_io_5fchannel_2eproto[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) =
   "\n\020io_channel.proto\022\nio_channel\"7\n\013SendRe"
   "quest\022\016\n\006nodeid\030\001 \001(\t\022\n\n\002id\030\002 \001(\t\022\014\n\004dat"
-  "a\030\003 \001(\t\"\027\n\007RetCode\022\014\n\004code\030\001 \001(\0052C\n\tIoCh"
+  "a\030\003 \001(\014\"\027\n\007RetCode\022\014\n\004code\030\001 \001(\0052C\n\tIoCh"
   "annel\0226\n\004Send\022\027.io_channel.SendRequest\032\023"
   ".io_channel.RetCode\"\000B\003\370\001\001b\006proto3"
   ;
@@ -197,12 +197,11 @@ const char* SendRequest::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID
           CHK_(ptr);
         } else goto handle_unusual;
         continue;
-      // string data = 3;
+      // bytes data = 3;
       case 3:
         if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 26)) {
           auto str = _internal_mutable_data();
           ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
-          CHK_(::PROTOBUF_NAMESPACE_ID::internal::VerifyUTF8(str, "io_channel.SendRequest.data"));
           CHK_(ptr);
         } else goto handle_unusual;
         continue;
@@ -254,13 +253,9 @@ failure:
         2, this->_internal_id(), target);
   }
 
-  // string data = 3;
+  // bytes data = 3;
   if (this->data().size() > 0) {
-    ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(
-      this->_internal_data().data(), static_cast<int>(this->_internal_data().length()),
-      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::SERIALIZE,
-      "io_channel.SendRequest.data");
-    target = stream->WriteStringMaybeAliased(
+    target = stream->WriteBytesMaybeAliased(
         3, this->_internal_data(), target);
   }
 
@@ -294,10 +289,10 @@ size_t SendRequest::ByteSizeLong() const {
         this->_internal_id());
   }
 
-  // string data = 3;
+  // bytes data = 3;
   if (this->data().size() > 0) {
     total_size += 1 +
-      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::BytesSize(
         this->_internal_data());
   }
 

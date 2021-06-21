@@ -233,20 +233,23 @@ GRpcChannel::~GRpcChannel() {
   delete []p_connected_nodes_;
 }
 
-ssize_t GRpcChannel::Recv(const char* node_id, const char* id, char* data, uint64_t length, int64_t timeout) {
+ssize_t GRpcChannel::Recv(const char* node_id, const char* id, char* data, uint64_t length, int64_t timeout) 
+{
   // return _net_io->recv(node_id, data, get_binary_string(id), timeout); 
   if(nullptr == _net_io){cout << "create io failed!" << endl; return 0;}
   if(nullptr == data){cout << "data is nullptr!" << endl; return 0;}
-  string strData = "";
-  uint16_t nLen =  _net_io->recv(node_id, strData, id, timeout);
-  memcpy(data, strData.c_str(), length);
+  cout << "GRpcChannel::Recv, nodeid:" << node_id << ", msg_id:"  << id << endl;
+  uint16_t nLen =  _net_io->recv(node_id, id, data, length, timeout);
   return nLen;
 }
 
-ssize_t GRpcChannel::Send(const char* node_id, const char* id, const char* data, uint64_t length, int64_t timeout) {
+ssize_t GRpcChannel::Send(const char* node_id, const char* id, const char* data, uint64_t length, 
+        int64_t timeout) 
+{
   // return _net_io->send(node_id, data, get_binary_string(id), timeout);
   if(nullptr == _net_io){cout << "create io failed!" << endl; return 0;}
-  return _net_io->send(node_id, data, id, timeout);
+  cout << "GRpcChannel::Send, nodeid:" << node_id << ", msg_id:"  << id << ", data:" << data << endl;
+  return _net_io->send(node_id, id, data, length, timeout);
 }
 
 /*

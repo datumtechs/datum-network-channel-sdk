@@ -12,8 +12,6 @@ add_definitions(-std=c++11)
 # Generate Proto file
 # get_filename_component(io_proto "./protos/io_channel.proto" ABSOLUTE)
 # get_filename_component(io_proto_path "${io_proto}" PATH)
-
-# # Generated sources
 # file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/protos)  
 # set(out_proto_dirs "${CMAKE_CURRENT_BINARY_DIR}/protos")
 # set(io_proto_srcs "${out_proto_dirs}/io_channel.pb.cc")

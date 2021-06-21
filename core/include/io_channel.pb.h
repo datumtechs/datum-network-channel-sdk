@@ -219,13 +219,13 @@ class SendRequest PROTOBUF_FINAL :
   std::string* _internal_mutable_id();
   public:
 
-  // string data = 3;
+  // bytes data = 3;
   void clear_data();
   const std::string& data() const;
   void set_data(const std::string& value);
   void set_data(std::string&& value);
   void set_data(const char* value);
-  void set_data(const char* value, size_t size);
+  void set_data(const void* value, size_t size);
   std::string* mutable_data();
   std::string* release_data();
   void set_allocated_data(std::string* data);
@@ -518,7 +518,7 @@ inline void SendRequest::set_allocated_id(std::string* id) {
   // @@protoc_insertion_point(field_set_allocated:io_channel.SendRequest.id)
 }
 
-// string data = 3;
+// bytes data = 3;
 inline void SendRequest::clear_data() {
   data_.ClearToEmpty();
 }
@@ -553,7 +553,7 @@ inline void SendRequest::set_data(const char* value) {
   data_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, ::std::string(value), GetArena());
   // @@protoc_insertion_point(field_set_char:io_channel.SendRequest.data)
 }
-inline void SendRequest::set_data(const char* value,
+inline void SendRequest::set_data(const void* value,
     size_t size) {
   
   data_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, ::std::string(

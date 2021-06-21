@@ -13,16 +13,16 @@ ClientConnection::ClientConnection(const string& server_addr, const string& task
 
 // stream
 ssize_t ClientConnection::send(const string& self_nodeid, const string& remote_nodeid, 
-	const string& task_id, const string& msg_id, const string& data, int64_t timeout)
+	const string& task_id, const string& msg_id, const char* data, const size_t nLen, int64_t timeout)
 {
-	// cout << "ClientConnection::send" << endl;
+	cout << "ClientConnection::send, remote_nodeid:" << remote_nodeid << endl;
 	
 	SendRequest req_info;
 	// 发送客户端的nodeid到服务器
 	req_info.set_nodeid(self_nodeid);
 	req_info.set_id(msg_id);
+	// req_info.set_data(data, nLen);
 	req_info.set_data(data);
-
 	RetCode ret_code;
 
 	auto start_time = system_clock::now();
@@ -35,13 +35,17 @@ ssize_t ClientConnection::send(const string& self_nodeid, const string& remote_n
 		context.AddMetadata("task_id", task_id);
 		context.AddMetadata("party_id", remote_nodeid);
 
+		cout << "ClientConnection stub_->Send1111, remote_nodeid:" << remote_nodeid << endl;
 		Status status = stub_->Send(&context, req_info, &ret_code);
+		cout << "ClientConnection stub_->Send2222, remote_nodeid:" << remote_nodeid << endl;
 		if (status.ok()) 
 		{
+			cout << "send data to " << remote_nodeid << " succeed=====" << endl;
 			break;
 		} 
 		else 
 		{
+			cout << "ClientConnection stub_->Send failed==========" << endl;
 			end_time = system_clock::now();
 			auto duration = duration_cast<microseconds>(end_time - start_time);
 			auto cost_time = double(duration.count()) * 
@@ -51,12 +55,13 @@ ssize_t ClientConnection::send(const string& self_nodeid, const string& remote_n
 				 << cost_time << " seconds." << endl;
 			if(cost_time >= timeout)
 				break;
-			sleep(1);
+			std::this_thread::yield();
+			sleep(SLEEP_TIME);
 		}
 	}
 	
-	cout << "Send message() - ret code: " << ret_code.code() << endl;
-	
-	return data.length();
+	// cout << "Send message() - ret code: " << ret_code.code() << endl;
+	cout << "send succeed========" << endl;
+	return nLen;
 }
 

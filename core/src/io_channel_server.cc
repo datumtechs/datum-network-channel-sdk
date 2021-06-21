@@ -39,6 +39,7 @@ IoChannelServer::IoChannelServer(const string& server_addr)
 grpc::Status IoChannelServer::Send(grpc::ServerContext* context, const SendRequest* request, 
     RetCode* response)
 {
+    cout << "IoChannelServer::Send===================" << endl;
     std::lock_guard<std::mutex> guard(mtx_);
     cout << "send request nodeid:" << request->nodeid() << ", id:" << request->id() 
             << ", data length:" << request->data().length() << endl;
@@ -49,7 +50,7 @@ grpc::Status IoChannelServer::Send(grpc::ServerContext* context, const SendReque
     // 保存数据
     save_data_map_.insert(std::pair<string, string>(strSaveId, request->data()));
     response->set_code(0);
-    // cout << "save_data_map_.size == " << save_data_map_.size() << endl;
+    cout << "save_data_map_.size == " << save_data_map_.size() << endl;
 
     return Status::OK;
 }

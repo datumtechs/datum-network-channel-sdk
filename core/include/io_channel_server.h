@@ -26,6 +26,8 @@ using grpc::ServerReaderWriter;
 using grpc::ServerWriter;
 using grpc::Status;
 
+#define SLEEP_TIME 1
+
 // 服务器
 class IoChannelServer: public IoChannel::Service
 {
