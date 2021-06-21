@@ -1,4 +1,4 @@
-#include "include/config.h"
+#include "config.h"
 
 #include <rapidjson/document.h>
 #include <rapidjson/prettywriter.h>

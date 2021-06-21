@@ -1,7 +1,7 @@
 #pragma once
 #include "IChannel.h"
-#include "src/io_channel_server.cc"
-// #include "src/io_channel_async_server.cc"
+#include "config.h"
+#include "io_channel_server.h"
 #include "net_io.h"
 #include <atomic>
 #include <condition_variable>
@@ -22,39 +22,52 @@ public:
   bool CloseServer() { if(server_) server_->close(); return true;}
 
   bool StartServer(const string& server_addr);
-  shared_ptr<IChannel> CreateChannel(const string& node_id, const string &config_str, 
+
+  
+  shared_ptr<IChannel> CreateIoChannel(const string& node_id, const string &config_str, 
       const bool& is_start_server=false, error_callback error_cb=nullptr);
 
   // 等待服务器结束
   void WaitServer(){if(server_) server_->wait();}
 private:
-  shared_ptr<BasicIO> CreateViaChannel(const NodeInfo& node_idInfo, 
+
+  shared_ptr<IChannel> CreateViaChannel(const NodeInfo& node_idInfo, shared_ptr<ChannelConfig> config,
       const vector<ViaInfo>& serverInfos, map<string, string>* share_data_map_=nullptr, 
       error_callback error_callback=nullptr);
+    
 
 private:
   shared_ptr<IoChannelServer> server_ = nullptr;
-  // shared_ptr<IoChannelAsyncServer> server_ = nullptr;
 };
 
 
 class GRpcChannel : public IChannel {
 public:
-    GRpcChannel(shared_ptr<BasicIO> net_io) {_net_io = net_io;}
-    ~GRpcChannel(){}
+    GRpcChannel(){}
+    GRpcChannel(shared_ptr<BasicIO> net_io, shared_ptr<ChannelConfig> config, const NodeInfo& node_info):
+      _net_io(net_io), channel_config_(config), self_node_info_(node_info) {}
+    ~GRpcChannel();
     virtual void SetErrorCallback(error_callback error_cb) {}
     virtual int64_t Recv(const char* node_id, const char* id, char* data, uint64_t length, int64_t timeout=-1);
     virtual int64_t Send(const char* node_id, const char* id, const char* data, uint64_t length, int64_t timeout=-1);
 
-    string GetCurrentVia();
-    string GetCurrentAddress();
-    string GetTaskId();
-
-    virtual vector<string> GetDataNodeIDs();
-    virtual map<string, int> GetComputationNodeIDs();
-    virtual vector<string> GetResultNodeIDs();
-    virtual string GetCurrentNodeID();
-    virtual vector<string> GetConnectedNodeIDs();
+    // virtual const char* GetCurrentVia();
+    // virtual const char* GetCurrentAddress();
+    // virtual const char* GetTaskId();
+    
+    virtual const char* GetDataNodeIDs();
+    virtual const char* GetComputationNodeIDs();
+    virtual const char* GetResultNodeIDs();
+    virtual const char* GetCurrentNodeID();
+    virtual const char* GetConnectedNodeIDs();
 private:
     shared_ptr<BasicIO> _net_io = nullptr;
+    shared_ptr<ChannelConfig> channel_config_ = nullptr;
+    NodeInfo self_node_info_;
+
+    const char* p_node_id_ = nullptr;
+    const char* p_data_nodes_ = nullptr;
+    const char* p_computation_nodes_ = nullptr;
+    const char* p_result_nodes_ = nullptr;
+    const char* p_connected_nodes_ = nullptr;
 };

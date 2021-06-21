@@ -42,7 +42,7 @@ class BasicIO {
   /**
    * Initialize the client connection.
    */
-  virtual bool init() = 0;
+  virtual bool init(const string& taskid) = 0;
   virtual ssize_t recv(const string& remote_nodeid, string& data, const string& id, int64_t timeout) = 0;
   virtual ssize_t send(const string& remote_nodeid, const string& data, const string& id, int64_t timeout) = 0;
 
@@ -52,28 +52,9 @@ class BasicIO {
    * close the connections(reserved interface).
    */
   void close();
-  
-  void set_channel_config(const shared_ptr<ChannelConfig> channel_config){
-    channel_config_ = channel_config;
-  }
 
-  shared_ptr<ChannelConfig> get_channel_config(){
-    return channel_config_;
-  }
-
-  const string get_current_nodeid() {
-    return node_info_.id;
-  }
-
-  const string get_current_via() {
-    return node_info_.via_address;
-  }
-
-  const string get_current_address() {
-    return node_info_.address;
-  }
-
-  const vector<string> get_connected_nodeids() {
+  const vector<string> get_connected_nodeids() 
+  {
     vector<string> vec_conn_nid(via_server_infos_.size());
     for(int i = 0; i < via_server_infos_.size(); i++) 
     {
@@ -85,7 +66,6 @@ class BasicIO {
  protected:
   NodeInfo node_info_;
   vector<ViaInfo> via_server_infos_;
-  shared_ptr<ChannelConfig> channel_config_ = nullptr;
   map<string, shared_ptr<ClientConnection>> connection_map;
   map<string, string>* share_data_map_ = nullptr;
   error_callback handler;
@@ -100,7 +80,7 @@ class ViaNetIO : public BasicIO {
   using BasicIO::BasicIO;
   virtual ~ViaNetIO() = default;
 
-  bool init();
+  bool init(const string& taskid);
   ssize_t recv(const string& remote_nodeid, string& data, const string& id, int64_t timeout);
   ssize_t send(const string& remote_nodeid, const string& data, const string& id, int64_t timeout);
 };

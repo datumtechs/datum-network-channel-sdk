@@ -1,5 +1,5 @@
 #pragma once
-
+#include <memory>
 #include <string>
 #include <vector>
 #include <map>
@@ -8,14 +8,19 @@
 using namespace std;
 
 typedef std::function<void(const char*, const char*, int, const char*, void*)> error_callback;
-
+const char* encode_string(const string& str);
+string decode_string(const char* str);
+const char* encode_vector(const vector<string>& vec);
+vector<string> decode_vector(const char* str);
+const char* encode_map(const map<string, int>& m);
+map<string, int> decode_map(const char* str);
 
 /// Channel interface definition
 /// the functionality is sending a message to peer and 
 /// receiving a message from peer
 class IChannel {
 public:
-  virtual ~IChannel()=default;
+  virtual ~IChannel() {};
 
    /**
    * @brief Set error callback for error handle.
@@ -56,7 +61,7 @@ public:
    * @return
    * return node id of all the data nodes
   */
-  virtual vector<string> GetDataNodeIDs() = 0;
+  virtual const char* GetDataNodeIDs() = 0;
 
   /**
    * @brief get node id and party id of all the computation nodes
@@ -64,25 +69,32 @@ public:
    * return node id and party id of all the computation nodes
    * string  indicates node id and int indicates party id
   */
-  virtual map<string, int> GetComputationNodeIDs() = 0;
+  virtual const char* GetComputationNodeIDs() = 0;
 
   /**
    * @brief get node id of all the result nodes
    * @return
    * return node id of all the result nodes
   */
-  virtual vector<string> GetResultNodeIDs() = 0;
+  virtual const char* GetResultNodeIDs() = 0;
   /**
    * @brief get node id of the current node
    * @return
    * return node id of the current node
   */
-  virtual string GetCurrentNodeID() = 0;
+  virtual const char* GetCurrentNodeID() = 0;
 
   /**
    * @brief get node id of all the nodes establishing connection with the current node
    * @return
    * return node id of all the nodes establishing connection with the current node
   */
-  virtual vector<string> GetConnectedNodeIDs() = 0;
+  virtual const char* GetConnectedNodeIDs() = 0;
+
+  // virtual const char* GetCurrentVia() = 0;
+  // virtual const char* GetCurrentAddress() = 0;
+  // virtual const char* GetTaskId() = 0;
 };// IChannel
+
+shared_ptr<IChannel> CreateChannel(const string& node_id, const string &config_str, 
+      const bool& is_start_server, error_callback error_cb);

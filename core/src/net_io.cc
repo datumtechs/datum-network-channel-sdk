@@ -1,5 +1,6 @@
-#include "include/net_io.h"
-#include "include/IChannel.h"
+#include "net_io.h"
+#include "IChannel.h"
+#include <unistd.h>
 #include <set>
 #include <chrono>   
 using namespace chrono;
@@ -13,28 +14,22 @@ BasicIO::BasicIO(const NodeInfo &node_info, const vector<ViaInfo>& server_infos,
   : node_info_(node_info), via_server_infos_(server_infos), 
     share_data_map_(share_data_map), handler(error_callback) {}
 
-bool ViaNetIO::init() 
+bool ViaNetIO::init(const string& taskid) 
 {
   // 创建多线程
   vector<thread> client_threads(via_server_infos_.size());
   vector<shared_ptr<ClientConnection>> clients(via_server_infos_.size());
   
   auto conn_f = [&](const ViaInfo &info, int i) -> bool {
-    // // 创建io通道
+    // 创建io通道
     cout << "create io channel, sids:" << info.id << endl;
-    clients[i] = make_shared<ClientConnection>(info.address);
+    clients[i] = make_shared<ClientConnection>(info.address, taskid);
     return true;
   };
 
   for (int i = 0; i < via_server_infos_.size(); i++) {
     
     client_threads[i] = thread(conn_f, via_server_infos_[i], i);
-
-    /*
-    clients[i] = make_shared<ClientConnection>(via_server_infos_[i].address);
-
-    client_threads[i] = thread(&ClientConnection::AsyncCompleteRpc, clients[i]);
-    */
   }
 
   for (int i = 0; i < via_server_infos_.size(); i++) {
@@ -96,9 +91,9 @@ ssize_t ViaNetIO::recv(const string& remote_nodeid, string& data, const string& 
 ssize_t ViaNetIO::send(const string& remote_nodeid, const string& data, const string& id, int64_t timeout) 
 {
   cout << "ViaNetIO::send, remote node_id: " << remote_nodeid << ", task id: " 
-       << channel_config_->task_id_ << ", id: " << id << endl;
+       << connection_map[remote_nodeid]->task_id_ << ", id: " << id << endl;
   
   ssize_t ret = connection_map[remote_nodeid]->send(node_info_.id, remote_nodeid, 
-      channel_config_->task_id_, id, data, timeout);
+      connection_map[remote_nodeid]->task_id_, id, data, timeout);
   return ret;
 }
