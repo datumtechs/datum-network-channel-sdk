@@ -85,23 +85,28 @@ map<string, int> decode_map(const char* str) {
 
 static shared_ptr<IoChannelImpl> gs_impl = make_shared<IoChannelImpl>();
 
+shared_ptr<IChannel> CreateChannel(const string& node_id, const string &config_str, 
+      const bool& is_start_server, error_callback error_cb) 
+{
+  return gs_impl->CreateIoChannel(node_id, config_str, is_start_server, error_cb);
+}
+
 bool IoChannelImpl::StartServer(const string& server_addr)
 {
-  auto start_server_f = [&](const string& _addr) -> bool {
-    // // 创建io通道
-    server_ = make_shared<IoChannelServer>(_addr);
-    return true;
-  };
-  
-  thread server_thread = thread(start_server_f, server_addr);
-  server_thread.join();
+  server_ = make_shared<IoChannelServer>(server_addr);
+  // server_ = make_shared<IoChannelAsyncServer>(server_addr);
   return true;
 }
 
 shared_ptr<IChannel> IoChannelImpl::CreateViaChannel(const NodeInfo& node_info, 
       shared_ptr<ChannelConfig> config, const vector<ViaInfo>& serverInfos, 
-      map<string, string>* share_data_map_, error_callback error_callback) 
-{      
+      error_callback error_callback) 
+{
+  map<string, shared_ptr<queue<string>>>* share_data_map_ = nullptr;
+  if(server_)
+  {
+    share_data_map_ = &(server_->get_data_map());
+  }
   shared_ptr<BasicIO> net_io =  nullptr;
   net_io = make_shared<ViaNetIO>(node_info, serverInfos, share_data_map_, error_callback);
   if (net_io->init(config->task_id_)) 
@@ -112,12 +117,6 @@ shared_ptr<IChannel> IoChannelImpl::CreateViaChannel(const NodeInfo& node_info,
  
   error_callback(node_info.id.c_str(), "", -1, "init io failed!", (void*)"user_data");
   return nullptr;
-}
-
-shared_ptr<IChannel> CreateChannel(const string& node_id, const string &config_str, 
-      const bool& is_start_server, error_callback error_cb) 
-{
-  return gs_impl->CreateIoChannel(node_id, config_str, is_start_server, error_cb);
 }
 
 shared_ptr<IChannel> IoChannelImpl::CreateIoChannel(const string& node_id, const string &config_str, 
@@ -165,7 +164,7 @@ shared_ptr<IChannel> IoChannelImpl::CreateIoChannel(const string& node_id, const
         viaTmp.id = nid;
         viaTmp.via = via;
         viaTmp.address = config->via_to_address_[via];
-        cout << "id: " << nid << ", via: " << viaTmp.via << ", address: " << viaTmp.address << endl;
+        // cout << "id: " << nid << ", via: " << viaTmp.via << ", address: " << viaTmp.address << endl;
         serverInfos.push_back(viaTmp);
         // 保存除自身外的计算节点
         nodeid_set.insert(nid);
@@ -175,11 +174,11 @@ shared_ptr<IChannel> IoChannelImpl::CreateIoChannel(const string& node_id, const
   
   if(isNodeType(node_types, NODE_TYPE_COMPUTE))
   {
-    cout << "is compute node!" << endl;
+    // cout << "is compute node!" << endl;
     // 遍历结果接收节点
     for (int i = 0; i < config->result_config_.P.size(); i++) 
     {
-      cout << "handle compute node" << endl;
+      // cout << "handle compute node" << endl;
       string nid = config->result_config_.P[i].NODE_ID;
       string via = config->nodeid_to_via_[nid];
       if (node_id != nid && nodeid_set.find(nid) == nodeid_set.end()) 
@@ -190,16 +189,16 @@ shared_ptr<IChannel> IoChannelImpl::CreateIoChannel(const string& node_id, const
         viaTmp.via = via;
         // via信息
         viaTmp.address = config->via_to_address_[viaTmp.via];
-        cout << "id: " << nid << ", via: " << viaTmp.via << ", address: " << viaTmp.address << endl;
+        // cout << "id: " << nid << ", via: " << viaTmp.via << ", address: " << viaTmp.address << endl;
         serverInfos.push_back(viaTmp);
         nodeid_set.insert(nid);
       }
     }  
   }
 
+  /*
   string strNodeInfo = "address: " + node_info.address + ", id:" + node_info.id;
   cout << "node_info=========:" << strNodeInfo << endl;
-
   string strServerInfo = "";
   string nodeid = "nodeid: ";
   string via = "via: ";
@@ -213,15 +212,12 @@ shared_ptr<IChannel> IoChannelImpl::CreateIoChannel(const string& node_id, const
   }
   strServerInfo = nodeid + ", " + via + ", " + address;
   cout << "server info=========:" << strServerInfo << endl;
+  */
+
   // 服务器模型, 设置共享内存
-  map<string, string>* share_data_map_ = nullptr;
+
   
-  if(server_)
-  {
-    share_data_map_ = &(server_->get_data_map());
-  }
-  
-  return CreateViaChannel(node_info, config, serverInfos, share_data_map_, error_cb);
+  return CreateViaChannel(node_info, config, serverInfos, error_cb);
 }
 
 // GRpcChannel
@@ -238,9 +234,9 @@ ssize_t GRpcChannel::Recv(const char* node_id, const char* id, char* data, uint6
   // return _net_io->recv(node_id, data, get_binary_string(id), timeout); 
   if(nullptr == _net_io){cout << "create io failed!" << endl; return 0;}
   if(nullptr == data){cout << "data is nullptr!" << endl; return 0;}
-  cout << "GRpcChannel::Recv, nodeid:" << node_id << ", msg_id:"  << id << endl;
-  uint16_t nLen =  _net_io->recv(node_id, id, data, length, timeout);
-  return nLen;
+  // cout << "GRpcChannel::Recv, nodeid:" << node_id << ", msg_id:"  << id 
+  //   << ", length:" << length << endl;
+  return _net_io->recv(node_id, id, data, length, timeout);
 }
 
 ssize_t GRpcChannel::Send(const char* node_id, const char* id, const char* data, uint64_t length, 
@@ -248,7 +244,8 @@ ssize_t GRpcChannel::Send(const char* node_id, const char* id, const char* data,
 {
   // return _net_io->send(node_id, data, get_binary_string(id), timeout);
   if(nullptr == _net_io){cout << "create io failed!" << endl; return 0;}
-  cout << "GRpcChannel::Send, nodeid:" << node_id << ", msg_id:"  << id << ", data:" << data << endl;
+  // cout << "GRpcChannel::Send, nodeid:" << node_id << ", msg_id:"  << id  
+  //   << ", length:" << length << endl;
   return _net_io->send(node_id, id, data, length, timeout);
 }
 

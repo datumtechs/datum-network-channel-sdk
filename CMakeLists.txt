@@ -65,5 +65,5 @@ target_link_libraries(${LIBNAME} PUBLIC pthread ${_REFLECTION} ${_GRPC_GRPCPP} $
 
 # targets pybind11
 add_subdirectory("./third_party/pybind11/" pybind11)
-pybind11_add_module(io_channel core/py/io_channel.cc)
+pybind11_add_module(io_channel core/pybind11/io_channel.cc)
 target_link_libraries(io_channel PRIVATE ${LIBNAME})

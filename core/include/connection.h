@@ -17,6 +17,9 @@ using grpc::ClientContext;
 using grpc::ClientReader;
 using grpc::ClientReaderWriter;
 using grpc::ClientWriter;
+using grpc::ClientAsyncResponseReader;
+using grpc::CompletionQueue;
+
 using io_channel::IoChannel;
 using io_channel::SendRequest;
 using io_channel::RetCode;
@@ -25,7 +28,7 @@ class ClientConnection
 {
 public:
 	ClientConnection(const string& server_addr, const string& taskid);
-	virtual ~ClientConnection(){}
+	~ClientConnection(){}
 
   	ssize_t send(const string& self_nodeid, const string& remote_nodeid, 
 	  	const string& task_id, const string& id, const char* data, const size_t nLen, int64_t timeout = -1L);

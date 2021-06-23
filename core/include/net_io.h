@@ -35,7 +35,7 @@ class BasicIO {
   virtual ~BasicIO();
 
   BasicIO(const NodeInfo &node_info, const vector<ViaInfo>& server_infos, 
-    map<string, string>* share_data_map_=nullptr,
+    map<string, shared_ptr<queue<string>>>* share_data_map_=nullptr,
     error_callback error_callback=nullptr);
 
  public:
@@ -69,7 +69,7 @@ class BasicIO {
   NodeInfo node_info_;
   vector<ViaInfo> via_server_infos_;
   map<string, shared_ptr<ClientConnection>> connection_map;
-  map<string, string>* share_data_map_ = nullptr;
+  map<string, shared_ptr<queue<string>>>* share_data_map_ = nullptr;
   error_callback handler;
 };
 

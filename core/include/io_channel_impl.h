@@ -17,7 +17,7 @@ using namespace std;
 class IoChannelImpl {
 public:
   IoChannelImpl(){}
-  ~IoChannelImpl(){CloseServer();}
+  ~IoChannelImpl(){cout << "start to close server==========" << endl; CloseServer();}
 
   bool CloseServer() { if(server_) server_->close(); return true;}
 
@@ -32,10 +32,8 @@ public:
 private:
 
   shared_ptr<IChannel> CreateViaChannel(const NodeInfo& node_idInfo, shared_ptr<ChannelConfig> config,
-      const vector<ViaInfo>& serverInfos, map<string, string>* share_data_map_=nullptr, 
-      error_callback error_callback=nullptr);
+      const vector<ViaInfo>& serverInfos, error_callback error_callback=nullptr);
     
-
 private:
   shared_ptr<IoChannelServer> server_ = nullptr;
 };

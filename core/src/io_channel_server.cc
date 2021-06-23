@@ -7,8 +7,8 @@ bool IoChannelServer::close()
     // 关闭服务
     if(server_)
         server_->Shutdown();
-        
-    cout << "IoChannelServer::close()" << endl;
+
+    save_data_map_.clear();
 }
 
 bool IoChannelServer::wait()
@@ -18,7 +18,7 @@ bool IoChannelServer::wait()
     cout << "IoChannelServer::wait()" << endl;
 }
 
-std::map<string, string>& IoChannelServer::get_data_map()
+std::map<string, shared_ptr<queue<string>>>& IoChannelServer::get_data_map()
 {
     return save_data_map_;
 }
@@ -35,22 +35,33 @@ IoChannelServer::IoChannelServer(const string& server_addr)
     // server_->Wait();
 }
 
-// 同步方式
 grpc::Status IoChannelServer::Send(grpc::ServerContext* context, const SendRequest* request, 
     RetCode* response)
 {
-    cout << "IoChannelServer::Send===================" << endl;
-    std::lock_guard<std::mutex> guard(mtx_);
-    cout << "send request nodeid:" << request->nodeid() << ", id:" << request->id() 
-            << ", data length:" << request->data().length() << endl;
+    // cout << "IoChannelServer::Send===================" << endl;
+    std::unique_lock<mutex> guard(mtx_);
+    // cout << "send request nodeid:" << request->nodeid() << ", id:" << request->id()
+    //      << ", data.size:" <<  request->data().size() << endl;
 
     // key = nodeid:msg_id
+    // string strSaveId = request->nodeid() + ":" + request->id();
     string strSaveId = request->nodeid() + ":" + request->id();
-    cout << "send strSaveId:" << strSaveId << endl;
+    // cout << "send strSaveId:" << strSaveId << endl;
     // 保存数据
-    save_data_map_.insert(std::pair<string, string>(strSaveId, request->data()));
-    response->set_code(0);
-    cout << "save_data_map_.size == " << save_data_map_.size() << endl;
+    auto iter = save_data_map_.find(strSaveId);
+    if(iter == save_data_map_.end())
+    {
+        shared_ptr<queue<string>> ptr_data_queue_ = make_shared<queue<string>>();
+        ptr_data_queue_->push(request->data());
+        save_data_map_.insert(std::pair<string,  shared_ptr<queue<string>>>(strSaveId, ptr_data_queue_));
+    }
+    else
+    {
+        iter->second->push(request->data());
+    }
+
+    response->set_code(RET_SUCCEED_CODE);
+    // cout << "save_data_map_.size == " << save_data_map_.size() << endl;
 
     return Status::OK;
 }
@@ -74,15 +85,3 @@ grpc::Status Send(grpc::ServerContext* context, ServerReader<SendRequest>* reque
     return grpc::Status::OK;
 }
 */
-
-/*
-grpc::Status Recv(grpc::ServerContext* context, const RecvRequest* request, RetData* respond)
-{
-    std::lock_guard<std::mutex> guard(mtx_);
-    cout << "recv request nodeid:" << request->nodeid()  << ", id:" << request->id() << endl;
-    string req_id = request->id() + request->nodeid();
-    SendRequest send_req = __requests[req_id];
-    respond->set_data(send_req.data());
-
-    return grpc::Status::OK;
-}*/
