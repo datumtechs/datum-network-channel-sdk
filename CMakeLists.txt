@@ -7,7 +7,7 @@ include(./cmake/common.cmake)
 add_definitions(-std=c++11)
 
 #file(MAKE_DIRECTORY ${lib_path})
-#set(LIBRARY_OUTPUT_PATH ${CMAKE_CURRENT_SOURCE_DIR}/lib)
+# set(LIBRARY_OUTPUT_PATH ${CMAKE_CURRENT_SOURCE_DIR}/lib)
 
 # Generate Proto file
 # get_filename_component(io_proto "./protos/io_channel.proto" ABSOLUTE)

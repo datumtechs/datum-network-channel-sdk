@@ -12,6 +12,7 @@ using namespace rapidjson;
 #include <sstream>
 #include <string>
 #include <vector>
+#include <set>
 using namespace std;
 
 #include <unistd.h>
@@ -226,6 +227,7 @@ bool ChannelConfig::parse_node_info(Document& doc, bool pass_via)
       cfg.node_.ADDRESS = GetString(Node, "ADDRESS", "", false);
       cfg.node_.VIA = GetString(Node, "VIA", "", false);
       node_info_config_.insert(std::pair<string, NodeInfoConfig>(cfg.node_.NODE_ID, cfg));
+      
       if(pass_via_) 
       {
         nodeid_to_via_.insert(std::pair<string, string>(cfg.node_.NODE_ID, cfg.node_.VIA));
@@ -328,10 +330,9 @@ bool ChannelConfig::parse_result(Document& doc) {
 
 bool ChannelConfig::parse(Document& doc) {
   //! @todo the node_id__ID field in CONFIG.json have not yet used
-  // node_id_ = GetString(doc, "NODE_ID", "", false);
-  pass_via_ = GetBool(doc, "PASS_VIA", true, false);
+  // pass_via_ = GetBool(doc, "PASS_VIA", true, false);
   task_id_ = GetString(doc, "TASK_ID", "", false);
-  if (!parse_node_info(doc, pass_via_)) {
+  if (!parse_node_info(doc)) {
     cout << "parse node info error" << endl;
   }
 
@@ -361,4 +362,121 @@ void ChannelConfig::fmt_print() {
   cout << compute_config_.to_string();
   cout << result_config_.to_string();
   cout << "=======================================" << endl;
+}
+
+void ChannelConfig::CopyNodeInfo(NodeInfo& node_info, const Node& nodeInfo) 
+{
+  node_info.id = nodeInfo.NODE_ID;
+  node_info.address = nodeInfo.ADDRESS;
+}
+
+bool ChannelConfig::isNodeType(const vector<NODE_TYPE>& vec_node_types, const NODE_TYPE nodeType)
+{
+  for(int i=0; i < vec_node_types.size(); ++i)
+  {
+    if(vec_node_types[i] == nodeType)
+    {
+      return true;
+    }
+  }
+  return false;
+}
+
+bool ChannelConfig::isServer(const string& node_id, const vector<NODE_TYPE>& node_types)
+{
+  if(isNodeType(node_types, NODE_TYPE_COMPUTE) || isNodeType(node_types, NODE_TYPE_RESULT))
+  {
+    return true;
+  }
+  return false;
+}
+
+bool ChannelConfig::GetServerInfos(vector<ViaInfo>& serverInfos, const string& node_id, 
+      const vector<NODE_TYPE>& node_types)
+{
+  set<string> nodeid_set;
+  if(isNodeType(node_types, NODE_TYPE_DATA) || isNodeType(node_types, NODE_TYPE_COMPUTE))
+  {
+    // 遍历计算节点
+    for (int i = 0; i < compute_config_.P.size(); i++) 
+    {
+      // 获取计算节点的nodeid
+      string nid = compute_config_.P[i].NODE_ID;
+      string via = nodeid_to_via_[nid];
+      if (node_id != nid && nodeid_set.find(nid) == nodeid_set.end()) 
+      {
+        ViaInfo viaTmp;
+        viaTmp.id = nid;
+        viaTmp.via = via;
+        viaTmp.address = via_to_address_[via];
+        // cout << "id: " << nid << ", via: " << viaTmp.via << ", address: " << viaTmp.address << endl;
+        serverInfos.push_back(viaTmp);
+        // 保存除自身外的计算节点
+        nodeid_set.insert(nid);
+      }
+    }
+  }
+  
+  if(isNodeType(node_types, NODE_TYPE_COMPUTE))
+  {
+    // cout << "is compute node!" << endl;
+    // 遍历结果接收节点
+    for (int i = 0; i < result_config_.P.size(); i++) 
+    {
+      // cout << "handle compute node" << endl;
+      string nid = result_config_.P[i].NODE_ID;
+      string via = nodeid_to_via_[nid];
+      if (node_id != nid && nodeid_set.find(nid) == nodeid_set.end()) 
+      {
+        ViaInfo viaTmp;
+        viaTmp.id = nid;
+        // 节点所在via
+        viaTmp.via = via;
+        // via信息
+        viaTmp.address = via_to_address_[viaTmp.via];
+        // cout << "id: " << nid << ", via: " << viaTmp.via << ", address: " << viaTmp.address << endl;
+        serverInfos.push_back(viaTmp);
+        nodeid_set.insert(nid);
+      }
+    }  
+  }
+  return true;
+}
+
+bool ChannelConfig::GetClientNodeIds(vector<string>& clientNodeIds, const string& node_id, 
+    const vector<NODE_TYPE>& node_types)
+{
+  set<string> nodeid_set;
+  if(isNodeType(node_types, NODE_TYPE_COMPUTE))
+  {
+    // 遍历计算节点
+    for (int i = 0; i < data_config_.P.size(); i++) 
+    {
+      // 获取计算节点的nodeid
+      string nid = data_config_.P[i].NODE_ID;
+      if (node_id != nid && nodeid_set.find(nid) == nodeid_set.end()) 
+      {
+        clientNodeIds.push_back(nid);
+        // 保存除自身外的计算节点
+        nodeid_set.insert(nid);
+      }
+    }
+  }
+  
+  if(isNodeType(node_types, NODE_TYPE_RESULT))
+  {
+    // cout << "is compute node!" << endl;
+    // 遍历结果接收节点
+    for (int i = 0; i < compute_config_.P.size(); i++) 
+    {
+      // cout << "handle compute node" << endl;
+      string nid = compute_config_.P[i].NODE_ID;
+      if (node_id != nid && nodeid_set.find(nid) == nodeid_set.end()) 
+      {
+        clientNodeIds.push_back(nid);
+        nodeid_set.insert(nid);
+      }
+    }  
+  }
+  return true;
 }

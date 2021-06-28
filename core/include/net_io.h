@@ -1,6 +1,7 @@
 #pragma once
 
-#include "connection.h"
+#include "server_connection.h"
+#include "io_channel_server.h"
 #include "config.h"
 #include "IChannel.h"
 #include <atomic>
@@ -35,7 +36,7 @@ class BasicIO {
   virtual ~BasicIO();
 
   BasicIO(const NodeInfo &node_info, const vector<ViaInfo>& server_infos, 
-    map<string, shared_ptr<queue<string>>>* share_data_map_=nullptr,
+    const vector<string>& client_nodeids,
     error_callback error_callback=nullptr);
 
  public:
@@ -68,9 +69,11 @@ class BasicIO {
  protected:
   NodeInfo node_info_;
   vector<ViaInfo> via_server_infos_;
-  map<string, shared_ptr<ClientConnection>> connection_map;
-  map<string, shared_ptr<queue<string>>>* share_data_map_ = nullptr;
+  vector<string> client_nodeids_;
+  map<string, shared_ptr<ServerConnection>> conn_server_map;
+  map<string, shared_ptr<ClientConnection>> client_conn_map;
   error_callback handler;
+  shared_ptr<IoChannelServer> server_ = nullptr;
 };
 
 
@@ -80,7 +83,12 @@ class BasicIO {
 class ViaNetIO : public BasicIO {
  public:
   using BasicIO::BasicIO;
-  virtual ~ViaNetIO() = default;
+  virtual ~ViaNetIO(){cout << "start to close server==========" << endl; CloseServer();}
+
+  bool CloseServer() { if(server_) server_->close(); return true;}
+
+  bool StartServer(const string& server_addr, 
+       map<string, shared_ptr<ClientConnection>>* ptr_client_conn_map);
 
   bool init(const string& taskid);
   ssize_t recv(const string& remote_nodeid, const char* id, char* data, uint64_t length, 

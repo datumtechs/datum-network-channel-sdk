@@ -87,6 +87,16 @@ class ChannelConfig {
   vector<NODE_TYPE> GetNodeType(const string& node_id);
   const Node& GetNode(const string& node_id);
 
+  void CopyNodeInfo(NodeInfo& node_info, const Node& nodeInfo);
+  bool isNodeType(const vector<NODE_TYPE>& vec_node_types, const NODE_TYPE nodeType);
+  bool isServer(const string& node_id, const vector<NODE_TYPE>& node_types);
+  bool GetServerInfos(vector<ViaInfo>& serverInfos, 
+    const string& node_id, const vector<NODE_TYPE>& node_types);
+
+  bool GetClientNodeIds(vector<string>& clientNodeIds, 
+    const string& node_id, const vector<NODE_TYPE>& node_types);
+  
+
  private:
   bool load(const string& node_id, const string& config_file);
   bool parse(Document& doc);

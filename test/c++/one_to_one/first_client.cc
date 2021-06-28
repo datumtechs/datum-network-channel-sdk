@@ -1,4 +1,4 @@
-#include "connection.h"
+#include "server_connection.h"
 #include <string>
 #include <fstream>
 #include <sstream>

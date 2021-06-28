@@ -1,6 +1,5 @@
 #include "io_channel_impl.h"
 #include "net_io.h"
-#include "common.h"
 #include <set>
 
 const char* encode_string(const string& str) {
@@ -86,29 +85,17 @@ map<string, int> decode_map(const char* str) {
 static shared_ptr<IoChannelImpl> gs_impl = make_shared<IoChannelImpl>();
 
 shared_ptr<IChannel> CreateChannel(const string& node_id, const string &config_str, 
-      const bool& is_start_server, error_callback error_cb) 
+        error_callback error_cb) 
 {
-  return gs_impl->CreateIoChannel(node_id, config_str, is_start_server, error_cb);
-}
-
-bool IoChannelImpl::StartServer(const string& server_addr)
-{
-  server_ = make_shared<IoChannelServer>(server_addr);
-  // server_ = make_shared<IoChannelAsyncServer>(server_addr);
-  return true;
+  return gs_impl->CreateIoChannel(node_id, config_str, error_cb);
 }
 
 shared_ptr<IChannel> IoChannelImpl::CreateViaChannel(const NodeInfo& node_info, 
       shared_ptr<ChannelConfig> config, const vector<ViaInfo>& serverInfos, 
-      error_callback error_callback) 
+      const vector<string>& clientNodeIds, error_callback error_callback) 
 {
-  map<string, shared_ptr<queue<string>>>* share_data_map_ = nullptr;
-  if(server_)
-  {
-    share_data_map_ = &(server_->get_data_map());
-  }
   shared_ptr<BasicIO> net_io =  nullptr;
-  net_io = make_shared<ViaNetIO>(node_info, serverInfos, share_data_map_, error_callback);
+  net_io = make_shared<ViaNetIO>(node_info, serverInfos, clientNodeIds, error_callback);
   if (net_io->init(config->task_id_)) 
   {
     shared_ptr<GRpcChannel> grpc_channel = make_shared<GRpcChannel>(net_io, config, node_info);
@@ -120,7 +107,7 @@ shared_ptr<IChannel> IoChannelImpl::CreateViaChannel(const NodeInfo& node_info,
 }
 
 shared_ptr<IChannel> IoChannelImpl::CreateIoChannel(const string& node_id, const string &config_str, 
-      const bool& is_start_server, error_callback error_cb) 
+        error_callback error_cb) 
 {
   shared_ptr<ChannelConfig> config = make_shared<ChannelConfig>(config_str);
   NodeInfo node_info;
@@ -130,14 +117,15 @@ shared_ptr<IChannel> IoChannelImpl::CreateIoChannel(const string& node_id, const
 
   vector<NODE_TYPE> node_types = config->GetNodeType(node_id);
   // 获取节点信息
-  CopyNodeInfo(node_info, node);
+  config->CopyNodeInfo(node_info, node);
 
   // 获取本节点对应的via地址
   string via_name = config->nodeid_to_via_[node_info.id];
   node_info.via_address = config->via_to_address_[via_name];
 
   // 启动服务器
-  if(is_start_server)
+  vector<string> clientNodeIds;
+  if(config->isServer(node_id, node_types))
   {
     if("" == node_info.via_address)
       throw ("The service node " + node_info.id + " does not have a VIA address!");
@@ -146,56 +134,13 @@ shared_ptr<IChannel> IoChannelImpl::CreateIoChannel(const string& node_id, const
       throw ("The address corresponding to the " + node_info.id + " node server is empty!");
 
     cout << "start server, node.ADDRESS: " << node.ADDRESS << endl;
-    StartServer(node.ADDRESS);
-  }
-  
-  set<string> nodeid_set;
-  if(isNodeType(node_types, NODE_TYPE_DATA) || isNodeType(node_types, NODE_TYPE_COMPUTE))
-  {
-    // 遍历计算节点
-    for (int i = 0; i < config->compute_config_.P.size(); i++) 
-    {
-      // 获取计算节点的nodeid
-      string nid = config->compute_config_.P[i].NODE_ID;
-      string via = config->nodeid_to_via_[nid];
-      if (node_id != nid && nodeid_set.find(nid) == nodeid_set.end()) 
-      {
-        ViaInfo viaTmp;
-        viaTmp.id = nid;
-        viaTmp.via = via;
-        viaTmp.address = config->via_to_address_[via];
-        // cout << "id: " << nid << ", via: " << viaTmp.via << ", address: " << viaTmp.address << endl;
-        serverInfos.push_back(viaTmp);
-        // 保存除自身外的计算节点
-        nodeid_set.insert(nid);
-      }
-    }
-  }
-  
-  if(isNodeType(node_types, NODE_TYPE_COMPUTE))
-  {
-    // cout << "is compute node!" << endl;
-    // 遍历结果接收节点
-    for (int i = 0; i < config->result_config_.P.size(); i++) 
-    {
-      // cout << "handle compute node" << endl;
-      string nid = config->result_config_.P[i].NODE_ID;
-      string via = config->nodeid_to_via_[nid];
-      if (node_id != nid && nodeid_set.find(nid) == nodeid_set.end()) 
-      {
-        ViaInfo viaTmp;
-        viaTmp.id = nid;
-        // 节点所在via
-        viaTmp.via = via;
-        // via信息
-        viaTmp.address = config->via_to_address_[viaTmp.via];
-        // cout << "id: " << nid << ", via: " << viaTmp.via << ", address: " << viaTmp.address << endl;
-        serverInfos.push_back(viaTmp);
-        nodeid_set.insert(nid);
-      }
-    }  
-  }
 
+    config->GetClientNodeIds(clientNodeIds, node_id, node_types);
+  //   StartServer(node.ADDRESS);
+  }
+  
+  // 获取服务器节点信息
+  config->GetServerInfos(serverInfos, node_id, node_types);
   /*
   string strNodeInfo = "address: " + node_info.address + ", id:" + node_info.id;
   cout << "node_info=========:" << strNodeInfo << endl;
@@ -217,7 +162,7 @@ shared_ptr<IChannel> IoChannelImpl::CreateIoChannel(const string& node_id, const
   // 服务器模型, 设置共享内存
 
   
-  return CreateViaChannel(node_info, config, serverInfos, error_cb);
+  return CreateViaChannel(node_info, config, serverInfos, clientNodeIds, error_cb);
 }
 
 // GRpcChannel

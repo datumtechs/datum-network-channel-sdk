@@ -1,5 +1,6 @@
 // file io_channel_server.h
 #pragma once
+#include "client_connection.h"
 #include <iostream>
 #include <unordered_map>
 #include <mutex>
@@ -7,6 +8,7 @@
 #include<thread>
 #include<map>
 #include<queue>
+
 using namespace std;
 
 #include "io_channel.grpc.pb.h"
@@ -36,13 +38,13 @@ class IoChannelServer: public IoChannel::Service
 public:
     bool close();
     bool wait();
-    std::map<string, shared_ptr<queue<string>>>& get_data_map();
-    IoChannelServer(const string& server_addr);
+
+    IoChannelServer(const string& server_addr, 
+        map<string, shared_ptr<ClientConnection>>* ptr_client_conn_map);
 	Status Send(ServerContext* context, const SendRequest* request, RetCode* response);
     
 private:
     std::mutex                    mtx_;
     std::unique_ptr<Server> server_;
-    // std::map<string, string> save_data_map_;
-    std::map<string, shared_ptr<queue<string>>> save_data_map_;
+    map<string, shared_ptr<ClientConnection>>* ptr_client_conn_map_ = nullptr;
 };

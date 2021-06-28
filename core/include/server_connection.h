@@ -1,6 +1,7 @@
 // file connection.h
 #pragma once
 #include "io_channel_server.h"
+#include "cycle_buffer.h"
 #include <unordered_map>
 #include <mutex>
 #include <iostream>
@@ -24,11 +25,14 @@ using io_channel::IoChannel;
 using io_channel::SendRequest;
 using io_channel::RetCode;
 
-class ClientConnection
+/*
+	连接其他服务器，并发送数据
+*/
+class ServerConnection
 {
 public:
-	ClientConnection(const string& server_addr, const string& taskid);
-	~ClientConnection(){}
+	ServerConnection(const string& server_addr, const string& taskid);
+	~ServerConnection(){}
 
   	ssize_t send(const string& self_nodeid, const string& remote_nodeid, 
 	  	const string& task_id, const string& id, const char* data, const size_t nLen, int64_t timeout = -1L);
@@ -36,6 +40,5 @@ public:
 public:
 	string task_id_;
 private:
-	
 	unique_ptr<IoChannel::Stub> stub_;
 };

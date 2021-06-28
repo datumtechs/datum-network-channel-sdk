@@ -1,5 +1,6 @@
 // file io_channel_server.cc
 #include "io_channel_server.h"
+#include "simple_buffer.h"
 
 // 服务器
 bool IoChannelServer::close()
@@ -7,8 +8,6 @@ bool IoChannelServer::close()
     // 关闭服务
     if(server_)
         server_->Shutdown();
-
-    save_data_map_.clear();
 }
 
 bool IoChannelServer::wait()
@@ -18,13 +17,10 @@ bool IoChannelServer::wait()
     cout << "IoChannelServer::wait()" << endl;
 }
 
-std::map<string, shared_ptr<queue<string>>>& IoChannelServer::get_data_map()
+IoChannelServer::IoChannelServer(const string& server_addr, 
+        map<string, shared_ptr<ClientConnection>>* ptr_client_conn_map) 
 {
-    return save_data_map_;
-}
-
-IoChannelServer::IoChannelServer(const string& server_addr) 
-{
+    ptr_client_conn_map_ = ptr_client_conn_map;
     grpc::ServerBuilder builder;
     // 调整消息大小限制(默认最大为4M, 设置最大为2G)
     builder.SetMaxReceiveMessageSize(INT_MAX);
@@ -38,50 +34,23 @@ IoChannelServer::IoChannelServer(const string& server_addr)
 grpc::Status IoChannelServer::Send(grpc::ServerContext* context, const SendRequest* request, 
     RetCode* response)
 {
-    // cout << "IoChannelServer::Send===================" << endl;
+    // cout << "IoChannelServer::Send, send request nodeid:" << nodeId << ", msgid:" << msgid << endl;
     std::unique_lock<mutex> guard(mtx_);
-    // cout << "send request nodeid:" << request->nodeid() << ", id:" << request->id()
-    //      << ", data.size:" <<  request->data().size() << endl;
+    const string& nodeId = request->nodeid();
+    // const string& msgid = request->id();
 
-    // key = nodeid:msg_id
-    // string strSaveId = request->nodeid() + ":" + request->id();
-    string strSaveId = request->nodeid() + ":" + request->id();
-    // cout << "send strSaveId:" << strSaveId << endl;
-    // 保存数据
-    auto iter = save_data_map_.find(strSaveId);
-    if(iter == save_data_map_.end())
+    auto iter = ptr_client_conn_map_->find(nodeId);
+    if(iter == ptr_client_conn_map_->end())
     {
-        shared_ptr<queue<string>> ptr_data_queue_ = make_shared<queue<string>>();
-        ptr_data_queue_->push(request->data());
-        save_data_map_.insert(std::pair<string,  shared_ptr<queue<string>>>(strSaveId, ptr_data_queue_));
+        return Status::OK;
     }
-    else
-    {
-        iter->second->push(request->data());
-    }
+    // The msgid is already included in the data  
+    const string& data = request->data();
+    iter->second->buffer_->write(data.data(), data.size());
+
+    // simple_buffer buffer(msgid, data.data(), data.size());
+    // client_conn->buffer_->write((const char*)buffer.data(), buffer.len());
 
     response->set_code(RET_SUCCEED_CODE);
-    // cout << "save_data_map_.size == " << save_data_map_.size() << endl;
-
     return Status::OK;
 }
-
-/*
-// stream方式发送
-grpc::Status Send(grpc::ServerContext* context, ServerReader<SendRequest>* request, 
-        RetCode* response)
-{
-    std::lock_guard<std::mutex> guard(mtx_);
-    SendRequest req;
-    int i = 0;
-    while (request->Read(&req)) 
-    {
-        i++;
-        cout << "i: " << i << ", send request nodeid:" << req.nodeid() << ", id:" 
-            << req.id() << ", data:" << req.data() <<  ", timeout:" << req.timeout() << endl;
-    }
-
-    response->set_code(100);
-    return grpc::Status::OK;
-}
-*/

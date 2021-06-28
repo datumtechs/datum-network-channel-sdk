@@ -1,7 +1,6 @@
 #pragma once
 #include "IChannel.h"
 #include "config.h"
-#include "io_channel_server.h"
 #include "net_io.h"
 #include <atomic>
 #include <condition_variable>
@@ -17,25 +16,18 @@ using namespace std;
 class IoChannelImpl {
 public:
   IoChannelImpl(){}
-  ~IoChannelImpl(){cout << "start to close server==========" << endl; CloseServer();}
-
-  bool CloseServer() { if(server_) server_->close(); return true;}
-
-  bool StartServer(const string& server_addr);
-
+  ~IoChannelImpl(){}
   
   shared_ptr<IChannel> CreateIoChannel(const string& node_id, const string &config_str, 
-      const bool& is_start_server=false, error_callback error_cb=nullptr);
+        error_callback error_cb=nullptr);
 
   // 等待服务器结束
-  void WaitServer(){if(server_) server_->wait();}
+  // void WaitServer(){if(server_) server_->wait();}
 private:
 
   shared_ptr<IChannel> CreateViaChannel(const NodeInfo& node_idInfo, shared_ptr<ChannelConfig> config,
-      const vector<ViaInfo>& serverInfos, error_callback error_callback=nullptr);
-    
-private:
-  shared_ptr<IoChannelServer> server_ = nullptr;
+      const vector<ViaInfo>& serverInfos, const vector<string>& clientNodeIds, 
+      error_callback error_callback=nullptr);
 };
 
 

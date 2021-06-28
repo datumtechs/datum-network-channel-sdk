@@ -97,4 +97,4 @@ public:
 };// IChannel
 
 shared_ptr<IChannel> CreateChannel(const string& node_id, const string &config_str, 
-      const bool& is_start_server, error_callback error_cb);
+      error_callback error_cb);
