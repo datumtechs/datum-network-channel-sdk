@@ -63,6 +63,11 @@ target_link_libraries(${LIBNAME} PUBLIC pthread ${_REFLECTION} ${_GRPC_GRPCPP} $
 # set_target_properties(${LIBNAME} PROPERTIES FOLDER "io"
 #     APPEND_STRING PROPERTY LINK_FLAGS " ${ADD_LINK_LIB_FLAGS}")
 
+option(USE_ALONE "" OFF)
+IF(USE_ALONE)
+    add_definitions(-DUSE_ALONE=1)
+ENDIF()
+
 # targets pybind11
 add_subdirectory("./third_party/pybind11/" pybind11)
 pybind11_add_module(io_channel core/pybind11/io_channel.cc)

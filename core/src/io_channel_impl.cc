@@ -90,6 +90,27 @@ shared_ptr<IChannel> CreateChannel(const string& node_id, const string &config_s
   return gs_impl->CreateIoChannel(node_id, config_str, error_cb);
 }
 
+void set_channel(shared_ptr<IChannel> io_channel)
+{
+  gs_impl->io_channel_ = io_channel;
+}
+
+string recv_msg(const string& node_id, const string& msg_id, uint64_t msg_len) 
+{
+  string str(msg_len, 0);
+  if(!gs_impl->io_channel_){cout << "io channel is nullptr." << endl; return "";}
+  gs_impl->io_channel_->Recv(node_id.c_str(), msg_id.c_str(), &str[0], msg_len);
+  return str;
+}
+
+void send_msg(const string& node_id, const string& msg_id, const string& data, uint64_t msg_len)
+{
+  if(msg_len > data.size())
+        msg_len = data.size();
+  if(!gs_impl->io_channel_){cout << "io channel is nullptr." << endl; return;}
+  gs_impl->io_channel_->Send(node_id.c_str(), msg_id.c_str(), data.c_str(), msg_len);
+}
+
 shared_ptr<IChannel> IoChannelImpl::CreateViaChannel(const NodeInfo& node_info, 
       shared_ptr<ChannelConfig> config, const vector<ViaInfo>& serverInfos, 
       const vector<string>& clientNodeIds, error_callback error_callback) 
@@ -159,9 +180,6 @@ shared_ptr<IChannel> IoChannelImpl::CreateIoChannel(const string& node_id, const
   cout << "server info=========:" << strServerInfo << endl;
   */
 
-  // 服务器模型, 设置共享内存
-
-  
   return CreateViaChannel(node_info, config, serverInfos, clientNodeIds, error_cb);
 }
 
@@ -179,8 +197,6 @@ ssize_t GRpcChannel::Recv(const char* node_id, const char* id, char* data, uint6
   // return _net_io->recv(node_id, data, get_binary_string(id), timeout); 
   if(nullptr == _net_io){cout << "create io failed!" << endl; return 0;}
   if(nullptr == data){cout << "data is nullptr!" << endl; return 0;}
-  // cout << "GRpcChannel::Recv, nodeid:" << node_id << ", msg_id:"  << id 
-  //   << ", length:" << length << endl;
   return _net_io->recv(node_id, id, data, length, timeout);
 }
 

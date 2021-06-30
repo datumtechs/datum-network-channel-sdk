@@ -23,6 +23,8 @@ public:
 
   // 等待服务器结束
   // void WaitServer(){if(server_) server_->wait();}
+public:
+  shared_ptr<IChannel> io_channel_ = nullptr;
 private:
 
   shared_ptr<IChannel> CreateViaChannel(const NodeInfo& node_idInfo, shared_ptr<ChannelConfig> config,
@@ -34,6 +36,7 @@ private:
 class GRpcChannel : public IChannel {
 public:
     GRpcChannel(){}
+
     GRpcChannel(shared_ptr<BasicIO> net_io, shared_ptr<ChannelConfig> config, const NodeInfo& node_info):
       _net_io(net_io), channel_config_(config), self_node_info_(node_info) {}
     ~GRpcChannel();

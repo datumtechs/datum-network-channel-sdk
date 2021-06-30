@@ -1,4 +1,4 @@
-import lib.io_channel as io_channel
+import io_channel
 import faulthandler
 import json
 import os
@@ -8,11 +8,11 @@ import traceback
 faulthandler.enable()
 
 file_path = os.path.split(os.path.realpath(__file__))[0]
-config_file = os.path.join(file_path, 'config/config.json')
+config_file = os.path.join(file_path, 'config/one_to_one.json')
 with open(config_file, 'r') as load_f:
     strJson = load_f.read()
 
-def fun(a, b, c, d, e):
+def callback(a, b, c, d, e):
     print("nodeid:{}, id:{}, errno:{}, error_msg:{}, ext_data:{}".format(a, b, c, d, e))
     return
 
@@ -20,25 +20,17 @@ if __name__ == '__main__':
     try:
 
         # 启动服务
-        address = ""
-        is_start_server = False
-
-        api = io_channel.impl.api()
-
-        io_ = api.create_channel("p1", strJson, is_start_server, address, fun)
-
-        # time.sleep(1000)
-        # print(io_)
+        channel = io_channel.create_channel("p0", strJson, callback)
 
         # 创建网络拓扑
         print("start to send========" )
         # 
         # 获取io接口
-        channel_ = io_channel.impl.grpc(io_)
-        channel_.send("p0", "1", "this is test p1", 1)
+        io_channel.set_channel(channel)
+        remote_nodeid = "p1"
+        msgid = "1"
+        data = "this is test p0"
+        io_channel.send_msg(remote_nodeid, msgid, data, 100)
 
-        if(is_start_server):
-            api.wait_server()
-            
     except Exception as e:
         print(traceback.format_exc())
