@@ -68,6 +68,11 @@ IF(USE_ALONE)
     add_definitions(-DUSE_ALONE=1)
 ENDIF()
 
+option(ASYNC_SERVER "" OFF)
+IF(ASYNC_SERVER)
+    add_definitions(-DASYNC_SERVER=1)
+ENDIF()
+
 # targets pybind11
 add_subdirectory("./third_party/pybind11/" pybind11)
 pybind11_add_module(io_channel core/pybind11/io_channel.cc)

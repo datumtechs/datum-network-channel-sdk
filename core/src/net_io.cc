@@ -18,8 +18,14 @@ BasicIO::BasicIO(const NodeInfo &node_info, const vector<ViaInfo>& server_infos,
 bool ViaNetIO::StartServer(const string& server_addr, 
     map<string, shared_ptr<ClientConnection>>* ptr_client_conn_map)
 {
+
+#if ASYNC_SERVER
+  server_ = make_shared<AsyncServer>(server_addr, ptr_client_conn_map);
+  handle_thread_ = thread(&AsyncServer::Handle_Event, server_);
+#else
   server_ = make_shared<SyncServer>(server_addr, ptr_client_conn_map);
-  // server_ = make_shared<IoChannelAsyncServer>(server_addr);
+#endif
+  
   return true;
 }
 
@@ -45,24 +51,6 @@ bool ViaNetIO::init(const string& taskid)
   {
     conn_servers[i] = make_shared<SyncClient>(via_server_infos_[i].address, taskid);
   }
-  /*
-  // 创建多线程
-  vector<thread> client_threads(via_server_infos_.size());
-  auto conn_f = [&](const ViaInfo &info, int i) -> bool {
-    // 创建io通道
-    cout << "create io channel, sids:" << info.id << endl;
-    clients[i] = make_shared<ClientConnection>(info.address, taskid);
-    return true;
-  };
-
-  for (int i = 0; i < via_server_infos_.size(); i++) {
-    client_threads[i] = thread(conn_f, via_server_infos_[i], i);
-  }
-
-  for (int i = 0; i < via_server_infos_.size(); i++) {
-    client_threads[i].join();
-  }
-  */
 
   for (int i = 0; i < via_server_infos_.size(); i++)
   {

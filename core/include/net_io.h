@@ -2,6 +2,7 @@
 
 #include "sync_client.h"
 #include "sync_server.h"
+#include "async_server.h"
 #include "config.h"
 #include "IChannel.h"
 #include <atomic>
@@ -73,7 +74,14 @@ class BasicIO {
   map<string, shared_ptr<SyncClient>> sync_client_map;
   map<string, shared_ptr<ClientConnection>> client_conn_map;
   error_callback handler;
+
+#if ASYNC_SERVER
+  shared_ptr<AsyncServer> server_ = nullptr;
+  std::thread handle_thread_;
+#else
   shared_ptr<SyncServer> server_ = nullptr;
+#endif
+  
 };
 
 
@@ -83,7 +91,8 @@ class BasicIO {
 class ViaNetIO : public BasicIO {
  public:
   using BasicIO::BasicIO;
-  virtual ~ViaNetIO(){cout << "start to close server==========" << endl; CloseServer();}
+  // virtual ~ViaNetIO(){cout << "start to close server==========" << endl; CloseServer();}
+  virtual ~ViaNetIO(){/*handle_thread_.join();*/}
 
   bool CloseServer() { if(server_) server_->close(); return true;}
 
