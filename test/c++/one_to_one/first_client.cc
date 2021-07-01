@@ -1,4 +1,4 @@
-#include "server_connection.h"
+#include "sync_client.h"
 #include <string>
 #include <fstream>
 #include <sstream>

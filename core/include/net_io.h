@@ -1,7 +1,7 @@
 #pragma once
 
-#include "server_connection.h"
-#include "io_channel_server.h"
+#include "sync_client.h"
+#include "sync_server.h"
 #include "config.h"
 #include "IChannel.h"
 #include <atomic>
@@ -70,10 +70,10 @@ class BasicIO {
   NodeInfo node_info_;
   vector<ViaInfo> via_server_infos_;
   vector<string> client_nodeids_;
-  map<string, shared_ptr<ServerConnection>> conn_server_map;
+  map<string, shared_ptr<SyncClient>> sync_client_map;
   map<string, shared_ptr<ClientConnection>> client_conn_map;
   error_callback handler;
-  shared_ptr<IoChannelServer> server_ = nullptr;
+  shared_ptr<SyncServer> server_ = nullptr;
 };
 
 

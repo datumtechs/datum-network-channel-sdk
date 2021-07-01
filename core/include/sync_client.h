@@ -1,6 +1,6 @@
-// file connection.h
+// file sync_client.h
 #pragma once
-#include "io_channel_server.h"
+#include "sync_server.h"
 #include "cycle_buffer.h"
 #include <unordered_map>
 #include <mutex>
@@ -26,13 +26,13 @@ using io_channel::SendRequest;
 using io_channel::RetCode;
 
 /*
-	连接其他服务器，并发送数据
+	同步客户端
 */
-class ServerConnection
+class SyncClient
 {
 public:
-	ServerConnection(const string& server_addr, const string& taskid);
-	~ServerConnection(){}
+	SyncClient(const string& server_addr, const string& taskid);
+	~SyncClient(){}
 
   	ssize_t send(const string& self_nodeid, const string& remote_nodeid, 
 	  	const string& task_id, const string& id, const char* data, const size_t nLen, int64_t timeout = -1L);

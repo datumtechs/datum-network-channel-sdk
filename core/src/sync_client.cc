@@ -1,10 +1,10 @@
-// file server_connection.cc
-#include "server_connection.h"
+// file sync_client.cc
+#include "sync_client.h"
 #include "simple_buffer.h"
 #include <thread>
 #include <chrono>   
 using namespace chrono;
-ServerConnection::ServerConnection(const string& server_addr, const string& taskid)
+SyncClient::SyncClient(const string& server_addr, const string& taskid)
 {
 	task_id_ = taskid;
 	auto channel = grpc::CreateChannel(server_addr, grpc::InsecureChannelCredentials());
@@ -12,10 +12,10 @@ ServerConnection::ServerConnection(const string& server_addr, const string& task
 	// cout << "create channel, server_addr:" << server_addr << endl;
 }
 
-ssize_t ServerConnection::send(const string& self_nodeid, const string& remote_nodeid, 
+ssize_t SyncClient::send(const string& self_nodeid, const string& remote_nodeid, 
 	const string& task_id, const string& msg_id, const char* data, const size_t nLen, int64_t timeout)
 {
-	// cout << "ServerConnection::send, remote_nodeid:" << remote_nodeid << ", msg_id:" << msg_id
+	// cout << "SyncClient::send, remote_nodeid:" << remote_nodeid << ", msg_id:" << msg_id
   //   << ", data length:" << nLen << endl;
 	
   SendRequest req_info;
