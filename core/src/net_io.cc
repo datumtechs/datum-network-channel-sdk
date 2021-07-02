@@ -32,11 +32,10 @@ bool ViaNetIO::StartServer(const string& server_addr,
 bool ViaNetIO::init(const string& taskid) 
 {
   // 初始化客户端连接过来的缓存
-  int32_t client_size = client_nodeids_.size();
+  uint32_t client_size = client_nodeids_.size();
   if(client_size > 0)
   {
-    vector<shared_ptr<ClientConnection>> clients_conn(client_nodeids_.size());
-    for (int i = 0; i < client_nodeids_.size(); i++) 
+    for (int i = 0; i < client_size; i++)
     {
       client_conn_map[client_nodeids_[i]] = make_shared<ClientConnection>();
     }
@@ -44,22 +43,23 @@ bool ViaNetIO::init(const string& taskid)
     // 启动服务
     StartServer(node_info_.address, &client_conn_map);
   }
- 
-  // 初始化连接服务器的连接
-  vector<shared_ptr<SyncClient>> conn_servers(via_server_infos_.size());
-  for (int i = 0; i < via_server_infos_.size(); i++) 
+  
+  uint32_t nServerSize = via_server_infos_.size();
+  conn_servers_.resize(nServerSize);
+  for (int i = 0; i < nServerSize; i++) 
   {
-    conn_servers[i] = make_shared<SyncClient>(via_server_infos_[i].address, taskid);
+#if ASYNC_CLIENT
+    conn_servers_[i] = make_shared<AsyncClient>(via_server_infos_[i].address, taskid);
+    clients_thread_.push_back(std::thread(&AsyncClient::AsyncCompleteRpc, conn_servers_[i]));
+    cout << "init async connect, sids:" << via_server_infos_[i].id << endl;
+#else
+    conn_servers_[i] = make_shared<SyncClient>(via_server_infos_[i].address, taskid);
+    cout << "init sync connect, sids:" << via_server_infos_[i].id << endl;
+#endif
+    string server_node_id =  via_server_infos_[i].id;
+    nid_to_server_map_[server_node_id] = conn_servers_[i];
   }
 
-  for (int i = 0; i < via_server_infos_.size(); i++)
-  {
-    string ser_node_id =  via_server_infos_[i].id;
-    // 保存到connection_map
-    cout << "save io channel sids:" << via_server_infos_[i].id << endl;
-    sync_client_map[ser_node_id] = conn_servers[i];
-  }
-  
   cout << "init all network connections succeed!" << endl;
   return true;
 }
@@ -77,7 +77,7 @@ ssize_t ViaNetIO::send(const string& remote_nodeid, const char* id, const char* 
   // cout << "ViaNetIO::send, remote node_id: " << remote_nodeid << ", task id: " 
   //      << sync_client_map[remote_nodeid]->task_id_ << ", id: " << id << endl;
 
-  ssize_t ret = sync_client_map[remote_nodeid]->send(node_info_.id, remote_nodeid, 
-      sync_client_map[remote_nodeid]->task_id_, id, data, length, timeout);
+  ssize_t ret = nid_to_server_map_[remote_nodeid]->send(node_info_.id, remote_nodeid, 
+        id, data, length, timeout);
   return ret;
 }

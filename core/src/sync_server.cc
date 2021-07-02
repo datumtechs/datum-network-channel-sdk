@@ -35,7 +35,7 @@ grpc::Status SyncServer::Send(grpc::ServerContext* context, const SendRequest* r
     RetCode* response)
 {
     // cout << "SyncServer::Send, send request nodeid:" << nodeId << ", msgid:" << msgid << endl;
-    std::unique_lock<mutex> guard(mtx_);
+    // std::unique_lock<mutex> guard(mtx_);
     const string& nodeId = request->nodeid();
     // const string& msgid = request->id();
 

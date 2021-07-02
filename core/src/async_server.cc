@@ -20,7 +20,7 @@ void CallData::Proceed(map<string, shared_ptr<ClientConnection>>* ptr_client_con
 		reply_.set_code(RET_SUCCEED_CODE);
 		responder_.Finish(reply_, Status::OK, this);
 		// 保存数据
-		std::unique_lock<mutex> guard(buffer_mtx_);
+		// std::unique_lock<mutex> guard(buffer_mtx_);
 		const string& nodeId = request_.nodeid();
 		// cout << "nodeid:===" << nodeId << endl;
 		auto iter = ptr_client_conn_map->find(nodeId);

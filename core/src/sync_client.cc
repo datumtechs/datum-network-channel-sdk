@@ -13,7 +13,7 @@ SyncClient::SyncClient(const string& server_addr, const string& taskid)
 }
 
 ssize_t SyncClient::send(const string& self_nodeid, const string& remote_nodeid, 
-	const string& task_id, const string& msg_id, const char* data, const size_t nLen, int64_t timeout)
+    const string& msg_id, const char* data, const size_t nLen, int64_t timeout)
 {
 	// cout << "SyncClient::send, remote_nodeid:" << remote_nodeid << ", msg_id:" << msg_id
   //   << ", data length:" << nLen << endl;
@@ -35,7 +35,7 @@ ssize_t SyncClient::send(const string& self_nodeid, const string& remote_nodeid,
     grpc::ClientContext context;
     // 添加注册到via的参数
     // context.AddMetadata("node_id", remote_nodeid);
-    context.AddMetadata("task_id", task_id);
+    context.AddMetadata("task_id", task_id_);
     context.AddMetadata("party_id", remote_nodeid);
 
     // cout << "ClientConnection stub_->Send1111, remote_nodeid:" << remote_nodeid << endl;
