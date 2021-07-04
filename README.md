@@ -88,7 +88,7 @@ cd channel-sdk && mkdir build && cd build
 make
 ```
 
-> 编译成功后在channel-sdk/lib下生成so文件，包括io库`libexternal_io.so`和cpython库，如cpython库为：`io_channel.cpython-37m-x86_64-linux-gnu.so`，表示对应的python版本号为python3.7；
+> 编译成功后在build目录下生成so文件，包括io库`libexternal_io.so`和cpython库，如cpython库为：`io_channel.cpython-37m-x86_64-linux-gnu.so`，表示对应的python版本号为python3.7；
 
 
 

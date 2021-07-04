@@ -6,7 +6,7 @@ using namespace chrono;
 
 ClientConnection::ClientConnection() 
 {
-  buffer_ = make_shared<cycle_buffer>(1024 * 1024 * 10);
+  buffer_ = make_shared<cycle_buffer>(1024 * 1024 * 50);
 }
 
 ssize_t ClientConnection::recv(const string& id, char* data, uint64_t length, int64_t timeout) 
@@ -60,7 +60,7 @@ ssize_t ClientConnection::recv(const string& id, char* data, uint64_t length, in
     }
 
     if (mapbuffer_.find(tmp_id) == mapbuffer_.end()) {
-      mapbuffer_[tmp_id] = make_shared<cycle_buffer>(1024 * 8);
+      mapbuffer_[tmp_id] = make_shared<cycle_buffer>(1024 * 100);
     }
 
     // write the real data

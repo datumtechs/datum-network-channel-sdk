@@ -1,0 +1,36 @@
+node info parse:p0
+node info parse:p1
+node info parse:p2
+node info parse:p9
+parse 3 data success
+parse  computation success
+parse 3 result success
+start server, node.ADDRESS: 127.0.0.1:20001
+Server listening on 127.0.0.1:20001
+init sync connect, sids:p0
+init sync connect, sids:p2
+init all network connections succeed!
+Server listening on 127.0.0.1:20001
+init sync connect, sids:p0
+init sync connect, sids:p2
+init all network connections succeed!
+Server listening on 127.0.0.1:20001
+init sync co
+node info parse:p0
+node info parse:p1
+node info parse:p2
+node info parse:p9
+parse 3 data success
+parse  computation success
+parse 3 result success
+start server, node.ADDRESS: 127.0.0.1:20001
+Server listening on 127.0.0.1:20001
+init sync connect, sids:p0
+init sync connect, sids:p2
+init all network connections succeed!
+Server listening on 127.0.0.1:20001
+init sync connect, sids:p0
+init sync connect, sids:p2
+init all network connections succeed!
+Server listening on 127.0.0.1:20001
+init sync 
