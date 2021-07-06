@@ -18,7 +18,7 @@ bool SyncServer::wait()
 }
 
 SyncServer::SyncServer(const string& server_addr, 
-        map<string, shared_ptr<ClientConnection>>* ptr_client_conn_map) 
+        map<string, shared_ptr<ClientConnection>>* ptr_client_conn_map)
 {
     ptr_client_conn_map_ = ptr_client_conn_map;
     grpc::ServerBuilder builder;

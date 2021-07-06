@@ -47,7 +47,6 @@ int main(int argc, char *argv[])
         vec_recv_thread[i] = thread(&Recv_Object::recv, &recv_object, vec_nid[i]);
     //    vec_thread[i].join();
     }
-
     while(true);
     
     return 0;

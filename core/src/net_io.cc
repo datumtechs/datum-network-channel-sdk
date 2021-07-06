@@ -21,7 +21,15 @@ bool ViaNetIO::StartServer(const string& server_addr,
 
 #if ASYNC_SERVER
   server_ = make_shared<AsyncServer>(server_addr, ptr_client_conn_map);
-  handle_thread_ = thread(&AsyncServer::Handle_Event, server_);
+  int enableCPUNum = sysconf(_SC_NPROCESSORS_ONLN);
+  // 可用cpu核数-1
+  int optimalUseCPUNum = enableCPUNum > 1 ? (enableCPUNum - 1): 1;
+  // int optimalUseCPUNum = 1;
+  handle_threads_.resize(optimalUseCPUNum);
+  for(int i = 0; i < optimalUseCPUNum; ++i)
+  {
+    handle_threads_[i] = thread(&AsyncServer::Handle_Event, server_, i);
+  }
 #else
   server_ = make_shared<SyncServer>(server_addr, ptr_client_conn_map);
 #endif

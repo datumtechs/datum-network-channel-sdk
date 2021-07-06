@@ -20,9 +20,9 @@ void CallData::Proceed(map<string, shared_ptr<ClientConnection>>* ptr_client_con
 		reply_.set_code(RET_SUCCEED_CODE);
 		responder_.Finish(reply_, Status::OK, this);
 		// 保存数据
-		// std::unique_lock<mutex> guard(buffer_mtx_);
 		const string& nodeId = request_.nodeid();
 		// cout << "nodeid:===" << nodeId << endl;
+		std::unique_lock<mutex> guard(buffer_mtx_);
 		auto iter = ptr_client_conn_map->find(nodeId);
 		if(iter == ptr_client_conn_map->end())
 		{
@@ -44,7 +44,10 @@ bool AsyncServer::close()
     // 关闭服务
     server_->Shutdown();
 	// Always shutdown the completion queue after the server.
-	cq_->Shutdown();
+	for(int i = 0; i < optimalUseCPUNum_; ++i)
+	{
+		map_cq_[i]->Shutdown();
+	}
 	return true;
 }
 
@@ -59,6 +62,7 @@ AsyncServer::AsyncServer(const string& server_address,
 	ptr_client_conn_map_ = ptr_client_conn_map;
 	// ServerBuilder builder;
 	builder_ = make_shared<ServerBuilder>();
+	builder_->SetMaxReceiveMessageSize(INT_MAX);
 	// Listen on the given address without any authentication mechanism.
 	builder_->AddListeningPort(server_address, grpc::InsecureServerCredentials());
 	// Register "service_" as the instance through which we'll communicate with
@@ -66,23 +70,40 @@ AsyncServer::AsyncServer(const string& server_address,
 	builder_->RegisterService(&service_);
 	// Get hold of the completion queue used for the asynchronous communication
 	// with the gRPC runtime.
-	cq_ = builder_->AddCompletionQueue();
+	enableCPUNum_ = sysconf(_SC_NPROCESSORS_ONLN);
+	optimalUseCPUNum_ = enableCPUNum_ > 1 ? (enableCPUNum_ - 1): 1;
+	// optimalUseCPUNum_ = 1;
+	for(int i = 0; i < optimalUseCPUNum_; ++i)
+	{
+		map_cq_[i] = builder_->AddCompletionQueue();
+	}
+
 	// Finally assemble the server.
 	server_ = builder_->BuildAndStart();
 	cout << "Server listening on " << server_address << endl;
 
 	// Proceed to the server's main loop.
 	// Spawn a new CallData instance to serve new clients.
-	new CallData(&service_, cq_.get());
+	for(int i = 0; i < optimalUseCPUNum_; ++i)
+	{
+		new CallData(&service_, map_cq_[i].get());
+	}
 }
 
-void AsyncServer::Handle_Event()
+void AsyncServer::Handle_Event(const int numEvent)
 {
+	auto iter = map_cq_.find(numEvent);
+	if(iter == map_cq_.end())
+	{
+		return;
+	}
+	
 	void* tag;  // uniquely identifies a request.
     bool ok;
+	
 	while (true) 
 	{
-      GPR_ASSERT(cq_->Next(&tag, &ok));
+      GPR_ASSERT(map_cq_[numEvent]->Next(&tag, &ok));
       GPR_ASSERT(ok);
       static_cast<CallData*>(tag)->Proceed(ptr_client_conn_map_);
     }

@@ -78,10 +78,12 @@ public:
 		map<string, shared_ptr<ClientConnection>>* ptr_client_conn_map);
 	~AsyncServer();
 	bool close();
-	void Handle_Event();
+	void Handle_Event(const int numEvent);
 
 private:
-	std::unique_ptr<ServerCompletionQueue> cq_;
+	int enableCPUNum_ = 0;
+	int optimalUseCPUNum_ = 0;
+	map<int, std::unique_ptr<ServerCompletionQueue>> map_cq_;
 	IoChannel::AsyncService service_;
 	std::unique_ptr<Server> server_;
 	std::shared_ptr<ServerBuilder> builder_ = nullptr;
