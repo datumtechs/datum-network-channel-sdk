@@ -1,6 +1,8 @@
 // file async_server.cc
 #include "async_server.h"
+#if USE_BUFFER_
 #include "simple_buffer.h"
+#endif
 #include <thread>
 #include <chrono>   
 using namespace chrono;
@@ -30,7 +32,13 @@ void CallData::Proceed(map<string, shared_ptr<ClientConnection>>* ptr_client_con
 		}
 		// The msgid is already included in the data  
 		const string& data = request_.data();
-		iter->second->buffer_->write(data.data(), data.size());
+
+	#if USE_BUFFER_
+    	iter->second->buffer_->write(data.data(), data.size());
+	#else
+		const string& msgid = request_.id();
+		iter->second->write(msgid, data);
+	#endif
 	}
 	else
 	{
@@ -100,10 +108,10 @@ void AsyncServer::Handle_Event(const int numEvent)
 	
 	void* tag;  // uniquely identifies a request.
     bool ok;
-	
+	std::unique_ptr<ServerCompletionQueue> cq = move(map_cq_[numEvent]);
 	while (true) 
 	{
-      GPR_ASSERT(map_cq_[numEvent]->Next(&tag, &ok));
+      GPR_ASSERT(cq->Next(&tag, &ok));
       GPR_ASSERT(ok);
       static_cast<CallData*>(tag)->Proceed(ptr_client_conn_map_);
     }

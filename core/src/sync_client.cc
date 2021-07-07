@@ -1,6 +1,8 @@
 // file sync_client.cc
 #include "sync_client.h"
+#if USE_BUFFER_
 #include "simple_buffer.h"
+#endif
 #include <thread>
 #include <chrono>   
 using namespace chrono;
@@ -21,10 +23,14 @@ ssize_t SyncClient::send(const string& self_nodeid, const string& remote_nodeid,
   SendRequest req_info;
   // 发送客户端的nodeid到服务器
   req_info.set_nodeid(self_nodeid);
-  // req_info.set_id(msg_id);
-  // req_info.set_data(data, nLen);
+
+#if USE_BUFFER_
   simple_buffer buffer(msg_id, data, nLen);
   req_info.set_data((const char*)buffer.data(), buffer.len());
+#else
+  req_info.set_id(msg_id);
+  req_info.set_data(data, nLen);
+#endif
   
   RetCode ret_code;
 

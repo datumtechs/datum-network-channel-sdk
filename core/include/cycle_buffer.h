@@ -1,4 +1,5 @@
 #pragma once
+#if USE_BUFFER_
 #include "simple_timer.h"
 
 #include <mutex>
@@ -49,3 +50,4 @@ struct cycle_buffer {
   void realloc(int32_t length);
   int32_t write(const char* data, int32_t length);
 };
+#endif

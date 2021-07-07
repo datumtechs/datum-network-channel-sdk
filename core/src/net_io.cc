@@ -43,9 +43,11 @@ bool ViaNetIO::init(const string& taskid)
   uint32_t client_size = client_nodeids_.size();
   if(client_size > 0)
   {
+    string client_nodeid = "";
     for (int i = 0; i < client_size; i++)
     {
-      client_conn_map[client_nodeids_[i]] = make_shared<ClientConnection>();
+      client_nodeid = client_nodeids_[i];
+      client_conn_map[client_nodeid] = make_shared<ClientConnection>(client_nodeid);
     }
 
     // 启动服务
