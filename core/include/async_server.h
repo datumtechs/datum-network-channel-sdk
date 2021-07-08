@@ -57,7 +57,7 @@ public:
 	// Let's implement a tiny state machine with the following states.
     enum CallStatus { CREATE, PROCESS, FINISH };
     CallStatus status_;  // The current serving state.
-	std::mutex buffer_mtx_;
+	std::mutex mtx_;
 };
 
 class CallData: public CommonCallData
