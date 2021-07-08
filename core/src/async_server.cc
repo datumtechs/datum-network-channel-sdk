@@ -16,11 +16,11 @@ void CallData::Proceed(map<string, shared_ptr<ClientConnection>>* ptr_client_con
 	}
 	else if (status_ == PROCESS)
 	{
-		std::unique_lock<mutex> guard(mtx_);
+		// cout << "thread id： " << std::this_thread::get_id() << endl;
 		new CallData(service_, cq_);
 		status_ = FINISH;
-		// 返回值
 		std::unique_lock<mutex> guard(mtx_);
+		// 返回值
 		reply_.set_code(RET_SUCCEED_CODE);
 		responder_.Finish(reply_, Status::OK, this);
 		// 保存数据
@@ -81,7 +81,7 @@ AsyncServer::AsyncServer(const string& server_address,
 	// with the gRPC runtime.
 	enableCPUNum_ = sysconf(_SC_NPROCESSORS_ONLN);
 	optimalUseCPUNum_ = enableCPUNum_ > 1 ? (enableCPUNum_ - 1): 1;
-	// optimalUseCPUNum_ = 1;
+	optimalUseCPUNum_ = 1;
 	for(int i = 0; i < optimalUseCPUNum_; ++i)
 	{
 		map_cq_[i] = builder_->AddCompletionQueue();
@@ -93,6 +93,7 @@ AsyncServer::AsyncServer(const string& server_address,
 
 	// Proceed to the server's main loop.
 	// Spawn a new CallData instance to serve new clients.
+	
 	for(int i = 0; i < optimalUseCPUNum_; ++i)
 	{
 		new CallData(&service_, map_cq_[i].get());
@@ -112,8 +113,8 @@ void AsyncServer::Handle_Event(const int numEvent)
 	std::unique_ptr<ServerCompletionQueue> cq = move(map_cq_[numEvent]);
 	while (true) 
 	{
-      GPR_ASSERT(cq->Next(&tag, &ok));
-      GPR_ASSERT(ok);
-      static_cast<CallData*>(tag)->Proceed(ptr_client_conn_map_);
-    }
+		GPR_ASSERT(cq->Next(&tag, &ok));
+		GPR_ASSERT(ok);
+		static_cast<CallData*>(tag)->Proceed(ptr_client_conn_map_);
+	}
 }
