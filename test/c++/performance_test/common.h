@@ -110,3 +110,49 @@ private:
     uint64_t record_count_ = 0;
 };
 
+class RunTest {
+private:
+    shared_ptr<IChannel> channel = nullptr;
+    shared_ptr<Send_Object> send_object = nullptr;
+    shared_ptr<Recv_Object> recv_object = nullptr;
+public:
+    bool start_test(const string& data_file, uint64_t record_count, const string& self_nid,
+        const vector<string>& other_nids)
+    {
+        string send_data = readFileIntoString(data_file);
+        if("" == send_data) return false;
+        uint64_t msg_len = send_data.size();
+
+        auto start_time = std::chrono::steady_clock::now();
+
+        //文件名
+        string fn = "config.json";
+        string io_config_str = readFileIntoString(fn);
+        // cout << io_config_str << endl;
+
+        // 启动服务
+        channel = CreateChannel(self_nid, io_config_str, nullptr);
+
+        send_object = make_shared<Send_Object>(channel, self_nid, send_data, msg_len, record_count);
+        recv_object = make_shared<Recv_Object>(channel, self_nid, msg_len, record_count);
+
+        vector<thread> vec_send_thread(server_counts);
+        vector<thread> vec_recv_thread(server_counts);
+        cout << "start send/recv=========" << endl;
+        send_object->set_start_time(start_time);
+        recv_object->set_start_time(start_time);
+        for(int i = 0; i < other_nids.size(); i++)
+        {
+            vec_send_thread[i] = thread(&Send_Object::send, send_object, other_nids[i]);
+            vec_recv_thread[i] = thread(&Recv_Object::recv, recv_object, other_nids[i]);
+        }
+
+        for(int i = 0; i < other_nids.size(); i++)
+        {
+            vec_send_thread[i].join();
+            vec_recv_thread[i].join();
+        }
+        return true;
+    }
+};
+
