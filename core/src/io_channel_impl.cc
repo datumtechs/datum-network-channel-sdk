@@ -148,11 +148,19 @@ shared_ptr<IChannel> IoChannelImpl::CreateIoChannel(const string& node_id, const
   vector<string> clientNodeIds;
  
   if("" == node_info.via_address)
-      throw ("The service node " + node_info.id + " does not have a VIA address!");
-
+  {
+    string strErrMsg = "The service node " + node_info.id + " does not have a VIA address!";
+    cout << strErrMsg << endl;
+    throw (strErrMsg);
+  }
+      
   if("" == node.ADDRESS)
-    throw ("The address corresponding to the " + node_info.id + " node server is empty!");
-
+  {
+    string strErrMsg = "The address corresponding to the " + node_info.id + " node server is empty!";
+    cout << strErrMsg << endl;
+    throw (strErrMsg);
+  }
+    
   // cout << "start server, node.ADDRESS: " << node.ADDRESS << endl;
 
   config->GetNodeInfos(clientNodeIds, serverInfos, node_id);

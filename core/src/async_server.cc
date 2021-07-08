@@ -79,8 +79,8 @@ AsyncServer::AsyncServer(const string& server_address,
 	// Get hold of the completion queue used for the asynchronous communication
 	// with the gRPC runtime.
 	enableCPUNum_ = sysconf(_SC_NPROCESSORS_ONLN);
-	optimalUseCPUNum_ = enableCPUNum_ > 1 ? (enableCPUNum_ - 1): 1;
-	// optimalUseCPUNum_ = 1;
+	// optimalUseCPUNum_ = enableCPUNum_ > 1 ? (enableCPUNum_ - 1): 1;
+	optimalUseCPUNum_ = 1;
 	for(int i = 0; i < optimalUseCPUNum_; ++i)
 	{
 		map_cq_[i] = builder_->AddCompletionQueue();

@@ -1,0 +1,67 @@
+{
+  "NODE_INFO": [
+    {
+      "NODE_ID" : "p0",
+      "NAME": "PartyA(P0)",
+      "HOST": "127.0.0.1",
+      "PORT": 11121
+    },
+    {
+      "NODE_ID" : "p1",
+      "NAME": "PartyB(P1)",
+      "HOST": "127.0.0.1",
+      "PORT": 12144
+    },
+    {
+      "NODE_ID" : "p2",
+      "NAME": "PartyC(P2)",
+      "HOST": "127.0.0.1",
+      "PORT": 13169
+    },
+    {
+      "NODE_ID" : "p00",
+      "NAME": "PartyA(P0)",
+      "HOST": "127.0.0.1",
+      "PORT": 11120
+    },
+    {
+      "NODE_ID" : "p11",
+      "NAME": "PartyB(P1)",
+      "HOST": "127.0.0.1",
+      "PORT": 12140
+    },
+    {
+      "NODE_ID" : "p22",
+      "NAME": "PartyC(P2)",
+      "HOST": "127.0.0.1",
+      "PORT": 13160
+    },
+    {
+      "NODE_ID" : "p30",
+      "NAME": "PartyA(P0)",
+      "HOST": "127.0.0.1",
+      "PORT": 31121
+    },
+    {
+      "NODE_ID" : "p31",
+      "NAME": "PartyB(P1)",
+      "HOST": "127.0.0.1",
+      "PORT": 32144
+    },
+    {
+      "NODE_ID" : "p32",
+      "NAME": "PartyC(P2)",
+      "HOST": "127.0.0.1",
+      "PORT": 33169
+    },
+    {
+      "NODE_ID" : "p33",
+      "NAME": "PartyI(P9)",
+      "HOST": "127.0.0.1",
+      "PORT": 39361
+    }
+  ],
+  "DATA_NODES": ["p30", "p0", "p1", "p2"],
+  "COMPUTATION_NODES": {"p00":0, "p11":1, "p22":2},
+  "RESULT_NODES": ["p30", "p31", "p32", "p33"]
+}
