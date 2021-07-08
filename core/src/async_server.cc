@@ -16,6 +16,7 @@ void CallData::Proceed(map<string, shared_ptr<ClientConnection>>* ptr_client_con
 	}
 	else if (status_ == PROCESS)
 	{
+		std::unique_lock<mutex> guard(mtx_);
 		new CallData(service_, cq_);
 		status_ = FINISH;
 		// 返回值
@@ -24,7 +25,6 @@ void CallData::Proceed(map<string, shared_ptr<ClientConnection>>* ptr_client_con
 		// 保存数据
 		const string& nodeId = request_.nodeid();
 		// cout << "nodeid:===" << nodeId << endl;
-		std::unique_lock<mutex> guard(buffer_mtx_);
 		auto iter = ptr_client_conn_map->find(nodeId);
 		if(iter == ptr_client_conn_map->end())
 		{
@@ -79,7 +79,7 @@ AsyncServer::AsyncServer(const string& server_address,
 	// Get hold of the completion queue used for the asynchronous communication
 	// with the gRPC runtime.
 	enableCPUNum_ = sysconf(_SC_NPROCESSORS_ONLN);
-	// optimalUseCPUNum_ = enableCPUNum_ > 1 ? (enableCPUNum_ - 1): 1;
+	optimalUseCPUNum_ = enableCPUNum_ > 1 ? (enableCPUNum_ - 1): 1;
 	optimalUseCPUNum_ = 1;
 	for(int i = 0; i < optimalUseCPUNum_; ++i)
 	{
