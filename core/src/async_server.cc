@@ -16,6 +16,7 @@ void CallData::Proceed(map<string, shared_ptr<ClientConnection>>* ptr_client_con
 	}
 	else if (status_ == PROCESS)
 	{
+		std::unique_lock<mutex> guard(mtx_);
 		new CallData(service_, cq_);
 		status_ = FINISH;
 		// 返回值
