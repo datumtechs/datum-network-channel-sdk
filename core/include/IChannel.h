@@ -30,12 +30,12 @@ public:
   virtual void SetErrorCallback(error_callback error_cb)= 0;
 
   /**
-   * @brief Recv receive a message from message queue， for the target node (blocking for timeout microseconds, default waiting forever)
+   * @brief Recv receive a message from message queue， for the target node (blocking for timeout millisecond, default waiting forever)
    * @param node_id target node id for message receiving.
    * @param id identity of a message, could be a task id or message id.
    * @param data buffer to receive a message.
    * @param length data length expect to receive
-   * @param timeout timeout to receive a message.
+   * @param timeout timeout to receive a message(Unit: milliseconds).
    * @return 
    *  return message length if receive a message successfully
    *  0 if peer is disconnected  
@@ -49,7 +49,7 @@ public:
    * @param id identity of a message, could be a task id or message id.
    * @param data buffer to send
    * @param length data length expect to send
-   * @param timeout timeout to receive a message.
+   * @param timeout timeout to receive a message(Unit: milliseconds).
    * @return 
    *  return length of data has been sent if send a message successfully
    *  -1 if gets exceptions or error
