@@ -93,7 +93,7 @@ AsyncServer::AsyncServer(const string& server_address,
 
 	// Proceed to the server's main loop.
 	// Spawn a new CallData instance to serve new clients.
-	
+
 	for(int i = 0; i < optimalUseCPUNum_; ++i)
 	{
 		new CallData(&service_, map_cq_[i].get());

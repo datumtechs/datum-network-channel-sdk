@@ -36,7 +36,8 @@ ssize_t SyncClient::send(const string& self_nodeid, const string& remote_nodeid,
 
   auto start_time = system_clock::now();
   auto end_time   = start_time;
-  
+  int64_t elapsed = 0;
+  system_clock::time_point deadline = start_time + std::chrono::milliseconds(timeout);
   do {
     grpc::ClientContext context;
     // 添加注册到via的参数
@@ -44,9 +45,10 @@ ssize_t SyncClient::send(const string& self_nodeid, const string& remote_nodeid,
     context.AddMetadata("task_id", task_id_);
     context.AddMetadata("party_id", remote_nodeid);
 
-    // cout << "ClientConnection stub_->Send1111, remote_nodeid:" << remote_nodeid << endl;
+    // 设置阻塞等待和超时时间
+    context.set_wait_for_ready(true);
+    context.set_deadline(deadline);
     Status status = stub_->Send(&context, req_info, &ret_code);
-    // cout << "ClientConnection stub_->Send2222, remote_nodeid:" << remote_nodeid << endl;
     if (status.ok()) 
     {
       // cout << "send data to " << remote_nodeid << " succeed=====" << endl;
@@ -55,19 +57,17 @@ ssize_t SyncClient::send(const string& self_nodeid, const string& remote_nodeid,
     else 
     {
       end_time = system_clock::now();
-      auto duration = duration_cast<microseconds>(end_time - start_time);
-      auto cost_time = double(duration.count()) * 
-        microseconds::period::num / microseconds::period::den;
+      elapsed = duration_cast<duration<int64_t, std::milli>>(end_time - start_time).count();
 
       // cout << "send data to " << remote_nodeid << " failed, cost " 
-      //   << cost_time << " seconds." << endl;
-      if(cost_time >= timeout)
-        break;
-      std::this_thread::yield();
-      // this_thread::sleep_for(chrono::milliseconds(SLEEP_TIME_MILLI_SECONDS));
+      //   << elapsed << " milliseconds." << endl;
+      if(elapsed >= timeout)
+      {
+          cout << "send request timeout!" << endl;
+          return 0;
+      }
     }
   } while(true);
 	
-	// cout << "Send data succeed==============" << endl;
 	return nLen;
 }

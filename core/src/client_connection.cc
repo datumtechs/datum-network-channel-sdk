@@ -15,7 +15,7 @@ ssize_t ClientConnection::recv(const string& id, char* data, uint64_t length, in
 {
   // cout << "ClientConnection::recv, msgid:" << id << ", buff size:" << buffer_->size() << endl;
   if (timeout < 0)
-    timeout = 1000 * 1000000;
+    timeout = 10 * 1000000;
 
   int64_t elapsed = 0;
   auto beg = system_clock::now();
@@ -98,7 +98,7 @@ bool ClientConnection::write(const string& msgid, const string& data)
 ssize_t ClientConnection::recv(const string& msgid, char* data, uint64_t length, int64_t timeout)
 {
   if (timeout < 0)
-    timeout = 1000 * 1000000;
+    timeout = 10 * 1000000;
   
   auto beg = system_clock::now();
   int64_t elapsed = 0;
