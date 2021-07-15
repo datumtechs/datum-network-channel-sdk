@@ -1,4 +1,4 @@
-import lib.io_channel as io_channel
+import channel_sdk.grpc as io_channel
 import faulthandler
 import traceback
 import os
@@ -17,12 +17,10 @@ def fun(a, b, c, d, e):
     return
 
 if __name__ == '__main__':
-
-    is_start_server = True
     api = io_channel.impl.api()
     node_id = "p0"
     # 启动服务
-    channel_ = api.create_channel(node_id, strJson, is_start_server, fun)
+    channel_ = api.create_channel(node_id, strJson, fun)
 
     # 获取via地址
     via_address = channel_.GetCurrentVia()

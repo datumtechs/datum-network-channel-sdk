@@ -5,7 +5,7 @@ import datetime
 import latticex.rosetta as rtt
 import tensorflow as tf
 
-import io_channel
+import channel_sdk.grpc as io_channel
 from config import cfg
 from protos import via_svc_pb2
 import os

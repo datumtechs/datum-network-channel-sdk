@@ -7,14 +7,14 @@ find . -name "__pycache__" -type d | xargs rm -rf
 rm -rf .eggs
 rm -rf build
 
-rm -rf python/io_channel.egg-info
-rm -rf python/io_channel/*.so*
+rm -rf python/channel_sdk.egg-info
+rm -rf python/channel_sdk/*.so*
 
-rm python/io_channel.egg-info -rf
+rm python/channel_sdk.egg-info -rf
 rm dist -rf
 
 if [ "$USER" == "root" ]; then
-  sudo pip3 uninstall io-channel -y
+  sudo pip3 uninstall channel-sdk -y
 else
-  python3 -m pip uninstall io-channel -y # for the current user
+  python3 -m pip uninstall channel-sdk -y # for the current user
 fi

@@ -1,4 +1,4 @@
-import lib.io_channel as io_channel
+import channel_sdk.grpc as io_channel
 import faulthandler
 import json
 import os
@@ -19,12 +19,9 @@ def fun(a, b, c, d, e):
 if __name__ == '__main__':
     try:
 
-        # 启动客户端
-        is_start_server = False
-
         api = io_channel.impl.api()
         # 创建网络拓扑
-        channel_ = api.create_channel("p1", strJson, is_start_server, fun)
+        channel_ = api.create_channel("p1", strJson, fun)
 
         # time.sleep(1000)
         # print(io_)

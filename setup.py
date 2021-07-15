@@ -2,21 +2,21 @@
 # Copyright 2021 The channel sdk
 # This file is part of the channel sdk library.
 #
-# The io_channel library is free software: you can redistribute it and/or modify
+# The channel sdk library is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Lesser General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
 #
-# The io_channel library is distributed in the hope that it will be useful,
+# The channel sdk library is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 # GNU Lesser General Public License for more details.
 #
 # You should have received a copy of the GNU Lesser General Public License
-# along with the io_channel library. If not, see <http://www.gnu.org/licenses/>.
+# along with the channel sdk library. If not, see <http://www.gnu.org/licenses/>.
 # =============================================================================="
 
-"""io channel is a network library"""
+"""channel sdk is a network library"""
 
 import glob
 from posixpath import dirname
@@ -29,7 +29,7 @@ import setuptools
 from distutils import sysconfig
 
 dir_name = "python"
-sub_dir_name = "io_channel"
+sub_dir_name = "channel_sdk"
 # save_lib_dir = os.path.join(dir_name, "/", sub_dir_name)
 save_lib_dir = dir_name + "/" + sub_dir_name + "/"
 
@@ -37,10 +37,14 @@ so_libs = glob.glob('build/lib/lib*.so')
 for file_name in so_libs:
     shutil.copy(file_name, save_lib_dir)
 
-cc_module_name = "io_channel"
+cc_module_name = "grpc"
 build_ext_target = sub_dir_name + "/" + cc_module_name
 DOCLINES = __doc__.split('\n')
 __version__ = '1.0.0'
+
+build_use_alone = False
+if 'USE_ALONE' in os.environ and os.environ['USE_ALONE'] == 'ON':
+    build_use_alone = True
 
 root_dir = os.path.dirname(os.path.abspath(__file__))
 include_dirs = []
@@ -63,6 +67,9 @@ library_dirs.append(save_lib_dir)
 
 # compile flags and definitions
 extra_cflags = []
+if build_use_alone:
+    extra_cflags.append('-DUSE_ALONE=1')  # USE_ALONE
+
 extra_cflags.append('-fPIC')  # general
 extra_cflags.append('-Wno-unused-function')  # general
 extra_cflags.append('-Wno-sign-compare')
@@ -102,10 +109,10 @@ if sys.platform == 'linux' or sys.platform == "darwin":  # remove -g flags
                 '-g ', ' ')
 
 setup(
-    name='io-channel',
+    name='channel-sdk',
     version=__version__,
     author='channel sdk',
-    author_email='io-channel@juzix.cn',
+    author_email='channel-sdk@juzix.cn',
     url='https://www.platon.network/',
     download_url='http://192.168.9.66/RosettaFlow/channel-sdk',
     description=DOCLINES[0],

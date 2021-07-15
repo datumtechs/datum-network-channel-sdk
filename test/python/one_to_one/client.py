@@ -1,4 +1,4 @@
-import io_channel
+import channel_sdk.grpc as io_channel
 import faulthandler
 import json
 import os

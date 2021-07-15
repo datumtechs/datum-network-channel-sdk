@@ -21,10 +21,10 @@ build/**
 build/
 .eggs/
 dist/
-python/io_channel/*.so
+python/channel_sdk/*.so
 __pycache__
 history
-python/io_channel.egg-info
+python/channel_sdk.egg-info
 *.swp
 
 

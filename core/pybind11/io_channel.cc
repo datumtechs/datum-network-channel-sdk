@@ -4,8 +4,8 @@
 namespace py = pybind11;
 #include "IChannel.h"
 
-// 定义模块名称(io_channel)
-PYBIND11_MODULE(io_channel, m) {
+// 定义模块名称(grpc)
+PYBIND11_MODULE(grpc, m) {
 
   m.def("create_channel", &CreateChannel);
 

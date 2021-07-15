@@ -108,7 +108,7 @@ void send_msg(const string& node_id, const string& msg_id, const string& data, u
   if(msg_len > data.size())
         msg_len = data.size();
   if(!gs_impl->io_channel_){cout << "io channel is nullptr." << endl; return;}
-  gs_impl->io_channel_->Send(node_id.c_str(), msg_id.c_str(), data.c_str(), msg_len);
+  gs_impl->io_channel_->Send(node_id.c_str(), msg_id.c_str(), data.c_str(), msg_len, 10 * 1000000);
 }
 
 shared_ptr<IChannel> IoChannelImpl::CreateViaChannel(const NodeInfo& node_info, 

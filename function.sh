@@ -24,8 +24,8 @@ function run_compile() {
         -DUSE_ALONE=${use_alone} \
         -DCMAKE_BUILD_TYPE=${build_type} \
         -DSERVER_TYPE=${server_type} \
-        -DCLIENT_TYPE=${client_type} \
-        -DPYBIND11_PYTHON_VERSION=${python_version}
+        -DCLIENT_TYPE=${client_type}
+        # -DPYBIND11_PYTHON_VERSION=${python_version}
 
     if [ -z ${verbose} ];then
         make -j4

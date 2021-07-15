@@ -1,1 +1,1 @@
-include python/io_channel/*.so*
+include python/channel_sdk/*.so*

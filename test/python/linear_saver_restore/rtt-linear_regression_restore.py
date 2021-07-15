@@ -9,7 +9,7 @@ from util import read_dataset
 
 
 import datetime
-import io_channel
+import channel_sdk.grpc as io_channel
 from protos import via_svc_pb2
 import os
 import json
