@@ -1,10 +1,14 @@
 cmake_minimum_required(VERSION 3.5.1)
 
-SET(LIBNAME external_io)
+SET(LIBNAME extio)
 project(${LIBNAME})
 
 include(./cmake/common.cmake)
-add_definitions(-std=c++11)
+include(./cmake/SetCommon.cmake)
+# add_definitions(-std=c++11)
+
+#list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+
 
 #file(MAKE_DIRECTORY ${lib_path})
 # set(LIBRARY_OUTPUT_PATH ${CMAKE_CURRENT_SOURCE_DIR}/lib)
@@ -38,6 +42,25 @@ add_definitions(-std=c++11)
 #   ${_GRPC_GRPCPP}
 #   ${_PROTOBUF_LIBPROTOBUF})
 
+# option
+option(USE_ALONE "" OFF)
+IF(USE_ALONE)
+    message(STATUS "[USE_ALONE]: ${USE_ALONE}")
+    add_definitions(-DUSE_ALONE=1)
+ENDIF()
+
+option(SERVER_TYPE "" OFF)
+IF(SERVER_TYPE)
+    message(STATUS "[SERVER_TYPE]: ${SERVER_TYPE}")
+    add_definitions(-D${SERVER_TYPE}=1)
+ENDIF()
+
+option(CLIENT_TYPE "" OFF)
+IF(CLIENT_TYPE)
+    message(STATUS "[CLIENT_TYPE]: ${CLIENT_TYPE}")
+    add_definitions(-D${CLIENT_TYPE}=1)
+ENDIF()
+
 
 # third party
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/third_party/rapidjson/include)
@@ -53,33 +76,19 @@ message(STATUS "_REFLECTION: ${_REFLECTION}")
 message(STATUS "_GRPC_GRPCPP: ${_GRPC_GRPCPP}")
 message(STATUS "_PROTOBUF_LIBPROTOBUF: ${_PROTOBUF_LIBPROTOBUF}")
 
-link_libraries(${_REFLECTION} ${_GRPC_GRPCPP} ${_PROTOBUF_LIBPROTOBUF})
+# link_libraries(${_REFLECTION} ${_GRPC_GRPCPP} ${_PROTOBUF_LIBPROTOBUF})
 # libraries
 file(GLOB_RECURSE srcs core/src/*.cc)
 add_library(${LIBNAME} SHARED ${srcs})
 target_include_directories(${LIBNAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/core/include)
 target_link_libraries(${LIBNAME} PUBLIC pthread ${_REFLECTION} ${_GRPC_GRPCPP} ${_PROTOBUF_LIBPROTOBUF})
- 
-# set_target_properties(${LIBNAME} PROPERTIES FOLDER "io"
+
+# set_target_properties(${LIBNAME} PROPERTIES FOLDER "extio"
 #     APPEND_STRING PROPERTY LINK_FLAGS " ${ADD_LINK_LIB_FLAGS}")
 
-option(USE_ALONE "" OFF)
-IF(USE_ALONE)
-    add_definitions(-DUSE_ALONE=1)
-ENDIF()
-
-option(ASYNC_SERVER "" OFF)
-IF(ASYNC_SERVER)
-    add_definitions(-DASYNC_SERVER=1)
-ENDIF()
-
-option(ASYNC_CLIENT "" OFF)
-IF(ASYNC_CLIENT)
-    add_definitions(-DASYNC_CLIENT=1)
-ENDIF()
-
-
 # targets pybind11
-add_subdirectory("./third_party/pybind11/" pybind11)
-pybind11_add_module(io_channel core/pybind11/io_channel.cc)
-target_link_libraries(io_channel PRIVATE ${LIBNAME})
+
+# add_subdirectory("./third_party/pybind11/" pybind11)
+# pybind11_add_module(io_channel core/pybind11/io_channel.cc)
+# link_libraries(${LIBNAME})
+# target_link_libraries(io_channel PRIVATE ${LIBNAME})
