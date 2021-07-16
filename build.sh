@@ -109,7 +109,7 @@ if [ "${cmd}" = "compile" ]; then
     server_type=${server_type}"_SERVER"
     client_type=${client_type}"_CLIENT"
     run_compile
-    run_compile_python
+    run_compile_python $use_alone
 
 elif [ "${cmd}" = "clean" ]; then
     ARGS=$(getopt -o "h" -l "help" -n "$0" -- "$@")
