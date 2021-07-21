@@ -9,7 +9,8 @@ from util import read_dataset
 
 
 import datetime
-import channel_sdk.grpc as io_channel
+import channel_sdk.grpc as grpc
+io_channel = grpc.APIManager()
 from protos import via_svc_pb2
 import os
 import json

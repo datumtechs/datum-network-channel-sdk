@@ -1,4 +1,5 @@
-import channel_sdk.grpc as io_channel
+import channel_sdk.grpc as grpc
+io_channel = grpc.APIManager()
 import faulthandler
 import json
 import os

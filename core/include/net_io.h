@@ -88,6 +88,7 @@ class BasicIO {
 #if ASYNC_SERVER
   shared_ptr<AsyncServer> server_ = nullptr;
   vector<std::thread> handle_threads_;
+  vector<std::thread> handle_data_threads_;
 #else
   shared_ptr<SyncServer> server_ = nullptr;
 #endif

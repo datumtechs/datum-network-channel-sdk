@@ -1,4 +1,5 @@
-import channel_sdk.grpc as io_channel
+import channel_sdk.grpc as grpc
+io_channel = grpc.APIManager()
 import faulthandler
 import json
 import os
@@ -26,12 +27,12 @@ if __name__ == '__main__':
     print("start to recv========" )
     # 
     # 获取io接口
-    io_channel.set_channel(channel)
+    # io_channel.set_channel(channel)
     remote_nodeid = "p0"
     msgid = "1"
     data = "this is test p0"
     msg_len = len(data)
     while(True):
-        recv_msg = io_channel.recv_msg(remote_nodeid, msgid, msg_len)
+        recv_msg = io_channel.recv_msg(remote_nodeid, msgid, msg_len, 0)
         print("recv_msg:{}".format(recv_msg))
     

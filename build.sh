@@ -25,6 +25,9 @@ function show_compile_usage() {
     echo "  -h --help                         Show this usage"
     echo "     --build-type                   [Release] One of [Release,Debug]"
     echo "     --server-type                  [ASYNC] One of [ASYNC,SYNC]"
+    echo "     --use-cache                    [OFF] Asynchronous server parameters:Use the cache queue switch"
+    echo "     --multi-locks                  [OFF] Asynchronous server parameters:Use multi-lock switches, and nodeid mapping"
+    echo "     --thread-count                 [4] Number of threads to process asynchronous server events, default to the number of CPU cores available "
     echo "     --client-type                  [SYNC] One of [ASYNC,SYNC]"
     echo "     --python-version               Python install version"
     echo "     --use-alone                    [OFF] The compiled version is used separately"
@@ -58,8 +61,12 @@ if [ "${cmd}" = "compile" ]; then
     client_type=SYNC
     python_version=$(python3 -c 'import sys;ver=sys.version_info;print(str(ver[0])+"."+str(ver[1]))')   
     use_alone=OFF
+    use_cache=OFF
+    thread_count=1
+    multi_locks=OFF
 
-    ARGS=$(getopt -o "h" -l "help,build-type:,server-type:,client-type:,use-alone,python-version:,verbose:" -n "$0" -- "$@")
+    ARGS=$(getopt -o "h" -l "help,build-type:,server-type:,client-type:,use-alone,use-cache, 
+        thread-count:,multi-locks, python-version:,verbose:" -n "$0" -- "$@")
     eval set -- "${ARGS}"
 
     while true; do
@@ -82,7 +89,6 @@ if [ "${cmd}" = "compile" ]; then
             shift 2
             ;;
         --python-version)
-            # echo "python-version:${2}"
             python_version=${2}
             shift 2
             ;;
@@ -92,6 +98,18 @@ if [ "${cmd}" = "compile" ]; then
             ;;
         --use-alone)
             use_alone=ON
+            shift
+            ;;
+        --use-cache)
+            use_cache=ON
+            shift
+            ;;
+        --thread-count)
+            thread_count=${2}
+            shift 2
+            ;;
+        --multi-locks)
+            multi_locks=ON
             shift
             ;;
         --)

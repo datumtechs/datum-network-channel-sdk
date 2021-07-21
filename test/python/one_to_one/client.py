@@ -1,4 +1,5 @@
-import channel_sdk.grpc as io_channel
+import channel_sdk.grpc as grpc
+io_channel = grpc.APIManager()
 import faulthandler
 import json
 import os
@@ -26,11 +27,11 @@ if __name__ == '__main__':
         print("start to send========" )
         # 
         # 获取io接口
-        io_channel.set_channel(channel)
+        # io_channel.set_channel(channel)
         remote_nodeid = "p1"
         msgid = "1"
         data = "this is test p0"
-        io_channel.send_msg(remote_nodeid, msgid, data, 100)
+        io_channel.send_msg(remote_nodeid, msgid, data, 100, 0)
 
     except Exception as e:
         print(traceback.format_exc())

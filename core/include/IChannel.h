@@ -96,9 +96,3 @@ public:
   // virtual const char* GetTaskId() = 0;
 };// IChannel
 
-shared_ptr<IChannel> CreateChannel(const string& node_id, const string &config_str, 
-      error_callback error_cb);
-
-void set_channel(shared_ptr<IChannel> io_channel);
-string recv_msg(const string& node_id, const string& msg_id, uint64_t msg_len); 
-void send_msg(const string& node_id, const string& msg_id, const string& data, uint64_t msg_len); 

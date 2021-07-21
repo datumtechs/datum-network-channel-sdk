@@ -21,9 +21,11 @@ function run_compile() {
     echo -e "${GREEN}Start compiling.${NC}"
     cd ${builddir}
     cmake .. -DCMAKE_INSTALL_PREFIX=.install -DCMAKE_PREFIX_PATH=${builddir}  \
+        -DTHREAD_COUNT=${thread_count} \
         -DUSE_ALONE=${use_alone} \
         -DCMAKE_BUILD_TYPE=${build_type} \
         -DSERVER_TYPE=${server_type} \
+        -DUSE_CACHE=${use_cache} -DMULTI_LOCKS=${multi_locks} \
         -DCLIENT_TYPE=${client_type}
         # -DPYBIND11_PYTHON_VERSION=${python_version}
 

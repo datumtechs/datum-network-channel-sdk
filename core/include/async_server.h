@@ -13,6 +13,19 @@
 #include <grpc++/grpc++.h>
 #include "io_channel.grpc.pb.h"
 
+/*
+四种使用缓存组合方案：
+1.单线程/单把锁/单个缓存队列;
+2.单线程/多把锁/多个缓存队列;
+3.多线程/单把锁/单个缓存队列;
+4.多线程/多把锁/多个缓存队列;
+
+四种不使用缓存组合方案：
+1.单线程/单把锁/无;
+2.单线程/多把锁/无;
+3.多线程/单把锁/无;
+4.多线程/多把锁/无;
+*/
 
 using grpc::Server;
 using grpc::ServerAsyncResponseWriter;
@@ -39,7 +52,8 @@ public:
 
 	virtual ~CommonCallData(){/*std::cout << "CommonCallData destructor" << std::endl;*/}
 
-	virtual void Proceed(map<string, shared_ptr<ClientConnection>>* ptr_client_conn_map = nullptr) = 0;
+	virtual void Proceed(void* ptr_save = nullptr, void* ptr_mtx = nullptr, void* ptr_cv = nullptr) = 0;
+
 public:
     // The means of communication with the gRPC runtime for an asynchronous
     // server.
@@ -57,7 +71,6 @@ public:
 	// Let's implement a tiny state machine with the following states.
     enum CallStatus { CREATE, PROCESS, FINISH };
     CallStatus status_;  // The current serving state.
-	std::mutex mtx_;
 };
 
 class CallData: public CommonCallData
@@ -66,7 +79,9 @@ public:
 	using CommonCallData::CommonCallData;
 	CallData(IoChannel::AsyncService* service, ServerCompletionQueue* cq):
 		CommonCallData(service, cq), responder_(&ctx_){Proceed();}
-	virtual void Proceed(map<string, shared_ptr<ClientConnection>>* ptr_client_conn_map = nullptr);
+
+	virtual void Proceed(void* ptr_save = nullptr, void* ptr_mtx = nullptr, void* ptr_cv = nullptr);
+
 private:
     ServerAsyncResponseWriter<RetCode> responder_;
 };
@@ -79,10 +94,31 @@ public:
 	~AsyncServer();
 	bool close();
 	void Handle_Event(const int numEvent);
+	int get_thread_count() {return thread_count_;}
+#if USE_CACHE
+	#if MULTI_LOCKS
+		void Handle_Data(const string& nodeid);
+	#else 
+		void Handle_Data();
+	#endif
+#endif
 
 private:
-	int enableCPUNum_ = 0;
-	int optimalUseCPUNum_ = 0;
+#if MULTI_LOCKS
+	map<string, shared_ptr<mutex>> map_mtx_;
+	#if USE_CACHE
+		map<string, shared_ptr<queue<SendRequest>>> map_send_queue_;
+		map<string, shared_ptr<condition_variable>> map_cv_;
+	#endif
+#else
+	mutex mtx_;
+	#if USE_CACHE
+		queue<SendRequest> send_queue_;
+		condition_variable cv_;
+	#endif
+#endif
+
+	int thread_count_ = 0;
 	map<int, std::unique_ptr<ServerCompletionQueue>> map_cq_;
 	IoChannel::AsyncService service_;
 	std::unique_ptr<Server> server_;

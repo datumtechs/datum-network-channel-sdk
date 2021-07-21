@@ -21,15 +21,27 @@ bool ViaNetIO::StartServer(const string& server_addr,
 
 #if ASYNC_SERVER
   server_ = make_shared<AsyncServer>(server_addr, ptr_client_conn_map);
-  int enableCPUNum = sysconf(_SC_NPROCESSORS_ONLN);
-  // 可用cpu核数-1
-  int optimalUseCPUNum = enableCPUNum > 1 ? (enableCPUNum - 1): 1;
-  // int optimalUseCPUNum = 1;
-  handle_threads_.resize(optimalUseCPUNum);
-  for(int i = 0; i < optimalUseCPUNum; ++i)
+  int thread_count = server_->get_thread_count();
+
+  handle_threads_.resize(thread_count);
+  for(int i = 0; i < thread_count; ++i)
   {
     handle_threads_[i] = thread(&AsyncServer::Handle_Event, server_, i);
   }
+#if USE_CACHE
+	#if MULTI_LOCKS
+		int i = 0;
+    handle_data_threads_.resize(ptr_client_conn_map->size());
+    for(auto &v: *ptr_client_conn_map)
+    {
+      handle_data_threads_[i++] = thread(&AsyncServer::Handle_Data, server_, v.first);
+    }
+	#else 
+    handle_data_threads_.resize(1);
+		handle_data_threads_[0] = thread(&AsyncServer::Handle_Data, server_);
+	#endif
+#endif
+  
 #else
   server_ = make_shared<SyncServer>(server_addr, ptr_client_conn_map);
 #endif
@@ -44,6 +56,7 @@ bool ViaNetIO::init(const string& taskid)
   if(client_size > 0)
   {
     string client_nodeid = "";
+
     for (int i = 0; i < client_size; i++)
     {
       client_nodeid = client_nodeids_[i];
