@@ -1,18 +1,24 @@
 {
-	"PASS_VIA": true,
 	"TASK_ID": "task-1",
+	"ROOT_CERT": "ssl_key/ca.pem",
 	"NODE_INFO": [
 		{
 			"NODE_ID": "p0",
-			"NAME": "PartyA(P0)",
 			"ADDRESS": "127.0.0.1:10001",
-			"VIA": "VIA1"
+			"VIA": "VIA1",
+			"SERVER_KEY": "ssl_key/server.key",
+			"SERVER_CERT": "ssl_key/server.pem",
+			"CLIENT_KEY": "ssl_key/client.key",
+			"CLIENT_CERT": "ssl_key/client.pem"
 		},
 		{
 			"NODE_ID": "p1",
-			"NAME": "PartyB(P1)",
 			"ADDRESS": "127.0.0.1:20001",
-			"VIA": "VIA2"
+			"VIA": "VIA2",
+			"SERVER_KEY": "ssl_key/server.key",
+			"SERVER_CERT": "ssl_key/server.pem",
+			"CLIENT_KEY": "ssl_key/client.key",
+			"CLIENT_CERT": "ssl_key/client.pem"
 		}
 	],
 	"VIA_INFO": {
