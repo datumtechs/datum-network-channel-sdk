@@ -1,15 +1,33 @@
 // file sync_client.cc
 #include "sync_client.h"
+#include <grpc++/security/credentials.h>
 #if USE_BUFFER_
 #include "simple_buffer.h"
 #endif
 #include <thread>
 #include <chrono>   
 using namespace chrono;
-SyncClient::SyncClient(const string& server_addr, const string& taskid)
+SyncClient::SyncClient(const string& server_addr, const string& taskid,
+    const char* server_cert, const char* client_key, const char* client_cert)
 {
 	task_id_ = taskid;
-	auto channel = grpc::CreateChannel(server_addr, grpc::InsecureChannelCredentials());
+  std::shared_ptr<grpc::ChannelCredentials> creds;
+#if USE_SSL
+  if(nullptr == server_cert || nullptr == client_key || nullptr == client_cert)
+  {
+    cerr << "Invalid client certificate, please check!" << endl;
+    return;
+  }
+	grpc::SslCredentialsOptions ssl_opts;
+  ssl_opts.pem_root_certs  = server_cert;
+  ssl_opts.pem_private_key = client_key;
+  ssl_opts.pem_cert_chain  = client_cert;
+  creds = grpc::SslCredentials(ssl_opts);
+#else
+	creds = grpc::InsecureChannelCredentials();
+#endif
+
+	auto channel = grpc::CreateChannel(server_addr, creds);
 	stub_ = IoChannel::NewStub(channel);
 	// cout << "create channel, server_addr:" << server_addr << endl;
 }

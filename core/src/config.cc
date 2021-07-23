@@ -226,6 +226,10 @@ bool ChannelConfig::parse_node_info(Document& doc, bool pass_via)
       cfg.node_.NAME = GetString(Node, "NAME", (std::string("P") + std::to_string(i)).c_str(), false);
       cfg.node_.ADDRESS = GetString(Node, "ADDRESS", "", false);
       cfg.node_.VIA = GetString(Node, "VIA", "", false);
+      cfg.node_.SERVER_KEY_PATH = GetString(Node, "SERVER_KEY", "", false);
+      cfg.node_.SERVER_CERT_PATH = GetString(Node, "SERVER_CERT", "", false);
+      cfg.node_.CLIENT_KEY_PATH = GetString(Node, "CLIENT_KEY", "", false);
+      cfg.node_.CLIENT_CERT_PATH = GetString(Node, "CLIENT_CERT", "", false);
       node_info_config_.insert(std::pair<string, NodeInfoConfig>(cfg.node_.NODE_ID, cfg));
       
       if(pass_via_) 
@@ -332,6 +336,7 @@ bool ChannelConfig::parse(Document& doc) {
   //! @todo the node_id__ID field in CONFIG.json have not yet used
   // pass_via_ = GetBool(doc, "PASS_VIA", true, false);
   task_id_ = GetString(doc, "TASK_ID", "", false);
+  root_cert_ = GetString(doc, "ROOT_CERT", "", false);
   if (!parse_node_info(doc)) {
     cout << "parse node info error" << endl;
   }
@@ -368,6 +373,13 @@ void ChannelConfig::CopyNodeInfo(NodeInfo& node_info, const Node& nodeInfo)
 {
   node_info.id = nodeInfo.NODE_ID;
   node_info.address = nodeInfo.ADDRESS;
+#if USE_SSL
+  node_info.ca_cert_path_ = root_cert_;
+  node_info.server_key_path_ = nodeInfo.SERVER_KEY_PATH;
+  node_info.server_cert_path_ = nodeInfo.SERVER_CERT_PATH;
+  // node_info.client_key_path_ = nodeInfo.CLIENT_KEY_PATH;
+  // node_info.client_cert_path_ = nodeInfo.CLIENT_CERT_PATH;
+#endif
 }
 
 bool ChannelConfig::isNodeType(const vector<NODE_TYPE>& vec_node_types, const NODE_TYPE nodeType)
@@ -398,6 +410,12 @@ bool ChannelConfig::GetNodeInfos(vector<string>& clientNodeIds, vector<ViaInfo>&
       viaTmp.id = nid;
       viaTmp.via = via;
       viaTmp.address = via_to_address_[via];
+    #if USE_SSL
+      const Node& node = node_info_config_[nid].node_;
+      viaTmp.server_cert_path_ = node.SERVER_CERT_PATH;
+      viaTmp.client_key_path_ = node.CLIENT_KEY_PATH;
+      viaTmp.client_cert_path_ = node.CLIENT_CERT_PATH;
+    #endif
       // cout << "id: " << nid << ", via: " << viaTmp.via << ", address: " << viaTmp.address << endl;
       serverInfos.push_back(viaTmp);
       clientNodeIds.push_back(nid);
@@ -417,6 +435,12 @@ bool ChannelConfig::GetNodeInfos(vector<string>& clientNodeIds, vector<ViaInfo>&
       viaTmp.id = nid;
       viaTmp.via = via;
       viaTmp.address = via_to_address_[via];
+    #if USE_SSL
+      const Node& node = node_info_config_[nid].node_;
+      viaTmp.server_cert_path_ = node.SERVER_CERT_PATH;
+      viaTmp.client_key_path_ = node.CLIENT_KEY_PATH;
+      viaTmp.client_cert_path_ = node.CLIENT_CERT_PATH;
+    #endif
       // cout << "id: " << nid << ", via: " << viaTmp.via << ", address: " << viaTmp.address << endl;
       serverInfos.push_back(viaTmp);
       clientNodeIds.push_back(nid);
@@ -437,6 +461,12 @@ bool ChannelConfig::GetNodeInfos(vector<string>& clientNodeIds, vector<ViaInfo>&
       viaTmp.via = via;
       // via信息
       viaTmp.address = via_to_address_[viaTmp.via];
+    #if USE_SSL
+      const Node& node = node_info_config_[nid].node_;
+      viaTmp.server_cert_path_ = node.SERVER_CERT_PATH;
+      viaTmp.client_key_path_ = node.CLIENT_KEY_PATH;
+      viaTmp.client_cert_path_ = node.CLIENT_CERT_PATH;
+    #endif
       // cout << "id: " << nid << ", via: " << viaTmp.via << ", address: " << viaTmp.address << endl;
       serverInfos.push_back(viaTmp);
       clientNodeIds.push_back(nid);

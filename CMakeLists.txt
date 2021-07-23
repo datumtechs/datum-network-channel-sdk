@@ -43,6 +43,12 @@ include(./cmake/SetCommon.cmake)
 #   ${_PROTOBUF_LIBPROTOBUF})
 
 # option
+option(USE_SSL "" OFF)
+message(STATUS "[USE_SSL]: ${USE_SSL}")
+IF(USE_SSL)
+    add_definitions(-DUSE_SSL=1)
+ENDIF()
+
 option(USE_ALONE "" OFF)
 message(STATUS "[USE_ALONE]: ${USE_ALONE}")
 IF(USE_ALONE)

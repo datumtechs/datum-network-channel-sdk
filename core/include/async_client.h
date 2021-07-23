@@ -58,7 +58,9 @@ public:
 class AsyncClient
 {
 public:
-    AsyncClient(const string& server_addr, const string& taskid);
+    AsyncClient(const string& server_addr, const string& taskid,
+		const char* server_cert = nullptr, const char* client_key = nullptr, 
+		const char* client_cert = nullptr);
 
 	void SendReqAgain(const AbstractAsyncClientCall* call);
 	// Assembles the client's payload and sends it to the server.
@@ -75,7 +77,6 @@ private:
     // Out of the passed in Channel comes the stub, stored here, our view of the
     // server's exposed services.
     std::unique_ptr<IoChannel::Stub> stub_;
-
     // The producer-consumer queue we use to communicate asynchronously with the
     // gRPC runtime.
     CompletionQueue cq_;

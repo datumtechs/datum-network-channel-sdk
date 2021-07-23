@@ -40,7 +40,8 @@ public:
     bool wait();
 
     SyncServer(const string& server_addr, 
-        map<string, shared_ptr<ClientConnection>>* ptr_client_conn_map);
+        map<string, shared_ptr<ClientConnection>>* ptr_client_conn_map,
+        const char* root_crt = nullptr, const char* server_key = nullptr, const char* server_cert = nullptr);
 	Status Send(ServerContext* context, const SendRequest* request, RetCode* response);
     
 private:

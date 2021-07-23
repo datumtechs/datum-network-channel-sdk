@@ -23,10 +23,28 @@ AsyncClientCall::AsyncClientCall(const string& task_id, const string& remote_nod
 	callStatus = PROCESS ;
 }
 
-AsyncClient::AsyncClient(const string& server_addr, const string& taskid)
+AsyncClient::AsyncClient(const string& server_addr, const string& taskid,
+		const char* server_cert, const char* client_key, const char* client_cert)
 {
 	task_id_ = taskid;
-	auto channel = grpc::CreateChannel(server_addr, grpc::InsecureChannelCredentials());
+  	shared_ptr<grpc::ChannelCredentials> creds;
+
+#if USE_SSL
+	if(nullptr == server_cert || nullptr == client_key || nullptr == client_cert)
+	{
+		cerr << "Invalid client certificate, please check!" << endl;
+		return;
+	}
+	grpc::SslCredentialsOptions ssl_opts;
+	ssl_opts.pem_root_certs  = server_cert;
+	ssl_opts.pem_private_key = client_key;
+	ssl_opts.pem_cert_chain  = client_cert;
+	creds = grpc::SslCredentials(ssl_opts);
+#else
+	creds = grpc::InsecureChannelCredentials();
+#endif
+
+	auto channel = grpc::CreateChannel(server_addr, creds);
 	stub_ = IoChannel::NewStub(channel);
 }
 

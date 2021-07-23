@@ -20,13 +20,31 @@ bool SyncServer::wait()
 }
 
 SyncServer::SyncServer(const string& server_addr, 
-        map<string, shared_ptr<ClientConnection>>* ptr_client_conn_map)
+    map<string, shared_ptr<ClientConnection>>* ptr_client_conn_map,
+    const char* root_crt, const char* server_key, const char* server_cert)
 {
     ptr_client_conn_map_ = ptr_client_conn_map;
     grpc::ServerBuilder builder;
     // 调整消息大小限制(默认最大为4M, 设置最大为2G)
     builder.SetMaxReceiveMessageSize(INT_MAX);
-    builder.AddListeningPort(server_addr, grpc::InsecureServerCredentials());
+    shared_ptr<grpc::ServerCredentials> creds;
+    
+#if USE_SSL
+	if(nullptr == root_crt || nullptr == server_key || nullptr == server_cert)
+	{
+		cerr << "Invalid server certificate, please check!" << endl;
+		return;
+	}
+	grpc::SslServerCredentialsOptions::PemKeyCertPair pkcp = {server_key, server_cert};
+	grpc::SslServerCredentialsOptions ssl_opts(GRPC_SSL_REQUEST_AND_REQUIRE_CLIENT_CERTIFICATE_AND_VERIFY);
+	ssl_opts.pem_root_certs = root_crt;
+	ssl_opts.pem_key_cert_pairs.push_back(pkcp);
+	creds = grpc::SslServerCredentials(ssl_opts);
+#else
+	creds = grpc::InsecureServerCredentials();
+#endif
+
+    builder.AddListeningPort(server_addr, creds);
     builder.RegisterService(this);
     server_ = builder.BuildAndStart();
     cout << "Server listening on " << server_addr << endl;

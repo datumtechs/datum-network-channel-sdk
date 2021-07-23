@@ -44,22 +44,20 @@ shared_ptr<IChannel> IoChannelImpl::CreateIoChannel(const string& node_id, const
         error_callback error_cb) 
 {
   shared_ptr<ChannelConfig> config = make_shared<ChannelConfig>(config_str);
+
+  // auto root_crt = get_file_contents(config->root_cert_.c_str());
+  // cout << "root_crt:" << root_crt << endl; 
+
   NodeInfo node_info;
   vector<ViaInfo> serverInfos;
   // 根据nodeid获取数据节点或计算节点或接收结果节点信息
   const Node& node = config->GetNode(node_id);
-
-  vector<NODE_TYPE> node_types = config->GetNodeType(node_id);
   // 获取节点信息
   config->CopyNodeInfo(node_info, node);
 
   // 获取本节点对应的via地址
   string via_name = config->nodeid_to_via_[node_info.id];
   node_info.via_address = config->via_to_address_[via_name];
-
-  // 启动服务器
-  vector<string> clientNodeIds;
- 
   if("" == node_info.via_address)
   {
     string strErrMsg = "The service node " + node_info.id + " does not have a VIA address!";
@@ -74,8 +72,7 @@ shared_ptr<IChannel> IoChannelImpl::CreateIoChannel(const string& node_id, const
     throw (strErrMsg);
   }
     
-  // cout << "start server, node.ADDRESS: " << node.ADDRESS << endl;
-
+  vector<string> clientNodeIds; 
   config->GetNodeInfos(clientNodeIds, serverInfos, node_id);
   /*
   string strNodeInfo = "address: " + node_info.address + ", id:" + node_info.id;

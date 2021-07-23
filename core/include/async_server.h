@@ -14,17 +14,17 @@
 #include "io_channel.grpc.pb.h"
 
 /*
-ËÄÖÖÊ¹ÓÃ»º´æ×éºÏ·½°¸£º
-1.µ¥Ïß³Ì/µ¥°ÑËø/µ¥¸ö»º´æ¶ÓÁĞ;
-2.µ¥Ïß³Ì/¶à°ÑËø/¶à¸ö»º´æ¶ÓÁĞ;
-3.¶àÏß³Ì/µ¥°ÑËø/µ¥¸ö»º´æ¶ÓÁĞ;
-4.¶àÏß³Ì/¶à°ÑËø/¶à¸ö»º´æ¶ÓÁĞ;
+å››ç§ä½¿ç”¨ç¼“å­˜ç»„åˆæ–¹æ¡ˆï¼š
+1.å•çº¿ç¨‹/å•æŠŠé”/å•ä¸ªç¼“å­˜é˜Ÿåˆ—;
+2.å•çº¿ç¨‹/å¤šæŠŠé”/å¤šä¸ªç¼“å­˜é˜Ÿåˆ—;
+3.å¤šçº¿ç¨‹/å•æŠŠé”/å•ä¸ªç¼“å­˜é˜Ÿåˆ—;
+4.å¤šçº¿ç¨‹/å¤šæŠŠé”/å¤šä¸ªç¼“å­˜é˜Ÿåˆ—;
 
-ËÄÖÖ²»Ê¹ÓÃ»º´æ×éºÏ·½°¸£º
-1.µ¥Ïß³Ì/µ¥°ÑËø/ÎŞ;
-2.µ¥Ïß³Ì/¶à°ÑËø/ÎŞ;
-3.¶àÏß³Ì/µ¥°ÑËø/ÎŞ;
-4.¶àÏß³Ì/¶à°ÑËø/ÎŞ;
+å››ç§ä¸ä½¿ç”¨ç¼“å­˜ç»„åˆæ–¹æ¡ˆï¼š
+1.å•çº¿ç¨‹/å•æŠŠé”/æ— ;
+2.å•çº¿ç¨‹/å¤šæŠŠé”/æ— ;
+3.å¤šçº¿ç¨‹/å•æŠŠé”/æ— ;
+4.å¤šçº¿ç¨‹/å¤šæŠŠé”/æ— ;
 */
 
 using grpc::Server;
@@ -90,7 +90,8 @@ class AsyncServer
 {
 public:
 	AsyncServer(const string& server_address, 
-		map<string, shared_ptr<ClientConnection>>* ptr_client_conn_map);
+		map<string, shared_ptr<ClientConnection>>* ptr_client_conn_map,
+		const char* root_crt = nullptr, const char* server_key = nullptr, const char* server_cert = nullptr);
 	~AsyncServer();
 	bool close();
 	void Handle_Event(const int numEvent);

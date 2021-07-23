@@ -107,7 +107,7 @@ class ViaNetIO : public BasicIO {
 
   bool CloseServer() { if(server_) server_->close(); return true;}
 
-  bool StartServer(const string& server_addr, 
+  bool StartServer(const NodeInfo& server_info,
        map<string, shared_ptr<ClientConnection>>* ptr_client_conn_map);
 
   bool init(const string& taskid);

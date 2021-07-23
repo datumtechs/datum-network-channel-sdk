@@ -1,5 +1,6 @@
 // file async_server.cc
 #include "async_server.h"
+#include <grpc++/security/credentials.h>
 #if USE_BUFFER_
 #include "simple_buffer.h"
 #endif
@@ -95,8 +96,9 @@ AsyncServer::~AsyncServer()
 	close();
 }
 
-AsyncServer::AsyncServer(const string& server_address, 
-	map<string, shared_ptr<ClientConnection>>* ptr_client_conn_map)
+AsyncServer::AsyncServer(const string& server_address,
+	map<string, shared_ptr<ClientConnection>>* ptr_client_conn_map,
+	const char* root_crt, const char* server_key, const char* server_cert)
 {
 	ptr_client_conn_map_ = ptr_client_conn_map;
 
@@ -116,7 +118,24 @@ AsyncServer::AsyncServer(const string& server_address,
 	builder_ = make_shared<ServerBuilder>();
 	builder_->SetMaxReceiveMessageSize(INT_MAX);
 	// Listen on the given address without any authentication mechanism.
-	builder_->AddListeningPort(server_address, grpc::InsecureServerCredentials());
+	std::shared_ptr<grpc::ServerCredentials> creds;
+
+#if USE_SSL
+	if(nullptr == root_crt || nullptr == server_key || nullptr == server_cert)
+	{
+		cerr << "Invalid server certificate, please check!" << endl;
+		return;
+	}
+	grpc::SslServerCredentialsOptions::PemKeyCertPair pkcp = {server_key, server_cert};
+	grpc::SslServerCredentialsOptions ssl_opts(GRPC_SSL_REQUEST_AND_REQUIRE_CLIENT_CERTIFICATE_AND_VERIFY);
+	ssl_opts.pem_root_certs = root_crt;
+	ssl_opts.pem_key_cert_pairs.push_back(pkcp);
+	creds = grpc::SslServerCredentials(ssl_opts);
+#else
+	creds = grpc::InsecureServerCredentials();
+#endif
+
+	builder_->AddListeningPort(server_address, creds);
 	// Register "service_" as the instance through which we'll communicate with
 	// clients. In this case it corresponds to an *asynchronous* service.
 	builder_->RegisterService(&service_);
