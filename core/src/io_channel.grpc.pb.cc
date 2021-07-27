@@ -27,23 +27,23 @@ static const char* IoChannel_method_names[] = {
 
 std::unique_ptr< IoChannel::Stub> IoChannel::NewStub(const std::shared_ptr< ::grpc::ChannelInterface>& channel, const ::grpc::StubOptions& options) {
   (void)options;
-  std::unique_ptr< IoChannel::Stub> stub(new IoChannel::Stub(channel));
+  std::unique_ptr< IoChannel::Stub> stub(new IoChannel::Stub(channel, options));
   return stub;
 }
 
-IoChannel::Stub::Stub(const std::shared_ptr< ::grpc::ChannelInterface>& channel)
-  : channel_(channel), rpcmethod_Send_(IoChannel_method_names[0], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+IoChannel::Stub::Stub(const std::shared_ptr< ::grpc::ChannelInterface>& channel, const ::grpc::StubOptions& options)
+  : channel_(channel), rpcmethod_Send_(IoChannel_method_names[0], options.suffix_for_stats(),::grpc::internal::RpcMethod::NORMAL_RPC, channel)
   {}
 
 ::grpc::Status IoChannel::Stub::Send(::grpc::ClientContext* context, const ::io_channel::SendRequest& request, ::io_channel::RetCode* response) {
   return ::grpc::internal::BlockingUnaryCall< ::io_channel::SendRequest, ::io_channel::RetCode, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(channel_.get(), rpcmethod_Send_, context, request, response);
 }
 
-void IoChannel::Stub::experimental_async::Send(::grpc::ClientContext* context, const ::io_channel::SendRequest* request, ::io_channel::RetCode* response, std::function<void(::grpc::Status)> f) {
+void IoChannel::Stub::async::Send(::grpc::ClientContext* context, const ::io_channel::SendRequest* request, ::io_channel::RetCode* response, std::function<void(::grpc::Status)> f) {
   ::grpc::internal::CallbackUnaryCall< ::io_channel::SendRequest, ::io_channel::RetCode, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(stub_->channel_.get(), stub_->rpcmethod_Send_, context, request, response, std::move(f));
 }
 
-void IoChannel::Stub::experimental_async::Send(::grpc::ClientContext* context, const ::io_channel::SendRequest* request, ::io_channel::RetCode* response, ::grpc::experimental::ClientUnaryReactor* reactor) {
+void IoChannel::Stub::async::Send(::grpc::ClientContext* context, const ::io_channel::SendRequest* request, ::io_channel::RetCode* response, ::grpc::ClientUnaryReactor* reactor) {
   ::grpc::internal::ClientCallbackUnaryFactory::Create< ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(stub_->channel_.get(), stub_->rpcmethod_Send_, context, request, response, reactor);
 }
 

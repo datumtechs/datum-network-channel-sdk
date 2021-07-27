@@ -2,11 +2,16 @@
 
 ​		OpenSSL是一套开放源代码的安全套接字层密码学基础库，囊括主要的密码算法、常用的密钥和证书封装管理功能及SSL/TLS协议，并提供丰富的API，以供应用程序开发、测试或其它目的使用。它广泛集成在各种类型的操作系统中，作为基础组件之一，深受广大IT爱好者的喜爱。即使某些操作系统没有将其集成为组件，通过源代码下载，也可以十分轻松地构建OpenSSL的开发及应用环境。
 
-​		尽管OpenSSL的功能十分强大且丰富，然而对于中国商用密码体系的算法及相关应用来说，它距离我们还是十分遥远的。因为OpenSSL仅仅包含国际通用的密码算法、认证体系及相关协议，却没有将中国商用密码体系中的公开算法SM2、SM3、SM4及祖冲之流密码算法纳入其中，也不支持**`双证书体系`**的应用及相关协议。这对于推广及研究中国商用密码体系的密码爱好者来说，是十分无奈的事情。国内也有不少密码界同仁尝试着将OpenSSL国密化，但大多都局限于公司内部交流使用。针对这种现状，江南天安经过长时间的研究分析，于2017年上半年推出天安版国密OpenSSL，并将其命名为TaSSL，解决了中国商用密码体系无法构建基于OpenSSL应用的实际问题。
+​		尽管OpenSSL的功能十分强大且丰富，然而对于中国商用密码体系的算法及相关应用来说，它距离我们还是十分遥远的。因为OpenSSL仅仅包含国际通用的密码算法、认证体系及相关协议，却没有将中国商用密码体系中的公开算法SM2、SM3、SM4及祖冲之流密码算法纳入其中，也不支持**双证书体系（签名证书和加密证书）**的应用及相关协议。这对于推广及研究中国商用密码体系的密码爱好者来说，是十分无奈的事情。国内也有不少密码界同仁尝试着将OpenSSL国密化，但大多都局限于公司内部交流使用。针对这种现状，江南天安经过长时间的研究分析，于2017年上半年推出天安版国密OpenSSL，并将其命名为TaSSL，解决了中国商用密码体系无法构建基于OpenSSL应用的实际问题。
 
 ​		为了信道安全，Channel-sdk支持openssl和gmssl(TaSSL)两种；
 
 ### 支持OpenSSL
+
+- OpenSSL工具简介
+  - openssl：多用途的命令行工具，可以实现：秘钥证书管理、对称加密和非对称加密。
+  -  libcrypto：加密算法库；
+  - libssl：加密模块应用库，实现了ssl及tls；
 
 - 服务器证书配置文件：server_cert.conf
 
@@ -163,18 +168,16 @@
 - 编译安装
 
   ```bash
+  mkdir -p $HOME/.local/TAGMSSL;
   tar -xvf TASSL-1.1.1b-V_1.4.tar.gz;
   cd TASSL-1.1.1b-V_1.4;
   chmod u+x ./config;
-  ./config --prefix=$HOME/.local;
-  make
-  sudo make install
-  gmssl version
-```
+  ./config --prefix=$HOME/.local/TAGMSSL;
+  make;
+  sudo make install;
+  $HOME/.local/TAGMSSL/bin/openssl version;
+  ```
   
-  > 安装之前备份openssl所在的库：
-  >
-  > ```bash
-  > cd /usr/lib/ && cp -rf x86_64-linux-gnu OpenSSL_x86_64-linux-gnu
-  > ```
-
+    > 注意：
+    >
+    > 安装路径和grpc的源码安装路径不能一样，因为grpc需要安装ssl的依赖库（libssl.so）和TaSSL安装的libssl.so会有冲突；
