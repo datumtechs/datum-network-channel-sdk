@@ -22,7 +22,7 @@ function run_compile() {
     cd ${builddir}
     cmake .. -DCMAKE_INSTALL_PREFIX=.install -DCMAKE_PREFIX_PATH=${builddir}  \
         -DTHREAD_COUNT=${thread_count} \
-        -DUSE_SSL=${use_ssl} \
+        -DSSL_TYPE=${ssl_type} \
         -DUSE_ALONE=${use_alone} \
         -DCMAKE_BUILD_TYPE=${build_type} \
         -DSERVER_TYPE=${server_type} \

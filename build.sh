@@ -31,7 +31,7 @@ function show_compile_usage() {
     echo "     --client-type                  [SYNC] One of [ASYNC,SYNC]"
     echo "     --python-version               Python install version"
     echo "     --use-alone                    [OFF] The compiled version is used separately"
-    echo "     --use-ssl                      [OFF] Whether the channel uses SSL authentication"
+    echo "     --ssl-type                     [0] SSL Type, 0: SSL is not used; 1: using openssl;  2: using GMSSL"
     echo "     --verbose                      [OFF] Display the detailed information of the compilation process, the value is a numeric type"
     echo ""
     echo "  The default options: --build-type Release --server-type ASYNC --client-type SYNC"
@@ -61,13 +61,13 @@ if [ "${cmd}" = "compile" ]; then
     server_type=ASYNC
     client_type=SYNC
     python_version=$(python3 -c 'import sys;ver=sys.version_info;print(str(ver[0])+"."+str(ver[1]))')   
-    use_ssl=OFF
+    ssl_type=0
     use_alone=OFF
     use_cache=OFF
     thread_count=1
     multi_locks=OFF
 
-    ARGS=$(getopt -o "h" -l "help,build-type:,server-type:,client-type:,use-ssl,use-alone,use-cache, 
+    ARGS=$(getopt -o "h" -l "help,build-type:,server-type:,client-type:,ssl-type:,use-alone,use-cache, 
         thread-count:,multi-locks, python-version:,verbose:" -n "$0" -- "$@")
     eval set -- "${ARGS}"
 
@@ -98,9 +98,9 @@ if [ "${cmd}" = "compile" ]; then
             verbose=${2}
             shift 2
             ;;
-        --use-ssl)
-            use_ssl=ON
-            shift
+        --ssl-type)
+            ssl_type=${2}
+            shift 2
             ;;
         --use-alone)
             use_alone=ON

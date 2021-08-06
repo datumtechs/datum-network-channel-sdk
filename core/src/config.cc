@@ -373,13 +373,22 @@ void ChannelConfig::CopyNodeInfo(NodeInfo& node_info, const Node& nodeInfo)
 {
   node_info.id = nodeInfo.NODE_ID;
   node_info.address = nodeInfo.ADDRESS;
-#if USE_SSL
-  node_info.ca_cert_path_ = root_cert_;
-  node_info.server_key_path_ = nodeInfo.SERVER_KEY_PATH;
-  node_info.server_cert_path_ = nodeInfo.SERVER_CERT_PATH;
+#ifdef SSL_TYPE
+  if(1 == SSL_TYPE)
+  {
+    node_info.ca_cert_path_ = root_cert_;
+    node_info.server_key_path_ = nodeInfo.SERVER_KEY_PATH;
+    node_info.server_cert_path_ = nodeInfo.SERVER_CERT_PATH;
+  }
+  else if(2 == SSL_TYPE)
+  {
+
+  }
+#endif
+  
   // node_info.client_key_path_ = nodeInfo.CLIENT_KEY_PATH;
   // node_info.client_cert_path_ = nodeInfo.CLIENT_CERT_PATH;
-#endif
+
 }
 
 bool ChannelConfig::isNodeType(const vector<NODE_TYPE>& vec_node_types, const NODE_TYPE nodeType)
@@ -410,11 +419,18 @@ bool ChannelConfig::GetNodeInfos(vector<string>& clientNodeIds, vector<ViaInfo>&
       viaTmp.id = nid;
       viaTmp.via = via;
       viaTmp.address = via_to_address_[via];
-    #if USE_SSL
-      const Node& node = node_info_config_[nid].node_;
-      viaTmp.server_cert_path_ = node.SERVER_CERT_PATH;
-      viaTmp.client_key_path_ = node.CLIENT_KEY_PATH;
-      viaTmp.client_cert_path_ = node.CLIENT_CERT_PATH;
+    #ifdef SSL_TYPE
+      if(1 == SSL_TYPE)
+      {
+        const Node& node = node_info_config_[nid].node_;
+        viaTmp.server_cert_path_ = node.SERVER_CERT_PATH;
+        viaTmp.client_key_path_ = node.CLIENT_KEY_PATH;
+        viaTmp.client_cert_path_ = node.CLIENT_CERT_PATH;
+      }
+      else if(2 == SSL_TYPE)
+      {
+
+      }
     #endif
       // cout << "id: " << nid << ", via: " << viaTmp.via << ", address: " << viaTmp.address << endl;
       serverInfos.push_back(viaTmp);
@@ -435,11 +451,18 @@ bool ChannelConfig::GetNodeInfos(vector<string>& clientNodeIds, vector<ViaInfo>&
       viaTmp.id = nid;
       viaTmp.via = via;
       viaTmp.address = via_to_address_[via];
-    #if USE_SSL
-      const Node& node = node_info_config_[nid].node_;
-      viaTmp.server_cert_path_ = node.SERVER_CERT_PATH;
-      viaTmp.client_key_path_ = node.CLIENT_KEY_PATH;
-      viaTmp.client_cert_path_ = node.CLIENT_CERT_PATH;
+    #ifdef SSL_TYPE
+      if(1 == SSL_TYPE)
+      {
+        const Node& node = node_info_config_[nid].node_;
+        viaTmp.server_cert_path_ = node.SERVER_CERT_PATH;
+        viaTmp.client_key_path_ = node.CLIENT_KEY_PATH;
+        viaTmp.client_cert_path_ = node.CLIENT_CERT_PATH;
+      }
+      else if(2 == SSL_TYPE)
+      {
+
+      }
     #endif
       // cout << "id: " << nid << ", via: " << viaTmp.via << ", address: " << viaTmp.address << endl;
       serverInfos.push_back(viaTmp);
@@ -461,11 +484,18 @@ bool ChannelConfig::GetNodeInfos(vector<string>& clientNodeIds, vector<ViaInfo>&
       viaTmp.via = via;
       // via信息
       viaTmp.address = via_to_address_[viaTmp.via];
-    #if USE_SSL
-      const Node& node = node_info_config_[nid].node_;
-      viaTmp.server_cert_path_ = node.SERVER_CERT_PATH;
-      viaTmp.client_key_path_ = node.CLIENT_KEY_PATH;
-      viaTmp.client_cert_path_ = node.CLIENT_CERT_PATH;
+    #ifdef SSL_TYPE
+      if(1 == SSL_TYPE)
+      {
+        const Node& node = node_info_config_[nid].node_;
+        viaTmp.server_cert_path_ = node.SERVER_CERT_PATH;
+        viaTmp.client_key_path_ = node.CLIENT_KEY_PATH;
+        viaTmp.client_cert_path_ = node.CLIENT_CERT_PATH;
+      }
+      else if(2 == SSL_TYPE)
+      {
+
+      }
     #endif
       // cout << "id: " << nid << ", via: " << viaTmp.via << ", address: " << viaTmp.address << endl;
       serverInfos.push_back(viaTmp);

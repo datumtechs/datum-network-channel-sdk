@@ -56,10 +56,10 @@
 
 - 编译命令
 
-  channel-sdk默认不使用ssl，如需使用ssl，需使用`--use-ssl`编译参数：
+  channel-sdk默认不使用ssl，如需使用openssl(类型为1)或gmssl(类型为2)，需使用`--ssl-type`编译参数：
 
   ```bash
-  ./build.sh compile --use-ssl
+  ./build.sh compile --ssl-type=1
   ```
 
   > 编译完成之后，进行重新安装；

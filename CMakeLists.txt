@@ -5,15 +5,11 @@ project(${LIBNAME})
 
 include(./cmake/common.cmake)
 include(./cmake/SetCommon.cmake)
-# add_definitions(-std=c++11)
+add_definitions(-std=c++11)
 
-#list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
-
-
-#file(MAKE_DIRECTORY ${lib_path})
-# set(LIBRARY_OUTPUT_PATH ${CMAKE_CURRENT_SOURCE_DIR}/lib)
-
-# Generate Proto file
+##########################################################################################
+###  Generate Proto file, The proto file needs to be recompiled only when it is modified.
+##########################################################################################
 # get_filename_component(io_proto "./protos/io_channel.proto" ABSOLUTE)
 # get_filename_component(io_proto_path "${io_proto}" PATH)
 # file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/protos)  
@@ -42,11 +38,13 @@ include(./cmake/SetCommon.cmake)
 #   ${_GRPC_GRPCPP}
 #   ${_PROTOBUF_LIBPROTOBUF})
 
+##########################################################################################
+
 # option
-option(USE_SSL "" OFF)
-message(STATUS "[USE_SSL]: ${USE_SSL}")
-IF(USE_SSL)
-    add_definitions(-DUSE_SSL=1)
+option(SSL_TYPE "" OFF)
+message(STATUS "[SSL_TYPE]: ${SSL_TYPE}")
+IF(SSL_TYPE)
+    add_definitions(-DSSL_TYPE=${SSL_TYPE})
 ENDIF()
 
 option(USE_ALONE "" OFF)
@@ -95,23 +93,34 @@ find_package(Threads REQUIRED)
 SET(ADD_LINK_LIB_FLAGS "-Wl,--rpath=$ORIGIN../:$ORIGIN")
 SET(CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} ${ADD_LINK_LIB_FLAGS}")
 
-
 message(STATUS "_REFLECTION: ${_REFLECTION}")
 message(STATUS "_GRPC_GRPCPP: ${_GRPC_GRPCPP}")
 message(STATUS "_PROTOBUF_LIBPROTOBUF: ${_PROTOBUF_LIBPROTOBUF}")
 
-# link_libraries(${_REFLECTION} ${_GRPC_GRPCPP} ${_PROTOBUF_LIBPROTOBUF})
 # libraries
 file(GLOB_RECURSE srcs core/src/*.cc)
 add_library(${LIBNAME} SHARED ${srcs})
 target_include_directories(${LIBNAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/core/include)
-target_link_libraries(${LIBNAME} PUBLIC pthread ${_REFLECTION} ${_GRPC_GRPCPP} ${_PROTOBUF_LIBPROTOBUF})
+
+IF(SSL_TYPE MATCHES 2)
+    # gmssl
+    set(THIRD_PARTY_DIR ${CMAKE_CURRENT_SOURCE_DIR}/third_party)
+    include_directories(${THIRD_PARTY_DIR}/gmssl/include)
+    link_directories(${THIRD_PARTY_DIR}/gmssl/lib)
+    set(GMSSL_LIBRARIES tacrypto tassl)
+
+    target_link_libraries(${LIBNAME} PUBLIC 
+        pthread ${_REFLECTION} ${_GRPC_GRPCPP} ${_PROTOBUF_LIBPROTOBUF} ${GMSSL_LIBRARIES})
+ELSE()  
+    target_link_libraries(${LIBNAME} PUBLIC 
+        pthread ${_REFLECTION} ${_GRPC_GRPCPP} ${_PROTOBUF_LIBPROTOBUF})
+ENDIF()
+
 
 # set_target_properties(${LIBNAME} PROPERTIES FOLDER "extio"
 #     APPEND_STRING PROPERTY LINK_FLAGS " ${ADD_LINK_LIB_FLAGS}")
 
 # targets pybind11
-
 # add_subdirectory("./third_party/pybind11/" pybind11)
 # pybind11_add_module(io_channel core/pybind11/io_channel.cc)
 # link_libraries(${LIBNAME})

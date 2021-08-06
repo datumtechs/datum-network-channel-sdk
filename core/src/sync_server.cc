@@ -29,19 +29,28 @@ SyncServer::SyncServer(const string& server_addr,
     builder.SetMaxReceiveMessageSize(INT_MAX);
     shared_ptr<grpc::ServerCredentials> creds;
     
-#if USE_SSL
-	if(nullptr == root_crt || nullptr == server_key || nullptr == server_cert)
-	{
-		cerr << "Invalid server certificate, please check!" << endl;
-		return;
-	}
-	grpc::SslServerCredentialsOptions::PemKeyCertPair pkcp = {server_key, server_cert};
-	grpc::SslServerCredentialsOptions ssl_opts(GRPC_SSL_REQUEST_AND_REQUIRE_CLIENT_CERTIFICATE_AND_VERIFY);
-	ssl_opts.pem_root_certs = root_crt;
-	ssl_opts.pem_key_cert_pairs.push_back(pkcp);
-	creds = grpc::SslServerCredentials(ssl_opts);
-#else
-	creds = grpc::InsecureServerCredentials();
+#ifdef SSL_TYPE
+    if(0 == SSL_TYPE)
+    {
+        creds = grpc::InsecureServerCredentials();
+    }
+    else if(1 == SSL_TYPE)
+    {
+        if(nullptr == root_crt || nullptr == server_key || nullptr == server_cert)
+        {
+            cerr << "Invalid server certificate, please check!" << endl;
+            return;
+        }
+        grpc::SslServerCredentialsOptions::PemKeyCertPair pkcp = {server_key, server_cert};
+        grpc::SslServerCredentialsOptions ssl_opts(GRPC_SSL_REQUEST_AND_REQUIRE_CLIENT_CERTIFICATE_AND_VERIFY);
+        ssl_opts.pem_root_certs = root_crt;
+        ssl_opts.pem_key_cert_pairs.push_back(pkcp);
+        creds = grpc::SslServerCredentials(ssl_opts);
+    }
+    else if(2 == SSL_TYPE)
+    {
+        
+    }
 #endif
 
     builder.AddListeningPort(server_addr, creds);

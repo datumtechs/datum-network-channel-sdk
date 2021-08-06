@@ -12,19 +12,28 @@ SyncClient::SyncClient(const string& server_addr, const string& taskid,
 {
 	task_id_ = taskid;
   std::shared_ptr<grpc::ChannelCredentials> creds;
-#if USE_SSL
-  if(nullptr == server_cert || nullptr == client_key || nullptr == client_cert)
+#ifdef SSL_TYPE
+  if(0 == SSL_TYPE)
   {
-    cerr << "Invalid client certificate, please check!" << endl;
-    return;
+    creds = grpc::InsecureChannelCredentials();
   }
-	grpc::SslCredentialsOptions ssl_opts;
-  ssl_opts.pem_root_certs  = server_cert;
-  ssl_opts.pem_private_key = client_key;
-  ssl_opts.pem_cert_chain  = client_cert;
-  creds = grpc::SslCredentials(ssl_opts);
-#else
-	creds = grpc::InsecureChannelCredentials();
+  else if(1 == SSL_TYPE)
+  {
+    if(nullptr == server_cert || nullptr == client_key || nullptr == client_cert)
+    {
+      cerr << "Invalid client certificate, please check!" << endl;
+      return;
+    }
+    grpc::SslCredentialsOptions ssl_opts;
+    ssl_opts.pem_root_certs  = server_cert;
+    ssl_opts.pem_private_key = client_key;
+    ssl_opts.pem_cert_chain  = client_cert;
+    creds = grpc::SslCredentials(ssl_opts);
+  }
+  else if(2 == SSL_TYPE) 
+  {
+
+  }	
 #endif
 
 	auto channel = grpc::CreateChannel(server_addr, creds);

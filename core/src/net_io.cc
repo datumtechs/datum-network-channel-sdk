@@ -41,14 +41,21 @@ bool ViaNetIO::StartServer(const NodeInfo& server_info,
   char* ptr_server_key = nullptr;
   char* ptr_server_cert = nullptr;
 
-#if USE_SSL
-  auto root_crt = get_file_contents(server_info.ca_cert_path_); // for verifying clients
-  auto server_key = get_file_contents(server_info.server_key_path_);
-  auto server_cert = get_file_contents(server_info.server_cert_path_);
+#ifdef SSL_TYPE
+  if(1 == SSL_TYPE)
+  {
+    auto root_crt = get_file_contents(server_info.ca_cert_path_); // for verifying clients
+    auto server_key = get_file_contents(server_info.server_key_path_);
+    auto server_cert = get_file_contents(server_info.server_cert_path_);
 
-  ptr_root_cert = const_cast<char*>(root_crt.c_str());
-  ptr_server_key = const_cast<char*>(server_key.c_str());
-  ptr_server_cert = const_cast<char*>(server_cert.c_str());
+    ptr_root_cert = const_cast<char*>(root_crt.c_str());
+    ptr_server_key = const_cast<char*>(server_key.c_str());
+    ptr_server_cert = const_cast<char*>(server_cert.c_str());
+  }
+  else if(2 == SSL_TYPE)
+  {
+
+  }
 #endif 
 
 #if ASYNC_SERVER
@@ -114,13 +121,20 @@ bool ViaNetIO::init(const string& taskid)
     char* ptr_client_key = nullptr;
     char* ptr_client_cert = nullptr;
 
-#if USE_SSL
-    auto server_cert = get_file_contents(via_server_infos_[i].server_cert_path_);
-    auto client_key  = get_file_contents(via_server_infos_[i].client_key_path_);
-    auto client_cert = get_file_contents(via_server_infos_[i].client_cert_path_);
-    ptr_server_cert = const_cast<char*>(server_cert.c_str());
-    ptr_client_key = const_cast<char*>(client_key.c_str());
-    ptr_client_cert = const_cast<char*>(client_cert.c_str());
+#ifdef SSL_TYPE
+    if(1 == SSL_TYPE)
+    {
+      auto server_cert = get_file_contents(via_server_infos_[i].server_cert_path_);
+      auto client_key  = get_file_contents(via_server_infos_[i].client_key_path_);
+      auto client_cert = get_file_contents(via_server_infos_[i].client_cert_path_);
+      ptr_server_cert = const_cast<char*>(server_cert.c_str());
+      ptr_client_key = const_cast<char*>(client_key.c_str());
+      ptr_client_cert = const_cast<char*>(client_cert.c_str());
+    }
+    else if(2 == SSL_TYPE)
+    {
+      
+    }
 #endif 
 
 #if ASYNC_CLIENT
