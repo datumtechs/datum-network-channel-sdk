@@ -41,11 +41,9 @@ add_definitions(-std=c++11)
 ##########################################################################################
 
 # option
-option(SSL_TYPE "" OFF)
+# option(SSL_TYPE "" OFF)
 message(STATUS "[SSL_TYPE]: ${SSL_TYPE}")
-IF(SSL_TYPE)
-    add_definitions(-DSSL_TYPE=${SSL_TYPE})
-ENDIF()
+add_definitions(-DSSL_TYPE=${SSL_TYPE})
 
 option(USE_ALONE "" OFF)
 message(STATUS "[USE_ALONE]: ${USE_ALONE}")
@@ -97,24 +95,20 @@ message(STATUS "_REFLECTION: ${_REFLECTION}")
 message(STATUS "_GRPC_GRPCPP: ${_GRPC_GRPCPP}")
 message(STATUS "_PROTOBUF_LIBPROTOBUF: ${_PROTOBUF_LIBPROTOBUF}")
 
-# libraries
-file(GLOB_RECURSE srcs core/src/*.cc)
-add_library(${LIBNAME} SHARED ${srcs})
-target_include_directories(${LIBNAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/core/include)
-
-IF(SSL_TYPE MATCHES 2)
+IF(SSL_TYPE MATCHES 0)
     # gmssl
     set(THIRD_PARTY_DIR ${CMAKE_CURRENT_SOURCE_DIR}/third_party)
     include_directories(${THIRD_PARTY_DIR}/gmssl/include)
     link_directories(${THIRD_PARTY_DIR}/gmssl/lib)
-    set(GMSSL_LIBRARIES tacrypto tassl)
-
-    target_link_libraries(${LIBNAME} PUBLIC 
-        pthread ${_REFLECTION} ${_GRPC_GRPCPP} ${_PROTOBUF_LIBPROTOBUF} ${GMSSL_LIBRARIES})
-ELSE()  
-    target_link_libraries(${LIBNAME} PUBLIC 
-        pthread ${_REFLECTION} ${_GRPC_GRPCPP} ${_PROTOBUF_LIBPROTOBUF})
+    link_libraries(tacrypto tassl)
 ENDIF()
+
+# libraries
+file(GLOB_RECURSE srcs core/src/*.cc)
+add_library(${LIBNAME} SHARED ${srcs})
+target_include_directories(${LIBNAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/core/include)
+target_link_libraries(${LIBNAME} PUBLIC 
+        pthread ${_REFLECTION} ${_GRPC_GRPCPP} ${_PROTOBUF_LIBPROTOBUF})
 
 
 # set_target_properties(${LIBNAME} PROPERTIES FOLDER "extio"

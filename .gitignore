@@ -20,7 +20,7 @@ build/**
 *.pbtxt
 build/
 .eggs/
-python/channel_sdk/*.so
+python/channel_sdk/*.so*
 __pycache__
 history
 python/channel_sdk.egg-info

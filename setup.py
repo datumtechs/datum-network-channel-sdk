@@ -30,11 +30,15 @@ from distutils import sysconfig
 
 dir_name = "python"
 sub_dir_name = "channel_sdk"
-# save_lib_dir = os.path.join(dir_name, "/", sub_dir_name)
 save_lib_dir = dir_name + "/" + sub_dir_name + "/"
 
 so_libs = glob.glob('build/lib/lib*.so')
 for file_name in so_libs:
+    shutil.copy(file_name, save_lib_dir)
+
+# gmssl
+gmssl_so_libs = glob.glob('third_party/gmssl/lib/lib*.so.*')
+for file_name in gmssl_so_libs:
     shutil.copy(file_name, save_lib_dir)
 
 cc_module_name = "grpc"
