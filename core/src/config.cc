@@ -223,15 +223,30 @@ bool ChannelConfig::parse_node_info(Document& doc, bool pass_via)
       Value& Node = Nodes[i];
       cfg.node_.NODE_ID = GetString(Node, "NODE_ID", "", false);
       cout << "node info parse:" << cfg.node_.NODE_ID << endl;
-      cfg.node_.NAME = GetString(Node, "NAME", (std::string("P") + std::to_string(i)).c_str(), false);
       cfg.node_.ADDRESS = GetString(Node, "ADDRESS", "", false);
       cfg.node_.VIA = GetString(Node, "VIA", "", false);
-      cfg.node_.SERVER_KEY_PATH = GetString(Node, "SERVER_KEY", "", false);
-      cfg.node_.SERVER_CERT_PATH = GetString(Node, "SERVER_CERT", "", false);
-      cfg.node_.CLIENT_KEY_PATH = GetString(Node, "CLIENT_KEY", "", false);
-      cfg.node_.CLIENT_CERT_PATH = GetString(Node, "CLIENT_CERT", "", false);
+      cfg.node_.CA_CERT_PATH = GetString(doc, "ROOT_CERT", root_cert_.c_str(), false);
+      #if(1 == SSL_TYPE)  
+      {
+        cfg.node_.SERVER_KEY_PATH = GetString(Node, "SERVER_KEY", "", false);
+        cfg.node_.SERVER_CERT_PATH = GetString(Node, "SERVER_CERT", "", false);
+        cfg.node_.CLIENT_KEY_PATH = GetString(Node, "CLIENT_KEY", "", false);
+        cfg.node_.CLIENT_CERT_PATH = GetString(Node, "CLIENT_CERT", "", false);
+      }
+      #elif(2 == SSL_TYPE)  
+      {
+        cfg.node_.SERVER_SIGN_KEY_PATH = GetString(Node, "SERVER_SIGN_KEY", "", false);
+        cfg.node_.SERVER_SIGN_CERT_PATH = GetString(Node, "SERVER_SIGN_CERT", "", false);
+        cfg.node_.SERVER_ENC_KEY_PATH = GetString(Node, "SERVER_ENC_KEY", "", false);
+        cfg.node_.SERVER_ENC_CERT_PATH = GetString(Node, "SERVER_ENC_CERT", "", false);
+        cfg.node_.CLIENT_SIGN_KEY_PATH = GetString(Node, "CLIENT_SIGN_KEY", "", false);
+        cfg.node_.CLIENT_SIGN_CERT_PATH = GetString(Node, "CLIENT_SIGN_CERT", "", false);
+        cfg.node_.CLIENT_ENC_KEY_PATH = GetString(Node, "CLIENT_ENC_KEY", "", false);
+        cfg.node_.CLIENT_ENC_CERT_PATH = GetString(Node, "CLIENT_ENC_CERT", "", false);
+      }
+      #endif
+
       node_info_config_.insert(std::pair<string, NodeInfoConfig>(cfg.node_.NODE_ID, cfg));
-      
       if(pass_via_) 
       {
         nodeid_to_via_.insert(std::pair<string, string>(cfg.node_.NODE_ID, cfg.node_.VIA));
@@ -373,16 +388,19 @@ void ChannelConfig::CopyNodeInfo(NodeInfo& node_info, const Node& nodeInfo)
 {
   node_info.id = nodeInfo.NODE_ID;
   node_info.address = nodeInfo.ADDRESS;
-#ifdef SSL_TYPE
-  if(1 == SSL_TYPE)
+  node_info.ca_cert_path_ = root_cert_;
+  
+  #if(1 == SSL_TYPE)
   {
-    node_info.ca_cert_path_ = root_cert_;
     node_info.server_key_path_ = nodeInfo.SERVER_KEY_PATH;
     node_info.server_cert_path_ = nodeInfo.SERVER_CERT_PATH;
   }
-  else if(2 == SSL_TYPE)
+  #elif(2 == SSL_TYPE)
   {
-
+    node_info.server_sign_key_path_ = nodeInfo.SERVER_SIGN_KEY_PATH;
+    node_info.server_sign_cert_path_ = nodeInfo.SERVER_SIGN_CERT_PATH;
+    node_info.server_enc_key_path_ = nodeInfo.SERVER_ENC_KEY_PATH;
+    node_info.server_enc_cert_path_ = nodeInfo.SERVER_ENC_CERT_PATH;
   }
 #endif
   
@@ -403,6 +421,25 @@ bool ChannelConfig::isNodeType(const vector<NODE_TYPE>& vec_node_types, const NO
   return false;
 }
 
+void GetCertInfosFromNode(ViaInfo& viaTmp, const Node& node)
+{
+  #if(1 == SSL_TYPE)
+  {
+    viaTmp.server_cert_path_ = node.SERVER_CERT_PATH;
+    viaTmp.client_key_path_ = node.CLIENT_KEY_PATH;
+    viaTmp.client_cert_path_ = node.CLIENT_CERT_PATH;
+  }
+  #elif(2 == SSL_TYPE)
+  {
+    viaTmp.server_cert_path_ = node.CA_CERT_PATH;
+    viaTmp.client_sign_key_path_ = node.CLIENT_SIGN_KEY_PATH;
+    viaTmp.client_sign_cert_path_ = node.CLIENT_SIGN_CERT_PATH;
+    viaTmp.client_enc_key_path_ = node.CLIENT_ENC_KEY_PATH;
+    viaTmp.client_enc_cert_path_ = node.CLIENT_ENC_CERT_PATH;
+  }
+  #endif
+}
+
 bool ChannelConfig::GetNodeInfos(vector<string>& clientNodeIds, vector<ViaInfo>& serverInfos, 
     const string& node_id)
 {
@@ -420,17 +457,8 @@ bool ChannelConfig::GetNodeInfos(vector<string>& clientNodeIds, vector<ViaInfo>&
       viaTmp.via = via;
       viaTmp.address = via_to_address_[via];
     #ifdef SSL_TYPE
-      if(1 == SSL_TYPE)
-      {
-        const Node& node = node_info_config_[nid].node_;
-        viaTmp.server_cert_path_ = node.SERVER_CERT_PATH;
-        viaTmp.client_key_path_ = node.CLIENT_KEY_PATH;
-        viaTmp.client_cert_path_ = node.CLIENT_CERT_PATH;
-      }
-      else if(2 == SSL_TYPE)
-      {
-
-      }
+      const Node& node = node_info_config_[nid].node_;
+      GetCertInfosFromNode(viaTmp, node);
     #endif
       // cout << "id: " << nid << ", via: " << viaTmp.via << ", address: " << viaTmp.address << endl;
       serverInfos.push_back(viaTmp);
@@ -452,17 +480,8 @@ bool ChannelConfig::GetNodeInfos(vector<string>& clientNodeIds, vector<ViaInfo>&
       viaTmp.via = via;
       viaTmp.address = via_to_address_[via];
     #ifdef SSL_TYPE
-      if(1 == SSL_TYPE)
-      {
-        const Node& node = node_info_config_[nid].node_;
-        viaTmp.server_cert_path_ = node.SERVER_CERT_PATH;
-        viaTmp.client_key_path_ = node.CLIENT_KEY_PATH;
-        viaTmp.client_cert_path_ = node.CLIENT_CERT_PATH;
-      }
-      else if(2 == SSL_TYPE)
-      {
-
-      }
+      const Node& node = node_info_config_[nid].node_;
+      GetCertInfosFromNode(viaTmp, node);
     #endif
       // cout << "id: " << nid << ", via: " << viaTmp.via << ", address: " << viaTmp.address << endl;
       serverInfos.push_back(viaTmp);
@@ -485,17 +504,8 @@ bool ChannelConfig::GetNodeInfos(vector<string>& clientNodeIds, vector<ViaInfo>&
       // via信息
       viaTmp.address = via_to_address_[viaTmp.via];
     #ifdef SSL_TYPE
-      if(1 == SSL_TYPE)
-      {
-        const Node& node = node_info_config_[nid].node_;
-        viaTmp.server_cert_path_ = node.SERVER_CERT_PATH;
-        viaTmp.client_key_path_ = node.CLIENT_KEY_PATH;
-        viaTmp.client_cert_path_ = node.CLIENT_CERT_PATH;
-      }
-      else if(2 == SSL_TYPE)
-      {
-
-      }
+      const Node& node = node_info_config_[nid].node_;
+      GetCertInfosFromNode(viaTmp, node);
     #endif
       // cout << "id: " << nid << ", via: " << viaTmp.via << ", address: " << viaTmp.address << endl;
       serverInfos.push_back(viaTmp);

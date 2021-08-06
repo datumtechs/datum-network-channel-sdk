@@ -1,6 +1,7 @@
 
 // file async_client.h
 #pragma once
+#include "config.h"
 #include <string>
 #include <functional>
 #include <stdexcept>
@@ -58,9 +59,7 @@ public:
 class AsyncClient
 {
 public:
-    AsyncClient(const string& server_addr, const string& taskid,
-		const char* server_cert = nullptr, const char* client_key = nullptr, 
-		const char* client_cert = nullptr);
+    AsyncClient(const ViaInfo& via_info, const string& taskid);
 
 	void SendReqAgain(const AbstractAsyncClientCall* call);
 	// Assembles the client's payload and sends it to the server.

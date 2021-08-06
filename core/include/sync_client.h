@@ -1,6 +1,7 @@
 // file sync_client.h
 #pragma once
-#include "sync_server.h"
+// #include "sync_server.h"
+#include "config.h"
 #include "cycle_buffer.h"
 #include <unordered_map>
 #include <mutex>
@@ -31,9 +32,7 @@ using io_channel::RetCode;
 class SyncClient
 {
 public:
-	SyncClient(const string& server_addr, const string& taskid,
-		const char* server_cert = nullptr, const char* client_key = nullptr, 
-		const char* client_cert = nullptr);
+	SyncClient(const ViaInfo& via_info, const string& taskid);
 	~SyncClient(){}
 
   	ssize_t send(const string& self_nodeid, const string& remote_nodeid, const string& id,

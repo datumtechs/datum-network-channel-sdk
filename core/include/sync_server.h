@@ -1,5 +1,6 @@
 // file sync_server.h
 #pragma once
+#include "config.h"
 #include "client_connection.h"
 #include <iostream>
 #include <unordered_map>
@@ -39,9 +40,7 @@ public:
     bool close();
     bool wait();
 
-    SyncServer(const string& server_addr, 
-        map<string, shared_ptr<ClientConnection>>* ptr_client_conn_map,
-        const char* root_crt = nullptr, const char* server_key = nullptr, const char* server_cert = nullptr);
+    SyncServer(const NodeInfo& server_info, map<string, shared_ptr<ClientConnection>>* ptr_client_conn_map);
 	Status Send(ServerContext* context, const SendRequest* request, RetCode* response);
     
 private:

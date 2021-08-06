@@ -1,0 +1,53 @@
+{
+	"TASK_ID": "task-1",
+	"ROOT_CERT": "ssl_key/ca.crt",
+	"NODE_INFO": [
+		{
+			"NODE_ID": "p0",
+			"ADDRESS": "127.0.0.1:10001",
+			"VIA": "VIA1",
+			"SERVER_KEY": "ssl_key/server.key",
+			"SERVER_CERT": "ssl_key/server.crt",
+			"CLIENT_KEY": "ssl_key/client.key",
+			"CLIENT_CERT": "ssl_key/client.crt"
+		},
+		{
+			"NODE_ID": "p1",
+			"ADDRESS": "127.0.0.1:20001",
+			"VIA": "VIA2",
+			"SERVER_KEY": "ssl_key/server.key",
+			"SERVER_CERT": "ssl_key/server.crt",
+			"CLIENT_KEY": "ssl_key/client.key",
+			"CLIENT_CERT": "ssl_key/client.crt"
+		},
+		{
+			"NODE_ID": "p2",
+			"ADDRESS": "127.0.0.1:30001",
+			"VIA": "VIA3",
+			"SERVER_KEY": "ssl_key/server.key",
+			"SERVER_CERT": "ssl_key/server.crt",
+			"CLIENT_KEY": "ssl_key/client.key",
+			"CLIENT_CERT": "ssl_key/client.crt"
+		}
+	],
+	"VIA_INFO": {
+		"VIA1": "127.0.0.1:10001",
+		"VIA2": "127.0.0.1:20001",
+		"VIA3": "127.0.0.1:30001"
+	},
+	"DATA_NODES": [
+		"p0",
+		"p1",
+		"p2"
+	],
+	"COMPUTATION_NODES": {
+		"p0": "P0",
+		"p1": "P1",
+		"p2": "P2"
+	},
+	"RESULT_NODES": [
+		"p0",
+		"p1",
+		"p2"
+	]
+}

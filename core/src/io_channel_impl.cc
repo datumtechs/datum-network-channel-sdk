@@ -45,9 +45,6 @@ shared_ptr<IChannel> IoChannelImpl::CreateIoChannel(const string& node_id, const
 {
   shared_ptr<ChannelConfig> config = make_shared<ChannelConfig>(config_str);
 
-  // auto root_crt = get_file_contents(config->root_cert_.c_str());
-  // cout << "root_crt:" << root_crt << endl; 
-
   NodeInfo node_info;
   vector<ViaInfo> serverInfos;
   // 根据nodeid获取数据节点或计算节点或接收结果节点信息

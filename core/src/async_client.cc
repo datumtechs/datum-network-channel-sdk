@@ -6,6 +6,8 @@
 #include <thread>
 #include <chrono>   
 using namespace chrono;
+#include <fstream>
+#include <sstream>
 
 AsyncClientCall::AsyncClientCall(const string& task_id, const string& remote_nodeid,
 		const SendRequest& request, CompletionQueue& cq_, 
@@ -23,35 +25,67 @@ AsyncClientCall::AsyncClientCall(const string& task_id, const string& remote_nod
 	callStatus = PROCESS ;
 }
 
-AsyncClient::AsyncClient(const string& server_addr, const string& taskid,
-		const char* server_cert, const char* client_key, const char* client_cert)
+static string get_file_contents(const string& fpath)
+{
+  ifstream ifile(fpath);
+  if(!ifile.good())
+  {
+      cout << "file is not exist:" << fpath << endl;
+      return "";
+  }
+  ostringstream buf;
+  char ch;
+  while(buf&&ifile.get(ch))
+  buf.put(ch);
+  return buf.str();
+}
+
+AsyncClient::AsyncClient(const ViaInfo& via_info, const string& taskid)
 {
 	task_id_ = taskid;
   	shared_ptr<grpc::ChannelCredentials> creds;
-#ifdef SSL_TYPE
-	if(0 == SSL_TYPE)
+	#if(1 == SSL_TYPE)
+	{
+		if(via_info.server_cert_path_.empty() || via_info.client_key_path_.empty() || via_info.client_cert_path_.empty())
+		{
+		cerr << "Invalid client openssl certificate, please check!" << endl;
+		return;
+		}
+		auto str_root_crt = get_file_contents(via_info.server_cert_path_); // for verifying clients
+		auto str_client_key = get_file_contents(via_info.client_key_path_);
+		auto str_client_cert = get_file_contents(via_info.client_cert_path_);
+
+		grpc::SslCredentialsOptions ssl_opts;
+		ssl_opts.pem_root_certs  = str_root_crt.c_str();
+		ssl_opts.pem_private_key = str_client_key.c_str();
+		ssl_opts.pem_cert_chain  = str_client_cert.c_str();
+		creds = grpc::SslCredentials(ssl_opts);
+	}
+	#elif(2 == SSL_TYPE) 
+	{
+		if(via_info.server_cert_path_.empty() || via_info.client_sign_key_path_.empty() || 
+		via_info.client_sign_cert_path_.empty() || via_info.client_enc_key_path_.empty() ||
+		via_info.client_enc_cert_path_.empty())
+		{
+		cerr << "Invalid client gmssl certificate, please check!" << endl;
+		return;
+		}
+
+		grpc::SslCredentialsOptions ssl_opts;
+		ssl_opts.pem_root_certs  = via_info.server_cert_path_.c_str();
+		ssl_opts.pem_private_key = via_info.client_sign_key_path_.c_str();
+		ssl_opts.pem_cert_chain  = via_info.client_sign_cert_path_.c_str();
+		ssl_opts.pem_enc_private_key =  via_info.client_enc_key_path_.c_str();
+		ssl_opts.pem_enc_cert_chain = via_info.client_enc_cert_path_.c_str();
+		creds = grpc::SslCredentials(ssl_opts);
+	}	
+	#else
 	{
 		creds = grpc::InsecureChannelCredentials();
 	}
-	else if(1 == SSL_TYPE)
-	{
-		if(nullptr == server_cert || nullptr == client_key || nullptr == client_cert)
-		{
-			cerr << "Invalid client certificate, please check!" << endl;
-			return;
-		}
-		grpc::SslCredentialsOptions ssl_opts;
-		ssl_opts.pem_root_certs  = server_cert;
-		ssl_opts.pem_private_key = client_key;
-		ssl_opts.pem_cert_chain  = client_cert;
-		creds = grpc::SslCredentials(ssl_opts);
-	}
-	else if(2 == SSL_TYPE)
-	{
-
-	}
-#endif
-	auto channel = grpc::CreateChannel(server_addr, creds);
+	#endif
+	
+	auto channel = grpc::CreateChannel(via_info.address, creds);
 	stub_ = IoChannel::NewStub(channel);
 }
 

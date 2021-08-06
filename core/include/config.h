@@ -16,10 +16,22 @@ struct Node
   string ADDRESS;
   string VIA;
   string CA_CERT_PATH;
+
+#if(1 == SSL_TYPE)
   string SERVER_KEY_PATH;
   string SERVER_CERT_PATH;
   string CLIENT_KEY_PATH;
   string CLIENT_CERT_PATH;
+#elif(2 == SSL_TYPE)
+  string SERVER_SIGN_KEY_PATH;
+  string SERVER_SIGN_CERT_PATH;
+  string SERVER_ENC_KEY_PATH;
+  string SERVER_ENC_CERT_PATH;
+  string CLIENT_SIGN_KEY_PATH;
+  string CLIENT_SIGN_CERT_PATH;
+  string CLIENT_ENC_KEY_PATH;
+  string CLIENT_ENC_CERT_PATH;
+#endif
 
   public:
     void copy_from(const Node& node) 
@@ -30,10 +42,26 @@ struct Node
       ADDRESS.assign(node.ADDRESS);
       VIA.assign(node.VIA);
       CA_CERT_PATH.assign(node.CA_CERT_PATH);
-      SERVER_KEY_PATH.assign(node.SERVER_KEY_PATH);
-      SERVER_CERT_PATH.assign(node.SERVER_CERT_PATH);
-      CLIENT_KEY_PATH.assign(node.CLIENT_KEY_PATH);
-      CLIENT_CERT_PATH.assign(node.CLIENT_CERT_PATH);
+
+      #if(1==SSL_TYPE)
+      {
+        SERVER_KEY_PATH.assign(node.SERVER_KEY_PATH);
+        SERVER_CERT_PATH.assign(node.SERVER_CERT_PATH);
+        CLIENT_KEY_PATH.assign(node.CLIENT_KEY_PATH);
+        CLIENT_CERT_PATH.assign(node.CLIENT_CERT_PATH);
+      }  
+      #elif(2 == SSL_TYPE)
+      {
+        SERVER_SIGN_KEY_PATH.assign(node.SERVER_SIGN_KEY_PATH);
+        SERVER_SIGN_CERT_PATH.assign(node.SERVER_SIGN_CERT_PATH);
+        SERVER_ENC_KEY_PATH.assign(node.SERVER_ENC_KEY_PATH);
+        SERVER_ENC_CERT_PATH.assign(node.SERVER_ENC_CERT_PATH);
+        CLIENT_SIGN_KEY_PATH.assign(node.CLIENT_SIGN_KEY_PATH);
+        CLIENT_SIGN_CERT_PATH.assign(node.CLIENT_SIGN_CERT_PATH);
+        CLIENT_ENC_KEY_PATH.assign(node.CLIENT_ENC_KEY_PATH);
+        CLIENT_ENC_CERT_PATH.assign(node.CLIENT_ENC_CERT_PATH);
+      } 
+      #endif
     }
 };
 class DataNodeConfig {
@@ -67,10 +95,16 @@ struct NodeInfo {
   string id;
   string address;
   string via_address;
-
   string ca_cert_path_;
+#if(1==SSL_TYPE) 
   string server_key_path_;
   string server_cert_path_;
+#elif(2==SSL_TYPE) 
+  string server_sign_key_path_;
+  string server_sign_cert_path_;
+  string server_enc_key_path_;
+  string server_enc_cert_path_;
+#endif
   // string client_key_path_;
   // string client_cert_path_;
 
@@ -84,8 +118,16 @@ struct ViaInfo {
   string address;
   string via;
   string server_cert_path_;
-  string client_key_path_;
-  string client_cert_path_;
+
+  #if(1==SSL_TYPE)  
+    string client_key_path_;
+    string client_cert_path_;
+  #elif(2==SSL_TYPE)  
+    string client_sign_key_path_;
+    string client_sign_cert_path_;
+    string client_enc_key_path_;
+    string client_enc_cert_path_;
+  #endif
 
   ViaInfo() = default;
   ViaInfo(const string& node_id, const string& addr, const string& via_) 

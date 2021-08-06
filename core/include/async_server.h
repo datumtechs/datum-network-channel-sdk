@@ -1,6 +1,7 @@
 
 // file async_server.h
 #pragma once
+#include "config.h"
 #include "client_connection.h"
 #include <unistd.h>
 #include <functional>
@@ -89,9 +90,7 @@ private:
 class AsyncServer
 {
 public:
-	AsyncServer(const string& server_address, 
-		map<string, shared_ptr<ClientConnection>>* ptr_client_conn_map,
-		const char* root_crt = nullptr, const char* server_key = nullptr, const char* server_cert = nullptr);
+	AsyncServer(const NodeInfo& server_info, map<string, shared_ptr<ClientConnection>>* ptr_client_conn_map);
 	~AsyncServer();
 	bool close();
 	void Handle_Event(const int numEvent);
