@@ -35,21 +35,16 @@ cd channel-sdk && ./build.sh compile
 >**编译选项说明：**
 >
 > - --build-type: 编译版本，包括Release（默认）和Debug；
->
 > - --server-type：服务器类型，包括ASYNC（默认）和SYNC，ASYNC表示异步服务器，SYNC表示同步服务器；
->
 > - --client-type：客户端类型，包括ASYNC和SYNC（默认） ，ASYNC表示异步客户端，SYNC表示同步客户端；
->
 > - --use-alone：是否单独使用，如果是ON表示是，OFF表示否（默认，供rosetta使用）；
->
-> - --verbose：是否显示编译详情，默认否；
->
->
+> - --verbose：是否显示编译详情，默认否 ；
+>- --ssl-type：通讯通道使用证书类型；0：不使用证书（默认），1：使用openssl库，2：使用gmssl库；
 >
 >**例子：**
 >
 > ```bash
->./build.sh compile --build-type=Debug --server-type=ASYNC --verbose=1
+>./build.sh compile --build-type=Debug --server-type=ASYNC --verbose=1 --ssl-type=2
 > ```
 
 
