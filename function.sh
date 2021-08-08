@@ -55,8 +55,8 @@ function run_compile_python() {
     python3 -m pip uninstall io_channe -y # for the current user
   fi
 
-  export USE_ALONE=$1 && python3 setup.py build_ext
-  export USE_ALONE=$1 && python3 setup.py bdist_wheel
+  export USE_ALONE=$1 SSL_TYPE=$2 && python3 setup.py build_ext
+  export USE_ALONE=$1 SSL_TYPE=$2 && python3 setup.py bdist_wheel
 
   cd ${curdir}
   echo -e "${GREEN}run stage run_compile_python ok.${NC}"
