@@ -1,8 +1,10 @@
 #pragma once
-
+#include <fstream>
+#include <sstream>
 #include <string>
 #include <vector>
 #include <map>
+#include <iostream>
 using namespace std;
 
 #include <rapidjson/document.h>
@@ -181,3 +183,18 @@ class ChannelConfig {
   ComputeNodeConfig compute_config_;
   ResultNodeConfig result_config_;
 };
+
+static string get_file_contents(const string& fpath)
+{
+    ifstream ifile(fpath);
+    if(!ifile.good())
+    {
+        cerr << "file is not exist:" << fpath << endl;
+        return "";
+    }
+    ostringstream buf;
+    char ch;
+    while(buf&&ifile.get(ch))
+    buf.put(ch);
+    return buf.str();
+}

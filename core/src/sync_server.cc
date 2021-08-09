@@ -3,8 +3,6 @@
 #if USE_BUFFER_
 #include "simple_buffer.h"
 #endif
-#include <fstream>
-#include <sstream>
 
 // 服务器
 bool SyncServer::close()
@@ -19,21 +17,6 @@ bool SyncServer::wait()
     if(server_)
         server_->Wait();
     cout << "SyncServer::wait()" << endl;
-}
-
-static string get_file_contents(const string& fpath)
-{
-    ifstream ifile(fpath);
-    if(!ifile.good())
-    {
-        cout << "file is not exist:" << fpath << endl;
-        return "";
-    }
-    ostringstream buf;
-    char ch;
-    while(buf&&ifile.get(ch))
-    buf.put(ch);
-    return buf.str();
 }
 
 SyncServer::SyncServer(const NodeInfo& server_info, map<string, shared_ptr<ClientConnection>>* ptr_client_conn_map)

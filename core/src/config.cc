@@ -7,14 +7,7 @@
 using namespace rapidjson;
 
 #include <algorithm>
-#include <fstream>
-#include <iostream>
-#include <sstream>
-#include <string>
-#include <vector>
 #include <set>
-using namespace std;
-
 #include <unistd.h>
 
 bool is_file_exist(const string& filepath) {

@@ -6,8 +6,6 @@
 #include <thread>
 #include <chrono>   
 using namespace chrono;
-#include <fstream>
-#include <sstream>
 
 AsyncClientCall::AsyncClientCall(const string& task_id, const string& remote_nodeid,
 		const SendRequest& request, CompletionQueue& cq_, 
@@ -23,21 +21,6 @@ AsyncClientCall::AsyncClientCall(const string& task_id, const string& remote_nod
 	responder->StartCall();
 	responder->Finish(&reply, &status, (void*)this);
 	callStatus = PROCESS ;
-}
-
-static string get_file_contents(const string& fpath)
-{
-  ifstream ifile(fpath);
-  if(!ifile.good())
-  {
-      cout << "file is not exist:" << fpath << endl;
-      return "";
-  }
-  ostringstream buf;
-  char ch;
-  while(buf&&ifile.get(ch))
-  buf.put(ch);
-  return buf.str();
 }
 
 AsyncClient::AsyncClient(const ViaInfo& via_info, const string& taskid)

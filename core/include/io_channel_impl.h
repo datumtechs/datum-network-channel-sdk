@@ -24,7 +24,6 @@ public:
   static IoChannelImpl* Instance() 
   {
     static IoChannelImpl impl;
-    // cout << "&impl=========" << &impl << endl;
     return &impl;
   }
 

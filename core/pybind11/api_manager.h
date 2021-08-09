@@ -1,14 +1,6 @@
 #pragma once
-
-#include <cstdio>
-#include <string>
-#include <vector>
-#include <iostream>
-#include <mutex>
-#include <fstream>
-using namespace std;
-
 #include "io_channel_impl.h"
+using namespace std;
 
 class APIManager 
 {

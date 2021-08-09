@@ -1,7 +1,5 @@
 // file sync_client.cc
 #include "sync_client.h"
-#include <fstream>
-#include <sstream>
 #include <grpc++/security/credentials.h>
 #if USE_BUFFER_
 #include "simple_buffer.h"
@@ -9,21 +7,6 @@
 #include <thread>
 #include <chrono>   
 using namespace chrono;
-
-static string get_file_contents(const string& fpath)
-{
-  ifstream ifile(fpath);
-  if(!ifile.good())
-  {
-      cout << "file is not exist:" << fpath << endl;
-      return "";
-  }
-  ostringstream buf;
-  char ch;
-  while(buf&&ifile.get(ch))
-  buf.put(ch);
-  return buf.str();
-}
 
 SyncClient::SyncClient(const ViaInfo& via_info, const string& taskid)
 {
