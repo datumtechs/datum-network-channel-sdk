@@ -47,7 +47,7 @@
   执行脚本：
 
   ```bash
-  ./generate.sh
+  cd openssl && ./generate.sh
   ```
 
   > 执行此命令可生成证书相关的文件：根证书的私钥/根证书，服务器私钥/服务器证书，客户端私钥/客户端证书；
@@ -140,24 +140,15 @@
   > - CLIENT_CERT：客户端证书文件路径；
   >   - 用于连接服务器时，将此证书提供给服务器，验证此证书是否由根证书颁发，连接服务器时时加载；
   >
-  > 
-  >
-  > 总结：
-  >
-  > - 客户端证书必须由根证书颁发；
-  > - 服务器证书可不由根证书颁发（脚本中是由根证书颁发）；
-  
+
   
 
 ### 支持GMSSL(TASSL)
 
-- 参考地址
-
-  ```bash
-  https://github.com/jntass/TASSL-1.1.1b
-  https://www.cnblogs.com/musea/articles/10891515.html
-  https://mp.weixin.qq.com/mp/appmsgalbum?__biz=MzI3NTQyMzEzNQ==&action=getalbum&album_id=1338591541056815107&subscene=159&subscene=158&scenenote=https%3A%2F%2Fmp.weixin.qq.com%2Fs%3F__biz%3DMzI3NTQyMzEzNQ%3D%3D%26mid%3D2247485921%26idx%3D1%26sn%3Dd511b445fe44c6e1851bc3e1788b87a1%26chksm%3Deb044311dc73ca072a6ee8c45bb4d8866c0bcf4b842f1184c34b6286ef584d82917818f5c21d%26scene%3D158%23rd#wechat_redirect
-  ```
+- GMSSL工具简介
+  - gmtassl：生成国密证书的命令行工具，兼容openssl命令行工具；
+  - libtacrypto：国密加密算法库；
+  - litabssl：国密加密模块应用库，实现了ssl及tls；
 
 - 下载gmssl
 
@@ -182,3 +173,11 @@
     >
     >
     > 安装路径和grpc的源码安装路径不能一样，因为grpc需要安装ssl的依赖库（libssl.so）和TaSSL安装的libssl.so会有冲突；
+
+- 生成证书相关文件
+
+  ```bash
+  cd gmssl && ./gen_certs_gmssl.sh
+  ```
+
+  
