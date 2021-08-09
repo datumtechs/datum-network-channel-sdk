@@ -1,8 +1,7 @@
 #pragma once
 
 #include "base_server.h"
-#include "sync_client.h"
-#include "async_client.h"
+#include "base_client.h"
 #include "config.h"
 #include "IChannel.h"
 #include <atomic>
@@ -71,16 +70,13 @@ class BasicIO {
   NodeInfo node_info_;
   vector<ViaInfo> via_server_infos_;
   vector<string> client_nodeids_;
- #if ASYNC_CLIENT
-  map<string, shared_ptr<AsyncClient>> nid_to_server_map_;
-  vector<shared_ptr<AsyncClient>> conn_servers_;
+
+#if ASYNC_CLIENT
   vector<thread> clients_thread_;
-#else
-  map<string, shared_ptr<SyncClient>> nid_to_server_map_;
-  vector<shared_ptr<SyncClient>> conn_servers_;
 #endif
-  
- 
+
+  map<string, shared_ptr<BaseClient>> nid_to_server_map_;
+  vector<shared_ptr<BaseClient>> conn_servers_;
   map<string, shared_ptr<ClientConnection>> client_conn_map;
   error_callback handler;
 
@@ -89,7 +85,6 @@ class BasicIO {
   vector<std::thread> handle_data_threads_;
 #endif
   shared_ptr<BaseServer> server_ = nullptr;
-  
 };
 
 

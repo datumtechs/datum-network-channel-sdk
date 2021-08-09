@@ -1,7 +1,8 @@
 #include "net_io.h"
 #include "sync_server.h"
 #include "async_server.h"
-
+#include "sync_client.h"
+#include "async_client.h"
 #include "IChannel.h"
 #include <unistd.h>
 #include <set>
