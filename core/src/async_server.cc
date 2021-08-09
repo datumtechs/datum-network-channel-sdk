@@ -82,7 +82,7 @@ void CallData::Proceed(void* ptr_save, void* ptr_mtx, void* ptr_cv)
 bool AsyncServer::close()
 {
     // 关闭服务
-    server_->Shutdown();
+    base_server_->Shutdown();
 	// Always shutdown the completion queue after the server.
 	for(int i = 0; i < thread_count_; ++i)
 	{
@@ -91,14 +91,13 @@ bool AsyncServer::close()
 	return true;
 }
 
-AsyncServer::~AsyncServer()
+AsyncServer::AsyncServer(const NodeInfo& server_info, 
+	map<string, shared_ptr<ClientConnection>>* ptr_client_conn_map):
+	BaseServer(server_info, ptr_client_conn_map)
 {
-	close();
-}
-
-AsyncServer::AsyncServer(const NodeInfo& server_info, map<string, shared_ptr<ClientConnection>>* ptr_client_conn_map)
-{
-	ptr_client_conn_map_ = ptr_client_conn_map;
+	// Register "service_" as the instance through which we'll communicate with
+	// clients. In this case it corresponds to an *asynchronous* service.
+	builder_->RegisterService(&service_);
 
 #if MULTI_LOCKS
 	for(auto &v : *ptr_client_conn_map)
@@ -112,58 +111,6 @@ AsyncServer::AsyncServer(const NodeInfo& server_info, map<string, shared_ptr<Cli
 	}
 #endif
 
-	// ServerBuilder builder;
-	builder_ = make_shared<ServerBuilder>();
-	builder_->SetMaxReceiveMessageSize(INT_MAX);
-	// Listen on the given address without any authentication mechanism.
-	std::shared_ptr<grpc::ServerCredentials> creds;
-	
-	#if(1 == SSL_TYPE)  
-	{   // openssl
-		if(server_info.ca_cert_path_.empty() || server_info.server_key_path_.empty() || server_info.server_cert_path_.empty())
-		{
-			cerr << "Invalid server openssl certificate, please check!" << endl;
-			return;
-		}
-		auto str_root_crt = get_file_contents(server_info.ca_cert_path_.c_str()); // for verifying clients
-    	auto str_server_key = get_file_contents(server_info.server_key_path_.c_str());
-    	auto str_server_cert = get_file_contents(server_info.server_cert_path_.c_str());
-		grpc::SslServerCredentialsOptions::PemKeyCertPair pkcp = {str_server_key.c_str(), str_server_cert.c_str()};
-		grpc::SslServerCredentialsOptions ssl_opts(GRPC_SSL_REQUEST_AND_REQUIRE_CLIENT_CERTIFICATE_AND_VERIFY);
-		ssl_opts.pem_root_certs = str_root_crt.c_str();
-		ssl_opts.pem_key_cert_pairs.push_back(pkcp);
-		creds = grpc::SslServerCredentials(ssl_opts);
-	}
-	#elif(2 == SSL_TYPE)  
-    {	// gmssl
-        if(server_info.ca_cert_path_.empty() || server_info.server_sign_key_path_.empty() || 
-		   server_info.server_sign_cert_path_.empty() || server_info.server_enc_key_path_.empty() ||
-		   server_info.server_enc_cert_path_.empty() )
-        { 
-            cerr << "Invalid server gmssl certificate, please check!" << endl;
-            return;
-        }
-
-        grpc::SslServerCredentialsOptions::PemKeyCertPair sig_pkcp = {
-			server_info.server_sign_key_path_.c_str(), server_info.server_sign_cert_path_.c_str()};
-
-        grpc::SslServerCredentialsOptions::PemKeyCertPair enc_pkcp = {
-			server_info.server_enc_key_path_.c_str(), server_info.server_enc_cert_path_.c_str()};
-        grpc::SslServerCredentialsOptions ssl_opts(GRPC_SSL_REQUEST_AND_REQUIRE_CLIENT_CERTIFICATE_AND_VERIFY);
-        ssl_opts.pem_root_certs = server_info.ca_cert_path_.c_str();
-        ssl_opts.pem_key_cert_pairs.push_back(sig_pkcp);
-        ssl_opts.pem_key_cert_pairs.push_back(enc_pkcp);
-        creds = grpc::SslServerCredentials(ssl_opts);
-    }
-	#else
-	{
-		creds = grpc::InsecureServerCredentials();
-	}
-#endif
-	builder_->AddListeningPort(server_info.address, creds);
-	// Register "service_" as the instance through which we'll communicate with
-	// clients. In this case it corresponds to an *asynchronous* service.
-	builder_->RegisterService(&service_);
 	// Get hold of the completion queue used for the asynchronous communication
 	// with the gRPC runtime.
 	int enableCPUNum = sysconf(_SC_NPROCESSORS_ONLN);
@@ -187,7 +134,7 @@ AsyncServer::AsyncServer(const NodeInfo& server_info, map<string, shared_ptr<Cli
 		map_cq_[i] = builder_->AddCompletionQueue();
 	}
 	// Finally assemble the server.
-	server_ = builder_->BuildAndStart();
+	base_server_ = builder_->BuildAndStart();
 	cout << "Server listening on " << server_info.address << endl;
 	// Proceed to the server's main loop.
 	// Spawn a new CallData instance to serve new clients.

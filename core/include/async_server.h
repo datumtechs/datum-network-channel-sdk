@@ -1,6 +1,7 @@
 
 // file async_server.h
 #pragma once
+#include "base_server.h"
 #include "config.h"
 #include "client_connection.h"
 #include <unistd.h>
@@ -28,12 +29,10 @@
 4.多线程/多把锁/无;
 */
 
-using grpc::Server;
 using grpc::ServerAsyncResponseWriter;
 using grpc::ServerAsyncWriter;
 using grpc::ServerAsyncReader;
 using grpc::ServerAsyncReaderWriter;
-using grpc::ServerBuilder;
 using grpc::ServerContext;
 using grpc::ServerCompletionQueue;
 using grpc::CompletionQueue;
@@ -42,8 +41,6 @@ using io_channel::IoChannel;
 using io_channel::SendRequest;
 using io_channel::RetCode;
 using namespace std;
-
-#define RET_SUCCEED_CODE 200
 
 class CommonCallData
 {
@@ -87,11 +84,12 @@ private:
     ServerAsyncResponseWriter<RetCode> responder_;
 };
 
-class AsyncServer
+class AsyncServer : public BaseServer
 {
+	using BaseServer::BaseServer;
 public:
 	AsyncServer(const NodeInfo& server_info, map<string, shared_ptr<ClientConnection>>* ptr_client_conn_map);
-	~AsyncServer();
+	~AsyncServer(){close();};
 	bool close();
 	void Handle_Event(const int numEvent);
 	int get_thread_count() {return thread_count_;}
@@ -121,8 +119,5 @@ private:
 	int thread_count_ = 0;
 	map<int, std::unique_ptr<ServerCompletionQueue>> map_cq_;
 	IoChannel::AsyncService service_;
-	std::unique_ptr<Server> server_;
-	std::shared_ptr<ServerBuilder> builder_ = nullptr;
-	map<string, shared_ptr<ClientConnection>>* ptr_client_conn_map_ = nullptr;
 };
 

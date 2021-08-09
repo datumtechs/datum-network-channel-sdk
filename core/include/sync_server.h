@@ -1,5 +1,6 @@
 // file sync_server.h
 #pragma once
+#include "base_server.h"
 #include "config.h"
 #include "client_connection.h"
 #include <iostream>
@@ -30,21 +31,17 @@ using grpc::ServerReaderWriter;
 using grpc::ServerWriter;
 using grpc::Status;
 
-#define SLEEP_TIME_MILLI_SECONDS 500
-#define RET_SUCCEED_CODE 200
-
 // 同步服务器
-class SyncServer: public IoChannel::Service
+class SyncServer: public BaseServer, public IoChannel::Service
 {
 public:
     bool close();
     bool wait();
+    ~SyncServer(){close();}
 
     SyncServer(const NodeInfo& server_info, map<string, shared_ptr<ClientConnection>>* ptr_client_conn_map);
 	Status Send(ServerContext* context, const SendRequest* request, RetCode* response);
     
 private:
-    std::mutex                    mtx_;
-    std::unique_ptr<Server> server_;
-    map<string, shared_ptr<ClientConnection>>* ptr_client_conn_map_ = nullptr;
+    std::mutex mtx_;
 };

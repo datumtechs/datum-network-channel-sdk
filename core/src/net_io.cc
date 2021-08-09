@@ -1,4 +1,7 @@
 #include "net_io.h"
+#include "sync_server.h"
+#include "async_server.h"
+
 #include "IChannel.h"
 #include <unistd.h>
 #include <set>
@@ -21,13 +24,12 @@ bool ViaNetIO::StartServer(const NodeInfo& server_info,
 #if ASYNC_SERVER
   // async server
   server_ = make_shared<AsyncServer>(server_info, ptr_client_conn_map);
-  
   int thread_count = server_->get_thread_count();
 
   handle_threads_.resize(thread_count);
   for(int i = 0; i < thread_count; ++i)
   {
-    handle_threads_[i] = thread(&AsyncServer::Handle_Event, server_, i);
+    handle_threads_[i] = thread(&BaseServer::Handle_Event, server_, i);
   }
 
   #if USE_CACHE
@@ -36,11 +38,11 @@ bool ViaNetIO::StartServer(const NodeInfo& server_info,
       handle_data_threads_.resize(ptr_client_conn_map->size());
       for(auto &v: *ptr_client_conn_map)
       {
-        handle_data_threads_[i++] = thread(&AsyncServer::Handle_Data, server_, v.first);
+        handle_data_threads_[i++] = thread(&BaseServer::Handle_Data, server_, v.first);
       }
-    #else 
+    #else
       handle_data_threads_.resize(1);
-      handle_data_threads_[0] = thread(&AsyncServer::Handle_Data, server_);
+      handle_data_threads_[0] = thread(&BaseServer::Handle_Data, server_);
     #endif
   #endif
   

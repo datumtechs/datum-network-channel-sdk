@@ -1,9 +1,8 @@
 #pragma once
 
+#include "base_server.h"
 #include "sync_client.h"
 #include "async_client.h"
-#include "sync_server.h"
-#include "async_server.h"
 #include "config.h"
 #include "IChannel.h"
 #include <atomic>
@@ -86,12 +85,10 @@ class BasicIO {
   error_callback handler;
 
 #if ASYNC_SERVER
-  shared_ptr<AsyncServer> server_ = nullptr;
   vector<std::thread> handle_threads_;
   vector<std::thread> handle_data_threads_;
-#else
-  shared_ptr<SyncServer> server_ = nullptr;
 #endif
+  shared_ptr<BaseServer> server_ = nullptr;
   
 };
 
