@@ -9,8 +9,8 @@ BaseClient::BaseClient(const ViaInfo& via_info, const string& taskid)
 	{
 		if(via_info.server_cert_path_.empty() || via_info.client_key_path_.empty() || via_info.client_cert_path_.empty())
 		{
-		cerr << "Invalid client openssl certificate, please check!" << endl;
-		return;
+			gpr_log(GPR_ERROR, "Invalid client openssl certificate, please check!");
+			return;
 		}
 		auto str_root_crt = get_file_contents(via_info.server_cert_path_); // for verifying clients
 		auto str_client_key = get_file_contents(via_info.client_key_path_);
@@ -28,8 +28,8 @@ BaseClient::BaseClient(const ViaInfo& via_info, const string& taskid)
 		via_info.client_sign_cert_path_.empty() || via_info.client_enc_key_path_.empty() ||
 		via_info.client_enc_cert_path_.empty())
 		{
-		cerr << "Invalid client gmssl certificate, please check!" << endl;
-		return;
+			gpr_log(GPR_ERROR, "Invalid client gmssl certificate, please check!");
+			return;
 		}
 
 		grpc::SslCredentialsOptions ssl_opts;

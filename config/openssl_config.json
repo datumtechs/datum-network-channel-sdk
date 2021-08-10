@@ -1,6 +1,7 @@
 {
 	"TASK_ID": "task-1",
 	"ROOT_CERT": "ssl_key/ca.crt",
+	"LOG_LEVEL":0,
 	"NODE_INFO": [
 		{
 			"NODE_ID": "p0",

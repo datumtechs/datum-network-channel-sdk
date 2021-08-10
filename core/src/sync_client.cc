@@ -45,7 +45,7 @@ ssize_t SyncClient::send(const string& self_nodeid, const string& remote_nodeid,
     Status status = stub_->Send(&context, req_info, &ret_code);
     if (status.ok()) 
     {
-      // cout << "send data to " << remote_nodeid << " succeed=====" << endl;
+      gpr_log(GPR_DEBUG, "Send data to %s succeed.", remote_nodeid.c_str());
       break;
     } 
     else 
@@ -53,11 +53,9 @@ ssize_t SyncClient::send(const string& self_nodeid, const string& remote_nodeid,
       end_time = system_clock::now();
       elapsed = duration_cast<duration<int64_t, std::milli>>(end_time - start_time).count();
 
-      // cout << "send data to " << remote_nodeid << " failed, cost " 
-      //   << elapsed << " milliseconds." << endl;
       if(elapsed >= timeout)
       {
-          cout << "send request timeout!" << endl;
+          gpr_log(GPR_ERROR, "Send request timeout:%ld.", timeout);
           return 0;
       }
     }

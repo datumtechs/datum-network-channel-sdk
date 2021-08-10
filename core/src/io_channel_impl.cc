@@ -30,10 +30,11 @@ shared_ptr<IChannel> IoChannelImpl::CreateViaChannel(const NodeInfo& node_info,
 {
   shared_ptr<BasicIO> net_io =  nullptr;
   net_io = make_shared<ViaNetIO>(node_info, serverInfos, clientNodeIds, error_callback);
+  net_io->SetLogLevel(config->log_level_);
   if (net_io->init(config->task_id_)) 
-  {
-    shared_ptr<GRpcChannel> grpc_channel = make_shared<GRpcChannel>(net_io, config, node_info);
-    return std::dynamic_pointer_cast<IChannel>(grpc_channel);
+  { 
+    io_channel_ = make_shared<GRpcChannel>(net_io, config, node_info);
+    return io_channel_;
   }
  
   error_callback(node_info.id.c_str(), "", -1, "init io failed!", (void*)"user_data");
@@ -71,24 +72,6 @@ shared_ptr<IChannel> IoChannelImpl::CreateIoChannel(const string& node_id, const
     
   vector<string> clientNodeIds; 
   config->GetNodeInfos(clientNodeIds, serverInfos, node_id);
-  /*
-  string strNodeInfo = "address: " + node_info.address + ", id:" + node_info.id;
-  cout << "node_info=========:" << strNodeInfo << endl;
-  string strServerInfo = "";
-  string nodeid = "nodeid: ";
-  string via = "via: ";
-  string address = "address: ";
-  for(int i=0; i < serverInfos.size(); ++i)
-  {
-      ViaInfo tmp = serverInfos[i];
-      nodeid = nodeid + " " + tmp.id;
-      via = via + " " + tmp.via;
-      address = address + " \n" + tmp.address;
-  }
-  strServerInfo = nodeid + ", " + via + ", " + address;
-  cout << "server info=========:" << strServerInfo << endl;
-  */
 
-  io_channel_ = CreateViaChannel(node_info, config, serverInfos, clientNodeIds, error_cb);
-  return io_channel_;
+  return CreateViaChannel(node_info, config, serverInfos, clientNodeIds, error_cb);
 }

@@ -35,7 +35,6 @@ using grpc::Status;
 class SyncServer: public BaseServer, public IoChannel::Service
 {
 public:
-    bool close();
     bool wait();
     ~SyncServer(){close();}
 

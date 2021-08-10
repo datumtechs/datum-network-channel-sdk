@@ -81,6 +81,7 @@ bool ClientConnection::write(const string& msgid, const string& data)
   auto iter = map_queue_.find(msgid);
   // cout << "ClientConnection::write, nodeid:" << nodeid_ << ",msgid:" << msgid << 
   //   ", data.size:" << data.size() << endl;
+
   if(iter == map_queue_.end())
   {
     shared_ptr<queue<string>> ptr_data_queue_ = make_shared<queue<string>>();

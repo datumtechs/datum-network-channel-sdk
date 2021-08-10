@@ -60,10 +60,10 @@ void CallData::Proceed(void* ptr_save, void* ptr_mtx, void* ptr_cv)
 		// 保存数据
 		map<string, shared_ptr<ClientConnection>>* ptr_client_conn_map = 
 			static_cast<map<string, shared_ptr<ClientConnection>>*>(ptr_save);
-		// cout << "nodeid:===" << nodeId << endl;
 		auto iter = ptr_client_conn_map->find(nodeId);
 		if(iter == ptr_client_conn_map->end())
 		{
+			gpr_log(GPR_ERROR, "Invalid nodeID:%s, server received invalid data.", nodeId.c_str());
 			return;
 		}
 		// The msgid is already included in the data  
@@ -74,6 +74,8 @@ void CallData::Proceed(void* ptr_save, void* ptr_mtx, void* ptr_cv)
 		#else
 			const string& msgid = request_.id();
 			iter->second->write(msgid, data);
+			gpr_log(GPR_DEBUG, "Save data from nodeid:%s, msgid:%s, data.size:%d", 
+    			nodeId.c_str(), msgid.c_str(), (int)data.size());
 		#endif
 	#endif
 	}
@@ -81,6 +83,7 @@ void CallData::Proceed(void* ptr_save, void* ptr_mtx, void* ptr_cv)
 
 bool AsyncServer::close()
 {
+	gpr_log(GPR_INFO, "Close Async Server."); 
     // 关闭服务
     base_server_->Shutdown();
 	// Always shutdown the completion queue after the server.
@@ -102,7 +105,7 @@ AsyncServer::AsyncServer(const NodeInfo& server_info,
 #if MULTI_LOCKS
 	for(auto &v : *ptr_client_conn_map)
 	{
-		cout << "nodeid key:" << v.first << endl;
+		gpr_log(GPR_INFO, "nodeid key:: %s.", v.first.c_str()); 
 		map_mtx_[v.first] = make_shared<mutex>();
 		#if USE_CACHE
 			map_cv_[v.first] = make_shared<condition_variable>();
@@ -135,7 +138,7 @@ AsyncServer::AsyncServer(const NodeInfo& server_info,
 	}
 	// Finally assemble the server.
 	base_server_ = builder_->BuildAndStart();
-	cout << "Server listening on " << server_info.address << endl;
+	gpr_log(GPR_INFO, "Async Server listening on: %s.", server_info.address.c_str()); 
 	// Proceed to the server's main loop.
 	// Spawn a new CallData instance to serve new clients.
 	for(int i = 0; i < thread_count_; ++i)
@@ -198,7 +201,7 @@ void AsyncServer::Handle_Data(const string& nodeid)
 			iter->second->write(req_info.id(), req_info.data());
 			map_send_queue_[nodeid]->pop();
 		}
-		// cout << "cv wait, nodeid:" << nodeid << endl;
+		gpr_log(GPR_DEBUG, "write data wait, nodeid: %s.", nodeid.c_str()); 
 		(*map_cv_[nodeid]).wait(lck);
 	} while(true);
 }
@@ -224,6 +227,7 @@ void AsyncServer::Handle_Data()
 			send_queue_.pop();
 		}
 		// cout << "cv wait============" << endl;
+		gpr_log(GPR_DEBUG, "Write data wait, nodeid: %s.", req_info.nodeid().c_str()); 
 		cv_.wait(lck);
 	} while(true);
 }

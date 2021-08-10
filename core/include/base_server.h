@@ -27,7 +27,7 @@ public:
 	BaseServer(const NodeInfo& server_info, 
 		map<string, shared_ptr<ClientConnection>>* ptr_client_conn_map);
 	virtual ~BaseServer(){};
-	virtual bool close() = 0;
+	virtual bool close(){if(base_server_) base_server_->Shutdown();return true;}
 
 #if ASYNC_SERVER
 	virtual void Handle_Event(const int numEvent) = 0;

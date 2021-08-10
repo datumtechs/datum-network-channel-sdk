@@ -33,7 +33,7 @@ using namespace std;
  */
 class BasicIO {
  public:
-  virtual ~BasicIO();
+  virtual ~BasicIO(){};
 
   BasicIO(const NodeInfo &node_info, const vector<ViaInfo>& server_infos, 
     const vector<string>& client_nodeids,
@@ -43,6 +43,7 @@ class BasicIO {
   /**
    * Initialize the client connection.
    */
+  virtual void SetLogLevel(uint8_t log_level) = 0;
   virtual bool init(const string& taskid) = 0;
   virtual ssize_t recv(const string& remote_nodeid, const char* id, char* data, 
       uint64_t length, int64_t timeout) = 0;
@@ -50,12 +51,6 @@ class BasicIO {
       uint64_t length, int64_t timeout) = 0;
 
  public:
-
-   /**
-   * close the connections(reserved interface).
-   */
-  void close();
-
   const vector<string> get_connected_nodeids() 
   {
     vector<string> vec_conn_nid(via_server_infos_.size());
@@ -76,7 +71,6 @@ class BasicIO {
 #endif
 
   map<string, shared_ptr<BaseClient>> nid_to_server_map_;
-  vector<shared_ptr<BaseClient>> conn_servers_;
   map<string, shared_ptr<ClientConnection>> client_conn_map;
   error_callback handler;
 
@@ -94,11 +88,8 @@ class BasicIO {
 class ViaNetIO : public BasicIO {
  public:
   using BasicIO::BasicIO;
-  // virtual ~ViaNetIO(){cout << "start to close server==========" << endl; CloseServer();}
-  virtual ~ViaNetIO(){/*handle_thread_.join();*/}
-
-  bool CloseServer() { if(server_) server_->close(); return true;}
-
+  virtual ~ViaNetIO(){}
+  void SetLogLevel(uint8_t log_level){gpr_set_log_verbosity((gpr_log_severity)log_level);};
   bool StartServer(const NodeInfo& server_info,
        map<string, shared_ptr<ClientConnection>>* ptr_client_conn_map);
 

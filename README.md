@@ -8,8 +8,6 @@ RosettaNet网络层sdk
 git clone -b develop http://192.168.9.66/RosettaFlow/channel-sdk.git
 ```
 
-
-
 ## 源码编译
 
 说明：如非源码编译方式，可不执行下面的操作步骤；
@@ -100,8 +98,4 @@ cd channel-sdk && ./build.sh clean
   ```bash
   ./run_restore.sh
   ```
-
-  
-
-
 

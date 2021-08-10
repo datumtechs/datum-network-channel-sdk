@@ -172,6 +172,7 @@ class ChannelConfig {
   bool pass_via_ = "true"; 
   string task_id_ = "";
   string root_cert_ = "";
+  uint8_t log_level_ = 0; // 0:Debug, 1:Info, 2: Error
   NODE_TYPE node_type_ = NODE_TYPE_INVALID;
   map<string, NodeInfoConfig> node_info_config_;
   map<string, string> nodeid_to_via_;

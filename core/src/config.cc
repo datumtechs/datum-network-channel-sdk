@@ -345,6 +345,9 @@ bool ChannelConfig::parse(Document& doc) {
   // pass_via_ = GetBool(doc, "PASS_VIA", true, false);
   task_id_ = GetString(doc, "TASK_ID", "", false);
   root_cert_ = GetString(doc, "ROOT_CERT", "", false);
+  log_level_ = GetInt(doc, "LOG_LEVEL", 2, false);
+  if(2 < log_level_)
+    log_level_ = 2;
   if (!parse_node_info(doc)) {
     cout << "parse node info error" << endl;
   }

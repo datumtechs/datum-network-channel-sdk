@@ -4,19 +4,11 @@
 #include "simple_buffer.h"
 #endif
 
-// 服务器
-bool SyncServer::close()
-{
-    // 关闭服务
-    if(base_server_)
-        base_server_->Shutdown();
-}
-
 bool SyncServer::wait()
 {
     if(base_server_)
         base_server_->Wait();
-    cout << "SyncServer::wait()" << endl;
+    return true;
 }
 
 SyncServer::SyncServer(const NodeInfo& server_info, 
@@ -25,7 +17,7 @@ SyncServer::SyncServer(const NodeInfo& server_info,
 {
     builder_->RegisterService(this);
     base_server_ = builder_->BuildAndStart();
-    cout << "Server listening on " << server_info.address << endl;
+    gpr_log(GPR_INFO, "Sync Server listening on: %s.", server_info.address.c_str()); 
     // base_server_->Wait();
 }
 

@@ -9,10 +9,6 @@
 #include <chrono>   
 using namespace chrono;
 
-void BasicIO::close() {}
-
-BasicIO::~BasicIO(){close();}
-
 BasicIO::BasicIO(const NodeInfo &node_info, const vector<ViaInfo>& server_infos,
     const vector<string>& client_nodeids,
     error_callback error_callback )
@@ -75,22 +71,21 @@ bool ViaNetIO::init(const string& taskid)
   }
   
   uint32_t nServerSize = via_server_infos_.size();
-  conn_servers_.resize(nServerSize);
   for (int i = 0; i < nServerSize; i++) 
   {
-#if ASYNC_CLIENT
-    conn_servers_[i] = make_shared<AsyncClient>(via_server_infos_[i], taskid);
-    clients_thread_.push_back(std::thread(&AsyncClient::AsyncCompleteRpc, conn_servers_[i]));
-    cout << "init async connect, sids:" << via_server_infos_[i].id << endl;
-#else
-    conn_servers_[i] = make_shared<SyncClient>(via_server_infos_[i], taskid);
-    cout << "init sync connect, sids:" << via_server_infos_[i].id << endl;
-#endif
     string server_node_id =  via_server_infos_[i].id;
-    nid_to_server_map_[server_node_id] = conn_servers_[i];
+#if ASYNC_CLIENT
+    nid_to_server_map_[server_node_id]  = make_shared<AsyncClient>(via_server_infos_[i], taskid);
+    clients_thread_.push_back(std::thread(&AsyncClient::AsyncCompleteRpc, nid_to_server_map_[server_node_id]));
+    gpr_log(GPR_INFO, "init async client connect, sids: %s.", via_server_infos_[i].id.c_str()); 
+#else
+    nid_to_server_map_[server_node_id] = make_shared<SyncClient>(via_server_infos_[i], taskid);
+    gpr_log(GPR_INFO, "init sync client connect, sids: %s.", via_server_infos_[i].id.c_str());
+#endif
+  
   }
 
-  cout << "init all network connections succeed!" << endl;
+  gpr_log(GPR_INFO, "init all network connections succeed!"); 
   return true;
 }
 

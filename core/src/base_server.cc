@@ -20,8 +20,9 @@ BaseServer::BaseServer(const NodeInfo& server_info,
 	{   // openssl
 		if(server_info.ca_cert_path_.empty() || server_info.server_key_path_.empty() || server_info.server_cert_path_.empty())
 		{
-			cerr << "Invalid server openssl certificate, please check!" << endl;
-			return;
+			const char* strErrMsg = "Invalid server openssl certificate, please check!";
+			gpr_log(GPR_ERROR, "%s", strErrMsg);
+			throw (strErrMsg);
 		}
 		auto str_root_crt = get_file_contents(server_info.ca_cert_path_.c_str()); // for verifying clients
     	auto str_server_key = get_file_contents(server_info.server_key_path_.c_str());
@@ -38,8 +39,9 @@ BaseServer::BaseServer(const NodeInfo& server_info,
 		   server_info.server_sign_cert_path_.empty() || server_info.server_enc_key_path_.empty() ||
 		   server_info.server_enc_cert_path_.empty() )
         { 
-            cerr << "Invalid server gmssl certificate, please check!" << endl;
-            return;
+			const char* strErrMsg = "Invalid server gmssl certificate, please check!";
+			gpr_log(GPR_ERROR, "%s", strErrMsg);
+			throw (strErrMsg);
         }
 
         grpc::SslServerCredentialsOptions::PemKeyCertPair sig_pkcp = {
@@ -57,7 +59,7 @@ BaseServer::BaseServer(const NodeInfo& server_info,
 	{
 		creds = grpc::InsecureServerCredentials();
 	}
-#endif
+	#endif
 	builder_->AddListeningPort(server_info.address, creds);
 }
 
