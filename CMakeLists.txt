@@ -81,7 +81,6 @@ IF(CLIENT_TYPE)
     add_definitions(-D${CLIENT_TYPE}=1)
 ENDIF()
 
-
 # third party
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/third_party/rapidjson/include)
 
@@ -110,9 +109,10 @@ target_include_directories(${LIBNAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/core/in
 target_link_libraries(${LIBNAME} PUBLIC 
         pthread ${_REFLECTION} ${_GRPC_GRPCPP} ${_PROTOBUF_LIBPROTOBUF})
 
+# Use to find the directory dependency path(libtacrypto, libtassl)
+set_target_properties(${LIBNAME} PROPERTIES FOLDER ${LIBNAME}
+    APPEND_STRING PROPERTY LINK_FLAGS "${ADD_LINK_LIB_FLAGS}")
 
-# set_target_properties(${LIBNAME} PROPERTIES FOLDER "extio"
-#     APPEND_STRING PROPERTY LINK_FLAGS " ${ADD_LINK_LIB_FLAGS}")
 
 # targets pybind11
 # add_subdirectory("./third_party/pybind11/" pybind11)

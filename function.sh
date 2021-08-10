@@ -49,14 +49,18 @@ function run_clean() {
 function run_compile_python() {
   echo -e "stage run_compile_python."
   cd ${curdir}
+  python_cmd=python${3}
+
+  echo -e "python_cmd: ${python_cmd}"
+
   if [ "$USER" == "root" ]; then
     ${pip_cmd} uninstall io_channel -y
   else
-    python3 -m pip uninstall io_channe -y # for the current user
+    ${python_cmd} -m pip uninstall io_channe -y # for the current user
   fi
 
-  export USE_ALONE=$1 SSL_TYPE=$2 && python3 setup.py build_ext
-  export USE_ALONE=$1 SSL_TYPE=$2 && python3 setup.py bdist_wheel
+  export USE_ALONE=$1 SSL_TYPE=$2 && ${python_cmd} setup.py build_ext
+  export USE_ALONE=$1 SSL_TYPE=$2 && ${python_cmd} setup.py bdist_wheel
 
   cd ${curdir}
   echo -e "${GREEN}run stage run_compile_python ok.${NC}"
