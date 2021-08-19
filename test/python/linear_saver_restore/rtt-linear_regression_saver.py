@@ -7,8 +7,6 @@ import tensorflow as tf
 import numpy as np
 from util import read_dataset
 import datetime
-import channel_sdk.grpc as grpc
-io_channel = grpc.APIManager()
 from protos import via_svc_pb2
 import os
 import json
@@ -63,18 +61,13 @@ def fun(a, b, c, d, e):
     return
 
 
-def create_channel():
-    print("_node_id======================:{}".format(node_id_))
-    # 启动服务
-    res = io_channel.create_channel(node_id_, strJson, fun)
-    return res
-
-
 # 使用外部io
 using_external_io = True
 if using_external_io:
     print("use external io=================================")
-    channel = create_channel()
+    import channel_sdk.grpc as grpc
+    io_channel = grpc.APIManager()
+    channel = io_channel.create_channel(node_id_, strJson)
     cfg = {'pass_via': False}
     # 注册服务
     if cfg['pass_via']:
@@ -97,7 +90,7 @@ if using_external_io:
 
     # 使用外部io
     print("start set==================")
-    rtt.set_channel(channel)
+    rtt.set_channel("", channel)
     print("set channel succeed==================")
 
 np.set_printoptions(suppress=True)

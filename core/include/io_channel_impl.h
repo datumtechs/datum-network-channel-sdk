@@ -20,7 +20,14 @@ private:
   IoChannelImpl& operator=(const IoChannelImpl&) = delete;
   IoChannelImpl& operator=(IoChannelImpl&&) = delete;
 public:
-  ~IoChannelImpl(){}
+  ~IoChannelImpl()
+  {
+    if(io_channel_)
+    {
+      delete io_channel_; 
+      io_channel_=nullptr;
+    }
+  }
   static IoChannelImpl* Instance() 
   {
     static IoChannelImpl impl;
@@ -31,16 +38,16 @@ public:
   ssize_t send_msg(const string& node_id, const string& msg_id, const string& data, 
         uint64_t msg_len, uint64_t timeout=0);
   
-  shared_ptr<IChannel> CreateIoChannel(const string& node_id, const string &config_str, 
+  IChannel* CreateIoChannel(const string& node_id, const string &config_str, 
         error_callback error_cb=nullptr);
 
   // 等待服务器结束
   // void WaitServer(){if(server_) server_->wait();}
 public:
-  shared_ptr<IChannel> io_channel_ = nullptr;
+  IChannel* io_channel_ = nullptr;
 private:
 
-  shared_ptr<IChannel> CreateViaChannel(const NodeInfo& node_idInfo, shared_ptr<ChannelConfig> config,
+  IChannel* CreateViaChannel(const NodeInfo& node_idInfo, shared_ptr<ChannelConfig> config,
       const vector<ViaInfo>& serverInfos, const vector<string>& clientNodeIds, 
       error_callback error_callback=nullptr);
 };

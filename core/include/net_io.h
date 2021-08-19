@@ -33,7 +33,27 @@ using namespace std;
  */
 class BasicIO {
  public:
-  virtual ~BasicIO(){};
+  virtual ~BasicIO()
+  {
+#if ASYNC_SERVER
+    for(auto& _thread : handle_threads_)
+    {
+      _thread.detach();
+    }
+    for(auto& _thread : handle_data_threads_)
+    {
+      _thread.detach();
+    }
+#endif
+
+#if ASYNC_CLIENT
+    for(auto& _thread : clients_thread_)
+    {
+      _thread.detach();
+    }
+#endif
+    // server_->close();
+  };
 
   BasicIO(const NodeInfo &node_info, const vector<ViaInfo>& server_infos, 
     const vector<string>& client_nodeids,
@@ -43,23 +63,12 @@ class BasicIO {
   /**
    * Initialize the client connection.
    */
-  virtual void SetLogLevel(uint8_t log_level) = 0;
+  virtual void SetLogLevel(uint8_t log_level){gpr_set_log_verbosity((gpr_log_severity)log_level);};
   virtual bool init(const string& taskid) = 0;
   virtual ssize_t recv(const string& remote_nodeid, const char* id, char* data, 
       uint64_t length, int64_t timeout) = 0;
   virtual ssize_t send(const string& remote_nodeid, const char* id, const char* data, 
       uint64_t length, int64_t timeout) = 0;
-
- public:
-  const vector<string> get_connected_nodeids() 
-  {
-    vector<string> vec_conn_nid(via_server_infos_.size());
-    for(int i = 0; i < via_server_infos_.size(); i++) 
-    {
-      vec_conn_nid[i] = via_server_infos_[i].id;
-    }
-    return vec_conn_nid;
-  }
 
  protected:
   NodeInfo node_info_;
@@ -88,8 +97,7 @@ class BasicIO {
 class ViaNetIO : public BasicIO {
  public:
   using BasicIO::BasicIO;
-  virtual ~ViaNetIO(){}
-  void SetLogLevel(uint8_t log_level){gpr_set_log_verbosity((gpr_log_severity)log_level);};
+  virtual ~ViaNetIO(){}  
   bool StartServer(const NodeInfo& server_info,
        map<string, shared_ptr<ClientConnection>>* ptr_client_conn_map);
 

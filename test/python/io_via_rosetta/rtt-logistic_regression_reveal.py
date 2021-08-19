@@ -69,7 +69,7 @@ def fun(a, b, c, d, e):
 def create_channel():
     print("_node_id======================:{}".format(node_id_))
     # 启动服务
-    res = io_channel.create_channel(node_id_, strJson, fun)
+    res = io_channel.create_channel(node_id_, strJson)
     return res
 
 
@@ -94,11 +94,8 @@ if cfg['pass_via']:
     from via_svc.svc import expose_me
     expose_me(cfg, task_id, via_svc_pb2.NET_COMM_SVC, node_id_)
 
-rtt.set_channel(channel)
+rtt.set_channel("", channel)
 print("set channel succeed==================")
-
-# 使用外部io
-# use_external_io()
 
 np.set_printoptions(suppress=True)
 

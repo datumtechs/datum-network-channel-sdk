@@ -89,7 +89,7 @@ class AsyncServer : public BaseServer
 	using BaseServer::BaseServer;
 public:
 	AsyncServer(const NodeInfo& server_info, map<string, shared_ptr<ClientConnection>>* ptr_client_conn_map);
-	~AsyncServer(){close();};
+	~AsyncServer(){close();}
 	bool close();
 	void Handle_Event(const int numEvent);
 	int get_thread_count() {return thread_count_;}

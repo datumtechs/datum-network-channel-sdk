@@ -64,7 +64,7 @@ def fun(a, b, c, d, e):
 
 
 def create_channel():
-    res = io_channel.create_channel(node_id_, strJson, fun)
+    res = io_channel.create_channel(node_id_, strJson)
     return res
 
 
@@ -95,7 +95,7 @@ def start_via():
         from via_svc.svc import expose_me
         expose_me(cfg, task_id, via_svc_pb2.NET_COMM_SVC, node_id_)
 
-    rtt.set_channel(channel)
+    rtt.set_channel("", channel)
     print("set channel succeed==================")
 
 

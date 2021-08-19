@@ -172,7 +172,7 @@ bool ChannelConfig::load(const string& node_id, const string& config_file) {
   ifstream ifile(config_file);
   if (!ifile.is_open()) {
     //log_warn << "open " << config_file << " error!\n";
-    cout << "try to load as json string" << endl;
+    // cout << "try to load as json string" << endl;
   } else {
     sjson = "";
     while (!ifile.eof()) {
@@ -193,7 +193,7 @@ bool ChannelConfig::load(const string& node_id, const string& config_file) {
   PrettyWriter<StringBuffer> writer(buffer);
   doc.Accept(writer);
   string data = buffer.GetString();
-  cout << "Config Source String:\n" << data << endl;
+  // cout << "Config Source String:\n" << data << endl;
 
   if (!parse(doc)) {
     cout << "parse error" << endl;
@@ -215,7 +215,7 @@ bool ChannelConfig::parse_node_info(Document& doc, bool pass_via)
       NodeInfoConfig cfg;
       Value& Node = Nodes[i];
       cfg.node_.NODE_ID = GetString(Node, "NODE_ID", "", false);
-      cout << "node info parse:" << cfg.node_.NODE_ID << endl;
+      // cout << "node info parse:" << cfg.node_.NODE_ID << endl;
       cfg.node_.ADDRESS = GetString(Node, "ADDRESS", "", false);
       cfg.node_.VIA = GetString(Node, "VIA", "", false);
       cfg.node_.CA_CERT_PATH = GetString(doc, "ROOT_CERT", root_cert_.c_str(), false);
@@ -280,7 +280,7 @@ bool ChannelConfig::parse_data(Document& doc) {
         cout << "can not find node info, node id:" << data_nodes_[i] << endl;
       }
     }
-    cout << "parse " << Nodes.Size() << " data success" << endl;
+    // cout << "parse " << Nodes.Size() << " data success" << endl;
 
   }
   return true;
@@ -314,7 +314,7 @@ bool ChannelConfig::parse_compute(Document& doc) {
         cout << "can not find node info, node id:" << iter->first << endl;
       }
     }
-    cout << "parse " << " computation success" << endl;
+    // cout << "parse " << " computation success" << endl;
   }
   return true;
 }
@@ -335,7 +335,7 @@ bool ChannelConfig::parse_result(Document& doc) {
         cout << "can not find node info, node id:" << result_nodes_[i] << endl;
       }
     }
-    cout << "parse " << Nodes.Size() << " result success" << endl;
+    // cout << "parse " << Nodes.Size() << " result success" << endl;
   }
   return true;
 }

@@ -164,7 +164,6 @@ class ChannelConfig {
   bool parse_result(Document& doc);
 
  public:
-  //ComputeNodeConfig& getMpcConfig() { return mpc; }
   void fmt_print();
 
  public:

@@ -45,7 +45,6 @@ ssize_t SyncClient::send(const string& self_nodeid, const string& remote_nodeid,
     Status status = stub_->Send(&context, req_info, &ret_code);
     if (status.ok()) 
     {
-      gpr_log(GPR_DEBUG, "Send data to %s succeed.", remote_nodeid.c_str());
       break;
     } 
     else 

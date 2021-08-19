@@ -74,8 +74,10 @@ void CallData::Proceed(void* ptr_save, void* ptr_mtx, void* ptr_cv)
 		#else
 			const string& msgid = request_.id();
 			iter->second->write(msgid, data);
+			/*
 			gpr_log(GPR_DEBUG, "Save data from nodeid:%s, msgid:%s, data.size:%d", 
     			nodeId.c_str(), msgid.c_str(), (int)data.size());
+			*/
 		#endif
 	#endif
 	}
@@ -87,10 +89,13 @@ bool AsyncServer::close()
     // 关闭服务
     base_server_->Shutdown();
 	// Always shutdown the completion queue after the server.
+	
 	for(int i = 0; i < thread_count_; ++i)
 	{
-		map_cq_[i]->Shutdown();
+		if(map_cq_[i])
+			map_cq_[i]->Shutdown();
 	}
+	
 	return true;
 }
 
@@ -157,11 +162,16 @@ void AsyncServer::Handle_Event(const int numEvent)
 	
 	void* tag;  // uniquely identifies a request.
     bool ok;
+	
 	std::unique_ptr<ServerCompletionQueue> cq = move(map_cq_[numEvent]);
 	while (true) 
 	{
 		GPR_ASSERT(cq->Next(&tag, &ok));
-		GPR_ASSERT(ok);
+		if(!ok)
+		{
+			break;
+		}
+		// GPR_ASSERT(ok);
 		#if MULTI_LOCKS
 			#if USE_CACHE
 				static_cast<CallData*>(tag)->Proceed(&map_send_queue_, &map_mtx_, &map_cv_);
@@ -176,6 +186,8 @@ void AsyncServer::Handle_Event(const int numEvent)
 			#endif
 		#endif
 	}
+
+	map_cq_[numEvent] = move(cq);
 }
 
 

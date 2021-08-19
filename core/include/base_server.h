@@ -26,8 +26,7 @@ class BaseServer
 public:
 	BaseServer(const NodeInfo& server_info, 
 		map<string, shared_ptr<ClientConnection>>* ptr_client_conn_map);
-	virtual ~BaseServer(){};
-	virtual bool close(){if(base_server_) base_server_->Shutdown();return true;}
+	virtual ~BaseServer(){}
 
 #if ASYNC_SERVER
 	virtual void Handle_Event(const int numEvent) = 0;
@@ -40,6 +39,14 @@ public:
 	#endif
 #endif
 #endif
+
+protected:
+	virtual bool close()
+	{
+		if(base_server_) 
+			base_server_->Shutdown();
+		return true;
+	}
 
 protected:
 	std::unique_ptr<Server> base_server_;

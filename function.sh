@@ -31,9 +31,9 @@ function run_compile() {
         # -DPYBIND11_PYTHON_VERSION=${python_version}
 
     if [ -z ${verbose} ];then
-        make -j4
+        make -j8
     else
-        make -j4 VERBOSE=${verbose}
+        make -j8 VERBOSE=${verbose}
     fi
 
     cd ${curdir}
@@ -50,13 +50,14 @@ function run_compile_python() {
   echo -e "stage run_compile_python."
   cd ${curdir}
   python_cmd=python${3}
+  package_name="channel_sdk"
 
   echo -e "python_cmd: ${python_cmd}"
 
   if [ "$USER" == "root" ]; then
-    ${pip_cmd} uninstall io_channel -y
+    ${pip_cmd} uninstall $package_name -y
   else
-    ${python_cmd} -m pip uninstall io_channe -y # for the current user
+    ${python_cmd} -m pip uninstall $package_name -y # for the current user
   fi
 
   export USE_ALONE=$1 SSL_TYPE=$2 && ${python_cmd} setup.py build_ext

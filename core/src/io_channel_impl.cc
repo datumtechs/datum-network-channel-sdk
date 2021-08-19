@@ -24,7 +24,7 @@ ssize_t IoChannelImpl::send_msg(const string& node_id, const string& msg_id, con
   return io_channel_->Send(node_id.c_str(), msg_id.c_str(), data.c_str(), msg_len, timeout);
 }
 
-shared_ptr<IChannel> IoChannelImpl::CreateViaChannel(const NodeInfo& node_info, 
+IChannel* IoChannelImpl::CreateViaChannel(const NodeInfo& node_info, 
       shared_ptr<ChannelConfig> config, const vector<ViaInfo>& serverInfos, 
       const vector<string>& clientNodeIds, error_callback error_callback) 
 {
@@ -33,7 +33,10 @@ shared_ptr<IChannel> IoChannelImpl::CreateViaChannel(const NodeInfo& node_info,
   net_io->SetLogLevel(config->log_level_);
   if (net_io->init(config->task_id_)) 
   { 
-    io_channel_ = make_shared<GRpcChannel>(net_io, config, node_info);
+    GRpcChannel* grpc_channel = new GRpcChannel(net_io, config, node_info);
+    grpc_channel->SetConnectedNodeIDs(clientNodeIds);
+    io_channel_ = grpc_channel;
+
     return io_channel_;
   }
  
@@ -41,7 +44,7 @@ shared_ptr<IChannel> IoChannelImpl::CreateViaChannel(const NodeInfo& node_info,
   return nullptr;
 }
 
-shared_ptr<IChannel> IoChannelImpl::CreateIoChannel(const string& node_id, const string &config_str, 
+IChannel* IoChannelImpl::CreateIoChannel(const string& node_id, const string &config_str, 
         error_callback error_cb) 
 {
   shared_ptr<ChannelConfig> config = make_shared<ChannelConfig>(config_str);
