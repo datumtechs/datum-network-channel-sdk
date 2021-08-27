@@ -7,39 +7,6 @@ include(./cmake/common.cmake)
 include(./cmake/SetCommon.cmake)
 add_definitions(-std=c++11)
 
-##########################################################################################
-###  Generate Proto file, The proto file needs to be recompiled only when it is modified.
-##########################################################################################
-# get_filename_component(io_proto "./protos/io_channel.proto" ABSOLUTE)
-# get_filename_component(io_proto_path "${io_proto}" PATH)
-# file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/protos)  
-# set(out_proto_dirs "${CMAKE_CURRENT_BINARY_DIR}/protos")
-# set(io_proto_srcs "${out_proto_dirs}/io_channel.pb.cc")
-# set(io_proto_hdrs "${out_proto_dirs}/io_channel.pb.h")
-# set(io_grpc_srcs "${out_proto_dirs}/io_channel.grpc.pb.cc")
-# set(io_grpc_hdrs "${out_proto_dirs}/io_channel.grpc.pb.h")
-# add_custom_command(
-#       OUTPUT "${io_proto_srcs}" "${io_proto_hdrs}" "${io_grpc_srcs}" "${io_grpc_hdrs}"
-#       COMMAND ${_PROTOBUF_PROTOC}
-#       ARGS --grpc_out "${out_proto_dirs}"
-#         --cpp_out "${out_proto_dirs}"
-#         -I "${io_proto_path}"
-#         --plugin=protoc-gen-grpc="${_GRPC_CPP_PLUGIN_EXECUTABLE}"
-#         "${io_proto}"
-#       DEPENDS "${io_proto}")
-
-# # Include generated *.pb.h files
-# include_directories("${CMAKE_CURRENT_BINARY_DIR}")
-# add_library(io_grpc_proto
-#   ${io_grpc_srcs} ${io_grpc_hdrs} ${io_proto_srcs} ${io_proto_hdrs})
-
-# target_link_libraries(io_grpc_proto
-#   ${_REFLECTION}
-#   ${_GRPC_GRPCPP}
-#   ${_PROTOBUF_LIBPROTOBUF})
-
-##########################################################################################
-
 # option
 # option(SSL_TYPE "" OFF)
 message(STATUS "[SSL_TYPE]: ${SSL_TYPE}")
@@ -113,7 +80,7 @@ target_link_libraries(${LIBNAME} PUBLIC
 set_target_properties(${LIBNAME} PROPERTIES FOLDER ${LIBNAME}
     APPEND_STRING PROPERTY LINK_FLAGS "${ADD_LINK_LIB_FLAGS}")
 
-
+##########################################################################################  
 # targets pybind11
 # add_subdirectory("./third_party/pybind11/" pybind11)
 # pybind11_add_module(io_channel core/pybind11/io_channel.cc)

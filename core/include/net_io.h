@@ -88,6 +88,7 @@ class BasicIO {
   vector<std::thread> handle_data_threads_;
 #endif
   shared_ptr<BaseServer> server_ = nullptr;
+  std::unique_ptr<VIAService::Stub> via_stub_;
 };
 
 
@@ -98,7 +99,7 @@ class ViaNetIO : public BasicIO {
  public:
   using BasicIO::BasicIO;
   virtual ~ViaNetIO(){}  
-  bool StartServer(const NodeInfo& server_info,
+  bool StartServer(const string& taskid, const NodeInfo& server_info,
        map<string, shared_ptr<ClientConnection>>* ptr_client_conn_map);
 
   bool init(const string& taskid);

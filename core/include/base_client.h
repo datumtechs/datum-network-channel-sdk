@@ -20,12 +20,18 @@
 #include <thread>
 
 #include "io_channel.grpc.pb.h"
+#include "via.grpc.pb.h"
 using grpc::Status;
 using grpc::Channel;
 using grpc::ClientContext;
 using io_channel::IoChannel;
 using io_channel::SendRequest;
 using io_channel::RetCode;
+
+// Register
+using via::VIAService;
+using via::SignupReq;
+using via::Boolean;
 using namespace std;
 
 class BaseClient

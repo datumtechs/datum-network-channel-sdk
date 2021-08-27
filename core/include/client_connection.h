@@ -2,7 +2,7 @@
 #pragma once
 #include <condition_variable>
 #include <mutex>
-#if USE_BUFFER_
+#if USE_BUFFER
 #include "cycle_buffer.h"
 #endif
 #include <unordered_map>
@@ -27,7 +27,7 @@ public:
 
 public:
 	string nodeid_;
-#if USE_BUFFER_
+#if USE_BUFFER
 	shared_ptr<cycle_buffer> buffer_ = nullptr;
 	//! for one message which id is msg_id
 	map<string, shared_ptr<cycle_buffer>> mapbuffer_;

@@ -1,6 +1,6 @@
 // file sync_server.cc
 #include "sync_server.h"
-#if USE_BUFFER_
+#if USE_BUFFER
 #include "simple_buffer.h"
 #endif
 
@@ -36,7 +36,7 @@ grpc::Status SyncServer::Send(grpc::ServerContext* context, const SendRequest* r
     }
     // The msgid is already included in the data  
     const string& data = request->data();
-#if USE_BUFFER_
+#if USE_BUFFER
     iter->second->buffer_->write(data.data(), data.size());
 #else
     const string& msgid = request->id();

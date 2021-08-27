@@ -1,5 +1,5 @@
 #pragma once
-#if USE_BUFFER_
+#if USE_BUFFER
 #include "simple_timer.h"
 
 #include <mutex>
@@ -17,7 +17,6 @@ struct cycle_buffer {
   char* buffer_ = nullptr;
   std::mutex mtx_;
   std::condition_variable cv_;
-  int verbose_ = 0;
 
   /// a timer for rm empty <msgid -> buffer>
   SimpleTimer timer_;
@@ -46,7 +45,6 @@ struct cycle_buffer {
    */
   int32_t read(char* data, int32_t length);
   int32_t read(string& id, string& data);
-  int32_t read(uint64_t &msg_id, string& data, bool block);
   void realloc(int32_t length);
   int32_t write(const char* data, int32_t length);
 };

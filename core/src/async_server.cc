@@ -1,7 +1,7 @@
 // file async_server.cc
 #include "async_server.h"
 #include <grpc++/security/credentials.h>
-#if USE_BUFFER_
+#if USE_BUFFER
 #include "simple_buffer.h"
 #endif
 #include <thread>
@@ -69,7 +69,7 @@ void CallData::Proceed(void* ptr_save, void* ptr_mtx, void* ptr_cv)
 		// The msgid is already included in the data  
 		const string& data = request_.data();
 
-		#if USE_BUFFER_
+		#if USE_BUFFER
 			iter->second->buffer_->write(data.data(), data.size());
 		#else
 			const string& msgid = request_.id();

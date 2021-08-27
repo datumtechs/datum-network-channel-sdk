@@ -4,7 +4,7 @@
 #include <chrono>   
 using namespace chrono;
 
-#if USE_BUFFER_
+#if USE_BUFFER
 ClientConnection::ClientConnection(const string& nodeid) 
 {
   nodeid_ = nodeid;
@@ -13,7 +13,6 @@ ClientConnection::ClientConnection(const string& nodeid)
 
 ssize_t ClientConnection::recv(const string& id, char* data, uint64_t length, int64_t timeout) 
 {
-  // cout << "ClientConnection::recv, msgid:" << id << ", buff size:" << buffer_->size() << endl;
   if (timeout < 0)
     timeout = 10 * 1000000;
 

@@ -12,7 +12,6 @@ message SendRequest {
     bytes data = 3;
 }
 
-
 message RetCode {
 	int32 code = 1;
 }

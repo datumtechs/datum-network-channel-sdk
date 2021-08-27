@@ -1,7 +1,7 @@
 // file sync_client.cc
 #include "sync_client.h"
 
-#if USE_BUFFER_
+#if USE_BUFFER
 #include "simple_buffer.h"
 #endif
 #include <thread>
@@ -18,7 +18,7 @@ ssize_t SyncClient::send(const string& self_nodeid, const string& remote_nodeid,
   // 发送客户端的nodeid到服务器
   req_info.set_nodeid(self_nodeid);
 
-#if USE_BUFFER_
+#if USE_BUFFER
   simple_buffer buffer(msg_id, data, nLen);
   req_info.set_data((const char*)buffer.data(), buffer.len());
 #else

@@ -10,6 +10,7 @@ function show_usage() {
     echo ""
     echo "COMMANDS:"
     echo "  compile    compile the io channel libraries."
+    echo "  proto      compile the proto files."
     echo "  install    install .whl"
     echo "  clean      clean workspace"
     echo "  $E COMMAND -h/--help"
@@ -35,6 +36,12 @@ function show_compile_usage() {
     echo "     --verbose                      [OFF] Display the detailed information of the compilation process, the value is a numeric type"
     echo ""
     echo "  The default options: --build-type Release --server-type ASYNC --client-type SYNC"
+    echo ""
+}
+
+function show_proto_usage() {
+    echo "USAGE:"
+    echo "  $E proto"
     echo ""
 }
 
@@ -135,6 +142,28 @@ if [ "${cmd}" = "compile" ]; then
     run_compile
     run_compile_python $use_alone $ssl_type $python_version
 
+elif [ "${cmd}" = "proto" ]; then
+    ARGS=$(getopt -o "h" -l "help" -n "$0" -- "$@")
+    eval set -- "${ARGS}"
+    while true; do
+        case "${1}" in
+        -h | --help)
+            show_proto_usage
+            exit 0
+            shift
+            ;;
+        --)
+            shift
+            break
+            ;;
+        *)
+            shift
+            break
+            ;;
+        esac
+    done
+    run_compile_proto
+    exit 0
 elif [ "${cmd}" = "clean" ]; then
     ARGS=$(getopt -o "h" -l "help" -n "$0" -- "$@")
     eval set -- "${ARGS}"

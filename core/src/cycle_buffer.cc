@@ -1,4 +1,4 @@
-#if USE_BUFFER_
+#if USE_BUFFER
 #include "cycle_buffer.h"
 
 #include <cstring>
@@ -22,10 +22,12 @@ void cycle_buffer::reset() {
   w_pos_ = 0;
   remain_space_ = n_;
 }
+
 bool cycle_buffer::can_read(int32_t length) {
   std::unique_lock<std::mutex> lck(mtx_);
   return (n_ - remain_space_ >= length);
 }
+
 bool cycle_buffer::can_remove(double t) {
   if (
     (remain_space_ == n_) // no datas
@@ -66,9 +68,10 @@ int32_t cycle_buffer::peek(char* data, int32_t length) {
   timer_.start();
   return length;
 }
+
 bool cycle_buffer::can_read() {
+  unique_lock<mutex> lck(mtx_);
   if (n_ - remain_space_ > sizeof(int32_t) + sizeof(uint8_t)) {
-    unique_lock<mutex> lck(mtx_);
     int len = 0;
     if (r_pos_ < w_pos_) {
       len = *(int32_t*)(buffer_ + r_pos_);
@@ -87,6 +90,7 @@ bool cycle_buffer::can_read() {
   }
   return false;
 }
+
 int32_t cycle_buffer::read(string& id, string& data) {
   if (n_ - remain_space_ > sizeof(int32_t) + sizeof(uint8_t)) {
     unique_lock<mutex> lck(mtx_);
@@ -131,63 +135,7 @@ int32_t cycle_buffer::read(string& id, string& data) {
   }
   return 0;
 }
-int32_t cycle_buffer::read(uint64_t &msg_id, string& data, bool block) {
-  while (1) {
-    if (n_ - remain_space_ > sizeof(int32_t) + sizeof(uint64_t)) {
-      unique_lock<mutex> lck(mtx_);
-      int len = 0;
-      if (r_pos_ < w_pos_) {
-        len = *(int32_t*)(buffer_ + r_pos_);
-        if (n_ - remain_space_ >= len) {
-          msg_id = *(uint64_t*)(buffer_ + r_pos_ + sizeof(int32_t));
-          data.resize(len - sizeof(int32_t) - sizeof(uint64_t));
-          memcpy(&data[0], buffer_ + r_pos_ + sizeof(int32_t) + sizeof(uint64_t), data.size());
-          r_pos_ += len;
-          remain_space_ += len;
-          break;
-        }
-      }
-      else {
-        char data_len[sizeof(int32_t)];
-        if (r_pos_ <= n_ - sizeof(int32_t)) {
-          memcpy(data_len, buffer_ + r_pos_, sizeof(int32_t));
-        }
-        else {
-          int remain_len = n_ - r_pos_;
-          memcpy(data_len, buffer_ + r_pos_, remain_len);
-          memcpy(data_len + remain_len, buffer_, sizeof(int32_t) - remain_len);
-        }
-        len = *(int32_t*)data_len;
-        string tmp;
-        if (n_ - remain_space_ >= len) {
-          int start = (r_pos_ + sizeof(int32_t)) % n_;
-          int msg_len = len - sizeof(int32_t);
-          tmp.resize(msg_len);
-          if (n_ - msg_len >= start) {
-            memcpy(&tmp[0], buffer_ + start, msg_len);
-          }
-          else {
-            int remain_len = n_ - start;
-            memcpy(&tmp[0], buffer_ + start, remain_len);
-            memcpy(((char*)&tmp[0]) + remain_len, buffer_, msg_len - remain_len);
-          }
-          msg_id = *(uint64_t*)&tmp[0];
-          data.resize(tmp.size() - sizeof(uint64_t));
-          memcpy(&data[0], tmp.data() + sizeof(uint64_t), data.size());
-          r_pos_ += len;
-          r_pos_ %= n_;
-          remain_space_ += len;
-          break;
-        }
-      }
-    }
-    if (!block) {
-      break;
-    }
-    usleep(2000);
-  }
-  return data.size();
-}
+
 int32_t cycle_buffer::read(char* data, int32_t length) {
   timer_.start();
   {
@@ -196,8 +144,6 @@ int32_t cycle_buffer::read(char* data, int32_t length) {
       cv_.wait_for(lck, std::chrono::milliseconds(1000), [&]() {
         if (n_ - remain_space_ >= length)
           return true;
-        if (verbose_ > 1)
-          cout << "can not read. expected:" << length << ",actual:" << size() << endl;
         return false;
       });
       if (n_ - remain_space_ >= length)
@@ -227,6 +173,7 @@ int32_t cycle_buffer::read(char* data, int32_t length) {
   timer_.start();
   return length;
 }
+
 void cycle_buffer::realloc(int32_t length) {
   unique_lock<mutex> lck(mtx_);
   if (remain_space_ >= length) {
@@ -235,8 +182,6 @@ void cycle_buffer::realloc(int32_t length) {
 
   if (remain_space_ < length) {
     int32_t new_n = n_ * ((length / n_) + 2); // at least 2x
-    cout << "buffer can not write. expected:" << length << ", actual:" << remain_space_
-              << ". will expand from " << n_ << " to " << new_n << endl;
 
     char* newbuffer_ = new char[new_n];
     int32_t havesize = size();
