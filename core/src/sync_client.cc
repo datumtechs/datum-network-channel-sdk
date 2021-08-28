@@ -11,6 +11,9 @@ using namespace chrono;
 SyncClient::SyncClient(const ViaInfo& via_info, const string& taskid):
   BaseClient(via_info, taskid){}
 
+SyncClient::SyncClient(const NodeInfo& node_info, const string& taskid):
+  BaseClient(node_info, taskid){}
+
 ssize_t SyncClient::send(const string& self_nodeid, const string& remote_nodeid, 
     const string& msg_id, const char* data, const size_t nLen, int64_t timeout)
 {	

@@ -22,9 +22,9 @@ cmake -DASYNC_SERVER=1 ..
 
 > 说明：
 >
-> - ASYNC_SERVER=1表示使用异步服务器；
-> - 不指定时（默认）表示使用同步服务器；
-
+> - ASYNC_SERVER=1表示使用异步服务器；不指定时（默认）表示使用同步服务器；
+> - USE_SSL=ON表示使用ssl证书验证；
+> - USE_GMSSL=ON表示使用gmssl证书验证;
 
 
 ### 执行编译

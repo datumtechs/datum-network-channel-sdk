@@ -88,7 +88,7 @@ class BasicIO {
   vector<std::thread> handle_data_threads_;
 #endif
   shared_ptr<BaseServer> server_ = nullptr;
-  std::unique_ptr<VIAService::Stub> via_stub_;
+  shared_ptr<BaseClient> via_client_ = nullptr;
 };
 
 

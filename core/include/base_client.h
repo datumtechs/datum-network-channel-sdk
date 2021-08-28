@@ -36,17 +36,26 @@ using namespace std;
 
 class BaseClient
 {
+private:
+    bool MakeCredentials(const ViaInfo& via_info);
 public:
     BaseClient(const ViaInfo& via_info, const string& taskid);
-	virtual ssize_t send(const string& self_nodeid, const string& remote_nodeid, 
-	  	const string& msg_id, const char* data, const size_t nLen, int64_t timeout = -1L) = 0;
+    // Create a connection between the node where the server is located and VIA to register the interface.
+    BaseClient(const NodeInfo& node_info, const string& taskid);
+    // Register the interface where the server node resides to via
+    bool SignUpToVia(const NodeInfo& server_info);
 
-	virtual ~BaseClient(){}
+    virtual ssize_t send(const string& self_nodeid, const string& remote_nodeid, 
+        const string& msg_id, const char* data, const size_t nLen, int64_t timeout = -1L) = 0;
+
+    virtual ~BaseClient(){}
 public:
 	string task_id_;
 protected:
     // Out of the passed in Channel comes the stub, stored here, our view of the
     // server's exposed services.
-    std::unique_ptr<IoChannel::Stub> stub_;
+    std::unique_ptr<IoChannel::Stub> stub_ = nullptr;
+    std::unique_ptr<VIAService::Stub> via_stub_ = nullptr;
+    shared_ptr<grpc::ChannelCredentials> creds_ = nullptr;
 };
 

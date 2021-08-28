@@ -29,7 +29,15 @@ file(GLOB_RECURSE srcs ${project_path}/core/src/*.cc)
 add_library(${LIBNAME} SHARED ${srcs})
 target_include_directories(${LIBNAME} PUBLIC ${project_path}/core/include ${project_path}/core/pybind11)
 target_link_libraries(${LIBNAME} PUBLIC pthread ${_REFLECTION} ${_GRPC_GRPCPP} ${_PROTOBUF_LIBPROTOBUF})
- 
+
+option(USE_SSL "" OFF)
+IF(USE_SSL)
+    add_definitions(-DSSL_TYPE=1)
+    message(STATUS "[SSL_TYPE]: 1")
+ELSEIF(USE_GMSSL)
+    add_definitions(-DSSL_TYPE=2)
+    message(STATUS "[SSL_TYPE]: 2")
+ENDIF()
 
 option(USE_ALONE "" OFF)
 IF(USE_ALONE)

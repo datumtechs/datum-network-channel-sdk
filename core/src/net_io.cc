@@ -47,50 +47,18 @@ bool ViaNetIO::StartServer(const string& taskid, const NodeInfo& server_info,
   server_ = make_shared<SyncServer>(server_info, ptr_client_conn_map);
 #endif
 
+  // When the ADDRESS of GRPC server and VIA server is not the same, 
+  // need to register the interface of GPRC server to VIA server.  
   if(node_info_.address != node_info_.via_address)
   {
-      ViaInfo via_info;
-      via_info.address = node_info_.via_address;
-    // #if(1==SSL_TYPE)  
-    //   via_info.client_key_path_;
-    //   via_info.client_cert_path_;
-    // #elif(2==SSL_TYPE)  
-    //   via_info.client_sign_key_path_;
-    //   via_info.client_sign_cert_path_;
-    //   via_info.client_enc_key_path_;
-    //   via_info.client_enc_cert_path_;
-    // #endif
-      shared_ptr<grpc::ChannelCredentials> creds = grpc::InsecureChannelCredentials();
-      cout << "server_info.address:" << server_info.address << endl;
-      cout << "via_info.address:" << via_info.address << endl;
-      auto channel = grpc::CreateChannel(via_info.address, creds);
-      via_stub_ = VIAService::NewStub(channel);
-      grpc::ClientContext context;
-      // 添加注册到via的参数
-      // context.AddMetadata("node_id", remote_nodeid);
-      context.AddMetadata("task_id", taskid);
-      context.AddMetadata("party_id", server_info.id);
-      SignupReq reg_req;
-      Boolean ret_code;
-
-      reg_req.set_taskid(taskid);
-      reg_req.set_partyid(server_info.id);
-      reg_req.set_servicetype("");
-      reg_req.set_address(server_info.address);
-
-      via_stub_->Signup(&context, reg_req, &ret_code);
-      
-      if (false == ret_code.result()) 
-      {
-        string strErrMsg = "Signup via server failed!";
-        cout << strErrMsg << endl;
-        throw (strErrMsg);
-      } 
-      
-      cout << "Signup via server succeed: " << via_info.address << endl;
+    via_client_ = make_shared<SyncClient>(node_info_, taskid);
+    if(!via_client_->SignUpToVia(node_info_))
+    {
+      throw "Signup to via server failed!";
+    }
+    cout << "Signup via server succeed: " << server_info.via_address << endl;
   }
   
-  cout << "server_info.id:" << server_info.id << ", via_address:" << server_info.via_address << endl;
   return true;
 }
 
