@@ -37,6 +37,7 @@ bool BaseClient::MakeCredentials(const ViaInfo& via_info)
 		ssl_opts.pem_cert_chain  = via_info.client_sign_cert_path_.c_str();
 		ssl_opts.pem_enc_private_key =  via_info.client_enc_key_path_.c_str();
 		ssl_opts.pem_enc_cert_chain = via_info.client_enc_cert_path_.c_str();
+
 		creds_ = grpc::SslCredentials(ssl_opts);
 	}	
 	#else
@@ -64,14 +65,14 @@ BaseClient::BaseClient(const NodeInfo& node_info, const string& taskid)
 	
 	#if(1 == SSL_TYPE)
 		via_info.server_cert_path_ = node_info.ca_cert_path_;
-		via_info.client_key_path_ = node_info.server_key_path_;
-		via_info.client_cert_path_ = node_info.server_cert_path_;
+		via_info.client_key_path_ = node_info.client_key_path_;
+		via_info.client_cert_path_ = node_info.client_cert_path_;
 	#elif(2 == SSL_TYPE) 
 		via_info.server_cert_path_ = node_info.ca_cert_path_;
-		via_info.client_sign_key_path_ = node_info.server_sign_key_path_;
-		via_info.client_sign_cert_path_ = node_info.server_sign_cert_path_;
-		via_info.client_enc_key_path_ = node_info.server_enc_key_path_;
-		via_info.client_enc_cert_path_ = node_info.server_enc_cert_path_;
+		via_info.client_sign_key_path_ = node_info.client_sign_key_path_;
+		via_info.client_sign_cert_path_ = node_info.client_sign_cert_path_;
+		via_info.client_enc_key_path_ = node_info.client_enc_key_path_;
+		via_info.client_enc_cert_path_ = node_info.client_enc_cert_path_;
 	#endif
 
 	if(!MakeCredentials(via_info)){return;}
@@ -90,7 +91,7 @@ bool BaseClient::SignUpToVia(const NodeInfo& server_info)
 	grpc::ClientContext context;
 	context.AddMetadata("task_id", task_id_);
 	context.AddMetadata("party_id", server_info.id);
-	
+
 	SignupReq reg_req;
 	Boolean ret_code;
 	reg_req.set_taskid(task_id_);

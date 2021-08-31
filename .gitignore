@@ -26,4 +26,4 @@ history
 python/channel_sdk.egg-info
 *.swp
 
-
+third_party/gmssl/*

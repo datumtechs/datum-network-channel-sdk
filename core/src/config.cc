@@ -390,6 +390,8 @@ void ChannelConfig::CopyNodeInfo(NodeInfo& node_info, const Node& nodeInfo)
   {
     node_info.server_key_path_ = nodeInfo.SERVER_KEY_PATH;
     node_info.server_cert_path_ = nodeInfo.SERVER_CERT_PATH;
+    node_info.client_key_path_ = nodeInfo.CLIENT_KEY_PATH;
+    node_info.client_cert_path_ = nodeInfo.CLIENT_CERT_PATH;
   }
   #elif(2 == SSL_TYPE)
   {
@@ -397,12 +399,12 @@ void ChannelConfig::CopyNodeInfo(NodeInfo& node_info, const Node& nodeInfo)
     node_info.server_sign_cert_path_ = nodeInfo.SERVER_SIGN_CERT_PATH;
     node_info.server_enc_key_path_ = nodeInfo.SERVER_ENC_KEY_PATH;
     node_info.server_enc_cert_path_ = nodeInfo.SERVER_ENC_CERT_PATH;
+    node_info.client_sign_key_path_ = nodeInfo.CLIENT_SIGN_KEY_PATH;
+    node_info.client_sign_cert_path_ = nodeInfo.CLIENT_SIGN_CERT_PATH;
+    node_info.client_enc_key_path_ = nodeInfo.CLIENT_ENC_KEY_PATH;
+    node_info.client_enc_cert_path_ = nodeInfo.CLIENT_ENC_CERT_PATH;
   }
 #endif
-  
-  // node_info.client_key_path_ = nodeInfo.CLIENT_KEY_PATH;
-  // node_info.client_cert_path_ = nodeInfo.CLIENT_CERT_PATH;
-
 }
 
 bool ChannelConfig::isNodeType(const vector<NODE_TYPE>& vec_node_types, const NODE_TYPE nodeType)

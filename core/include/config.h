@@ -101,14 +101,20 @@ struct NodeInfo {
 #if(1==SSL_TYPE) 
   string server_key_path_;
   string server_cert_path_;
+  // Used as a client certificate to invoke the VIA server registration interface
+  string client_key_path_;
+  string client_cert_path_;
 #elif(2==SSL_TYPE) 
   string server_sign_key_path_;
   string server_sign_cert_path_;
   string server_enc_key_path_;
   string server_enc_cert_path_;
+  // Used as a client certificate to invoke the VIA server registration interface
+  string client_sign_key_path_;
+  string client_sign_cert_path_;
+  string client_enc_key_path_;
+  string client_enc_cert_path_;
 #endif
-  // string client_key_path_;
-  // string client_cert_path_;
 
   NodeInfo() = default;
   NodeInfo(const string& node_id, const string& addr, const string& via_addr) 
