@@ -61,13 +61,13 @@ message(STATUS "_REFLECTION: ${_REFLECTION}")
 message(STATUS "_GRPC_GRPCPP: ${_GRPC_GRPCPP}")
 message(STATUS "_PROTOBUF_LIBPROTOBUF: ${_PROTOBUF_LIBPROTOBUF}")
 
-IF(SSL_TYPE MATCHES 2)
-    # gmssl
-    set(THIRD_PARTY_DIR ${CMAKE_CURRENT_SOURCE_DIR}/third_party)
-    include_directories(${THIRD_PARTY_DIR}/gmssl/include)
-    link_directories(${THIRD_PARTY_DIR}/gmssl/lib)
-    link_libraries(tacrypto tassl)
-ENDIF()
+# IF(SSL_TYPE MATCHES 2)
+#     # gmssl
+#     set(THIRD_PARTY_DIR ${CMAKE_CURRENT_SOURCE_DIR}/third_party)
+#     include_directories(${THIRD_PARTY_DIR}/gmssl/include)
+#     link_directories(${THIRD_PARTY_DIR}/gmssl/lib)
+#     link_libraries(tacrypto tassl)
+# ENDIF()
 
 # libraries
 file(GLOB_RECURSE srcs core/src/*.cc)
