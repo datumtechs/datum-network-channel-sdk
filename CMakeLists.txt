@@ -3,9 +3,8 @@ cmake_minimum_required(VERSION 3.5.1)
 SET(LIBNAME extio)
 project(${LIBNAME})
 
-include(./cmake/common.cmake)
 include(./cmake/SetCommon.cmake)
-add_definitions(-std=c++11)
+#add_definitions(-std=c++11)
 
 # option
 # option(SSL_TYPE "" OFF)
@@ -57,10 +56,6 @@ find_package(Threads REQUIRED)
 SET(ADD_LINK_LIB_FLAGS "-Wl,--rpath=$ORIGIN../:$ORIGIN")
 SET(CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} ${ADD_LINK_LIB_FLAGS}")
 
-message(STATUS "_REFLECTION: ${_REFLECTION}")
-message(STATUS "_GRPC_GRPCPP: ${_GRPC_GRPCPP}")
-message(STATUS "_PROTOBUF_LIBPROTOBUF: ${_PROTOBUF_LIBPROTOBUF}")
-
 # IF(SSL_TYPE MATCHES 2)
 #     # gmssl
 #     set(THIRD_PARTY_DIR ${CMAKE_CURRENT_SOURCE_DIR}/third_party)
@@ -70,11 +65,17 @@ message(STATUS "_PROTOBUF_LIBPROTOBUF: ${_PROTOBUF_LIBPROTOBUF}")
 # ENDIF()
 
 # libraries
-file(GLOB_RECURSE srcs core/src/*.cc)
+file(GLOB_RECURSE srcs core/src/*.cc core/src/*.cpp)
 add_library(${LIBNAME} SHARED ${srcs})
 target_include_directories(${LIBNAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/core/include)
-target_link_libraries(${LIBNAME} PUBLIC 
-        pthread ${_REFLECTION} ${_GRPC_GRPCPP} ${_PROTOBUF_LIBPROTOBUF})
+
+set(THIRD_PARTY_DIR /home/luodahui/core/ice/cpp)
+include_directories(${THIRD_PARTY_DIR}/include)
+link_directories(${THIRD_PARTY_DIR}/lib)
+#link_libraries(Ice++11)
+link_libraries(Ice)
+
+target_link_libraries(${LIBNAME} PUBLIC Ice pthread)
 
 # Use to find the directory dependency path(libtacrypto, libtassl)
 set_target_properties(${LIBNAME} PROPERTIES FOLDER ${LIBNAME}

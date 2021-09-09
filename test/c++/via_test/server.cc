@@ -45,6 +45,11 @@ int main(int argc, char *argv[])
     uint64_t msg_len = send_data.size();
     // recv
     string recv_msg_id = "";
+    string str(msg_len, 0);
+    recv_msg_id = to_string(0);
+    channel->Recv(serNodeId.c_str(), recv_msg_id.c_str(), &str[0], msg_len, timeout);
+    cout << "recv by nodeid: " << serNodeId << ", data: " << str << endl;
+    /*
     for(int i = 0; i < 1; ++i)
     {
         string str(msg_len, 0);
@@ -52,13 +57,14 @@ int main(int argc, char *argv[])
         channel->Recv(serNodeId.c_str(), recv_msg_id.c_str(), &str[0], msg_len, timeout);
         cout << "recv by nodeid: " << serNodeId << ", data: " << str << endl;
     }
-
+    
     for(int i = 0; i < 1; ++i)
     {
         send_msg_id = to_string(i);
         channel->Send(serNodeId.c_str(), send_msg_id.c_str(), send_data.c_str(), 
             send_data.size(), timeout);
     }
+    */
     sleep(10);
     
     return 0;

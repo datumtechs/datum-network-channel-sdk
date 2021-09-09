@@ -23,14 +23,16 @@ IF(USE_ALONE)
     add_definitions(-DUSE_ALONE=1)
 ENDIF()
 
-option(ASYNC_SERVER "" OFF)
+option(ASYNC_SERVER "" ON)
 IF(ASYNC_SERVER)
     add_definitions(-DASYNC_SERVER=1)
+    message(STATUS "[ASYNC_SERVER]:ON")
 ENDIF()
 
 option(ASYNC_CLIENT "" OFF)
 IF(ASYNC_CLIENT)
     add_definitions(-DASYNC_CLIENT=1)
+    message(STATUS "[ASYNC_CLIENT]:ON")
 ENDIF()
 
 # third party

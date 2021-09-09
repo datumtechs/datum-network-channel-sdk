@@ -63,7 +63,6 @@ class BasicIO {
   /**
    * Initialize the client connection.
    */
-  virtual void SetLogLevel(uint8_t log_level){gpr_set_log_verbosity((gpr_log_severity)log_level);};
   virtual bool init(const string& taskid) = 0;
   virtual ssize_t recv(const string& remote_nodeid, const char* id, char* data, 
       uint64_t length, int64_t timeout) = 0;

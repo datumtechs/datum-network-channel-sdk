@@ -2,7 +2,6 @@
 #include "sync_server.h"
 #include "async_server.h"
 #include "sync_client.h"
-#include "async_client.h"
 #include "IChannel.h"
 #include <unistd.h>
 #include <set>
@@ -28,37 +27,11 @@ bool ViaNetIO::StartServer(const string& taskid, const NodeInfo& server_info,
     handle_threads_[i] = thread(&BaseServer::Handle_Event, server_, i);
   }
 
-  #if USE_CACHE
-    #if MULTI_LOCKS
-      int i = 0;
-      handle_data_threads_.resize(ptr_client_conn_map->size());
-      for(auto &v: *ptr_client_conn_map)
-      {
-        handle_data_threads_[i++] = thread(&BaseServer::Handle_Data, server_, v.first);
-      }
-    #else
-      handle_data_threads_.resize(1);
-      handle_data_threads_[0] = thread(&BaseServer::Handle_Data, server_);
-    #endif
-  #endif
-  
 #else
   // sync server
   server_ = make_shared<SyncServer>(server_info, ptr_client_conn_map);
 #endif
 
-  // When the ADDRESS of GRPC server and VIA server is not the same, 
-  // need to register the interface of GPRC server to VIA server.  
-  if(node_info_.address != node_info_.via_address)
-  {
-    via_client_ = make_shared<SyncClient>(node_info_, taskid);
-    if(!via_client_->SignUpToVia(node_info_))
-    {
-      throw "Signup to via server failed!";
-    }
-    cout << "Signup via server succeed: " << server_info.via_address << endl;
-  }
-  
   return true;
 }
 
@@ -87,15 +60,15 @@ bool ViaNetIO::init(const string& taskid)
 #if ASYNC_CLIENT
     nid_to_server_map_[server_node_id]  = make_shared<AsyncClient>(via_server_infos_[i], taskid);
     clients_thread_.push_back(std::thread(&AsyncClient::AsyncCompleteRpc, nid_to_server_map_[server_node_id]));
-    gpr_log(GPR_INFO, "init async client connect, sids: %s.", via_server_infos_[i].id.c_str()); 
+    // gpr_log(GPR_INFO, "init async client connect, sids: %s.", via_server_infos_[i].id.c_str()); 
 #else
     nid_to_server_map_[server_node_id] = make_shared<SyncClient>(via_server_infos_[i], taskid);
-    gpr_log(GPR_INFO, "init sync client connect, sids: %s.", via_server_infos_[i].id.c_str());
+    nid_to_server_map_[server_node_id]->checkConnect();
+    // gpr_log(GPR_INFO, "init sync client connect, sids: %s.", via_server_infos_[i].id.c_str());
 #endif
   
   }
 
-  gpr_log(GPR_INFO, "init all network connections succeed!"); 
   return true;
 }
 
@@ -103,7 +76,7 @@ ssize_t ViaNetIO::recv(const string& remote_nodeid, const char* id, char* data,
       uint64_t length, int64_t timeout) 
 {
   ssize_t ret = client_conn_map[remote_nodeid]->recv(id, data, length, timeout);
-  gpr_log(GPR_DEBUG, "recv data from %s succeed, id:%s, size:%ld.", remote_nodeid.c_str(), id, ret);
+  // gpr_log(GPR_DEBUG, "recv data from %s succeed, id:%s, size:%ld.", remote_nodeid.c_str(), id, ret);
   return ret;
 }
 
@@ -112,6 +85,6 @@ ssize_t ViaNetIO::send(const string& remote_nodeid, const char* id, const char* 
 {
   ssize_t ret = nid_to_server_map_[remote_nodeid]->send(node_info_.id, remote_nodeid, 
         id, data, length, timeout);
-  gpr_log(GPR_DEBUG, "send data to %s succeed, id:%s, size:%ld.", remote_nodeid.c_str(), id, ret);
+  // gpr_log(GPR_DEBUG, "send data to %s succeed, id:%s, size:%ld.", remote_nodeid.c_str(), id, ret);
   return ret;
 }

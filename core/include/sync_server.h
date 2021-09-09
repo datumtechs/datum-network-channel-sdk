@@ -10,37 +10,30 @@
 #include<thread>
 #include<map>
 #include<queue>
-
+#include <Ice/Ice.h>
+#include "io_channel_ice.h"
+using namespace ChannelSdk;
 using namespace std;
-
-#include "io_channel.grpc.pb.h"
-#include <grpc/grpc.h>
-#include <grpc++/server.h>
-#include <grpc++/server_builder.h>
-#include <grpc++/server_context.h>
-#include <grpc++/security/server_credentials.h>
-using io_channel::IoChannel;
-using io_channel::SendRequest;
-using io_channel::RetCode;
-
-using grpc::Server;
-using grpc::ServerBuilder;
-using grpc::ServerContext;
-using grpc::ServerReader;
-using grpc::ServerReaderWriter;
-using grpc::ServerWriter;
-using grpc::Status;
+class IoChannelI : public IoChannel 
+{
+public:
+    IoChannelI(map<string, shared_ptr<ClientConnection>>* ptr_client_conn_map)
+    {
+        ptr_client_conn_map_ = ptr_client_conn_map;
+    }
+    virtual int send(const SendRequest& s, const Ice::Current&);
+private:
+    map<string, shared_ptr<ClientConnection>>* ptr_client_conn_map_ = nullptr;  
+};
 
 // 同步服务器
-class SyncServer: public BaseServer, public IoChannel::Service
+class SyncServer: public BaseServer
 {
 public:
     bool wait();
     ~SyncServer(){close();}
 
     SyncServer(const NodeInfo& server_info, map<string, shared_ptr<ClientConnection>>* ptr_client_conn_map);
-	Status Send(ServerContext* context, const SendRequest* request, RetCode* response);
-    
 private:
     std::mutex mtx_;
 };

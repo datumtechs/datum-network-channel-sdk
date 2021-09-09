@@ -30,7 +30,6 @@ IChannel* IoChannelImpl::CreateViaChannel(const NodeInfo& node_info,
 {
   shared_ptr<BasicIO> net_io =  nullptr;
   net_io = make_shared<ViaNetIO>(node_info, serverInfos, clientNodeIds, error_callback);
-  net_io->SetLogLevel(config->log_level_);
   if (net_io->init(config->task_id_)) 
   { 
     GRpcChannel* grpc_channel = new GRpcChannel(net_io, config, node_info);

@@ -11,6 +11,7 @@ function show_usage() {
     echo "COMMANDS:"
     echo "  compile    compile the io channel libraries."
     echo "  proto      compile the proto files."
+    echo "  ice        compile the ice files."
     echo "  install    install .whl"
     echo "  clean      clean workspace"
     echo "  $E COMMAND -h/--help"
@@ -45,6 +46,12 @@ function show_proto_usage() {
     echo ""
 }
 
+function show_ice_usage() {
+    echo "USAGE:"
+    echo "  $E ice"
+    echo ""
+}
+
 function show_clean_usage() {
     echo "USAGE:"
     echo "  $E clean"
@@ -65,7 +72,7 @@ fi
 cmd=${1}
 if [ "${cmd}" = "compile" ]; then
     build_type=Release
-    server_type=ASYNC
+    server_type=SYNC
     client_type=SYNC
     python_version=$(python3 -c 'import sys;ver=sys.version_info;print(str(ver[0])+"."+str(ver[1]))')   
     ssl_type=0
@@ -163,6 +170,28 @@ elif [ "${cmd}" = "proto" ]; then
         esac
     done
     run_compile_proto
+    exit 0
+elif [ "${cmd}" = "ice" ]; then
+    ARGS=$(getopt -o "h" -l "help" -n "$0" -- "$@")
+    eval set -- "${ARGS}"
+    while true; do
+        case "${1}" in
+        -h | --help)
+            show_ice_usage
+            exit 0
+            shift
+            ;;
+        --)
+            shift
+            break
+            ;;
+        *)
+            shift
+            break
+            ;;
+        esac
+    done
+    run_compile_ice
     exit 0
 elif [ "${cmd}" = "clean" ]; then
     ARGS=$(getopt -o "h" -l "help" -n "$0" -- "$@")

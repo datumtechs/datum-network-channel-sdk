@@ -55,6 +55,19 @@ function run_compile_proto() {
     echo -e "${GREEN}compile proto file successfully.${NC}"
 }
 
+function run_compile_ice() {
+    echo -e "${GREEN}start compile ice file.${NC}"
+    ice_file_dir=./ice
+    core_dir=./core/src/
+    include_dir=./core/include/
+
+    slice2cpp $ice_file_dir/*.ice --output-dir=$ice_file_dir
+
+    mv $ice_file_dir/*.cpp $core_dir
+    mv $ice_file_dir/*.h $include_dir
+    echo -e "${GREEN}compile ice file successfully.${NC}"
+}
+
 function run_clean() {
     echo -e "${GREEN}Start cleaning.${NC}"
     ./clean.sh

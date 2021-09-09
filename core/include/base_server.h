@@ -11,15 +11,13 @@
 #include <cmath>
 #include <map>
 #include "assert.h"
-#include <grpc++/grpc++.h>
-#include "io_channel.grpc.pb.h"
-
-
-using grpc::Server;
-using grpc::ServerBuilder;
+#include <Ice/Ice.h>
+#include <io_channel_ice.h>
+#include <thread>
+using namespace ChannelSdk;
 using namespace std;
 
-#define RET_SUCCEED_CODE 200
+#define RET_SUCCEED_CODE 0
 
 class BaseServer
 {
@@ -43,14 +41,20 @@ public:
 protected:
 	virtual bool close()
 	{
-		if(base_server_) 
-			base_server_->Shutdown();
+		if (ic_) 
+		{
+			try {
+				ic_->destroy();
+			} catch (const Ice::Exception& e) {
+				cerr << e << endl;
+			}
+    	}
 		return true;
 	}
 
 protected:
-	std::unique_ptr<Server> base_server_;
-	std::shared_ptr<ServerBuilder> builder_ = nullptr;
+	Ice::CommunicatorPtr ic_;
+	Ice::ObjectAdapterPtr adapter_;
 	map<string, shared_ptr<ClientConnection>>* ptr_client_conn_map_ = nullptr;
 };
 
