@@ -31,6 +31,7 @@ function gen_root() {
         -out $CERTS_DIR/$ROOT_FILE.req
 
     $OPENSSL_CMD x509 -req -days $DAYS \
+	-sm3 \
         -in $CERTS_DIR/$ROOT_FILE.req \
         -extfile $OPENSSL_DIR/openssl.cnf \
         -extensions v3_ca \
@@ -73,6 +74,7 @@ function gen_cert() {
         -out $CERTS_DIR/$CERT_FILE.req
 
     $OPENSSL_CMD x509 -req -days $DAYS \
+	-sm3 \
         -in $CERTS_DIR/$CERT_FILE.req \
         -CA $CERTS_DIR/$ROOT_FILE.crt \
         -CAkey $KEYS_DIR/$ROOT_FILE.key \
