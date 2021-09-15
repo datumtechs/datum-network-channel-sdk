@@ -46,7 +46,7 @@ for file_name in so_libs:
 cc_module_name = "grpc"
 build_ext_target = sub_dir_name + "/" + cc_module_name
 DOCLINES = __doc__.split('\n')
-__version__ = '1.0.0'
+__version__ = '2.0.0'
 
 build_use_alone = False
 if 'USE_ALONE' in os.environ and os.environ['USE_ALONE'] == 'ON':
