@@ -59,28 +59,7 @@ class IoChannelPrx;
 namespace ChannelSdk
 {
 
-struct SendRequest
-{
-    ::std::string nodeid;
-    ::std::string id;
-    ::std::string data;
-
-    /**
-     * Obtains a tuple containing all of the struct's data members.
-     * @return The data members in a tuple.
-     */
-    std::tuple<const ::std::string&, const ::std::string&, const ::std::string&> ice_tuple() const
-    {
-        return std::tie(nodeid, id, data);
-    }
-};
-
-using Ice::operator<;
-using Ice::operator<=;
-using Ice::operator>;
-using Ice::operator>=;
-using Ice::operator==;
-using Ice::operator!=;
+using bytes = ::std::vector<::Ice::Byte>;
 
 }
 
@@ -121,7 +100,7 @@ public:
      */
     static const ::std::string& ice_staticId();
 
-    virtual int send(SendRequest s, const ::Ice::Current& current) = 0;
+    virtual int send(::std::string nodeid, ::std::string msgid, bytes data, const ::Ice::Current& current) = 0;
     /// \cond INTERNAL
     bool _iceD_send(::IceInternal::Incoming&, const ::Ice::Current&);
     /// \endcond
@@ -140,30 +119,30 @@ class IoChannelPrx : public virtual ::Ice::Proxy<IoChannelPrx, ::Ice::ObjectPrx>
 {
 public:
 
-    int send(const SendRequest& s, const ::Ice::Context& context = ::Ice::noExplicitContext)
+    int send(const ::std::string& nodeid, const ::std::string& msgid, const bytes& data, const ::Ice::Context& context = ::Ice::noExplicitContext)
     {
-        return _makePromiseOutgoing<int>(true, this, &IoChannelPrx::_iceI_send, s, context).get();
+        return _makePromiseOutgoing<int>(true, this, &IoChannelPrx::_iceI_send, nodeid, msgid, data, context).get();
     }
 
     template<template<typename> class P = ::std::promise>
-    auto sendAsync(const SendRequest& s, const ::Ice::Context& context = ::Ice::noExplicitContext)
+    auto sendAsync(const ::std::string& nodeid, const ::std::string& msgid, const bytes& data, const ::Ice::Context& context = ::Ice::noExplicitContext)
         -> decltype(::std::declval<P<int>>().get_future())
     {
-        return _makePromiseOutgoing<int, P>(false, this, &IoChannelPrx::_iceI_send, s, context);
+        return _makePromiseOutgoing<int, P>(false, this, &IoChannelPrx::_iceI_send, nodeid, msgid, data, context);
     }
 
     ::std::function<void()>
-    sendAsync(const SendRequest& s,
+    sendAsync(const ::std::string& nodeid, const ::std::string& msgid, const bytes& data,
               ::std::function<void(int)> response,
               ::std::function<void(::std::exception_ptr)> ex = nullptr,
               ::std::function<void(bool)> sent = nullptr,
               const ::Ice::Context& context = ::Ice::noExplicitContext)
     {
-        return _makeLamdaOutgoing<int>(std::move(response), std::move(ex), std::move(sent), this, &ChannelSdk::IoChannelPrx::_iceI_send, s, context);
+        return _makeLamdaOutgoing<int>(std::move(response), std::move(ex), std::move(sent), this, &ChannelSdk::IoChannelPrx::_iceI_send, nodeid, msgid, data, context);
     }
 
     /// \cond INTERNAL
-    void _iceI_send(const ::std::shared_ptr<::IceInternal::OutgoingAsyncT<int>>&, const SendRequest&, const ::Ice::Context&);
+    void _iceI_send(const ::std::shared_ptr<::IceInternal::OutgoingAsyncT<int>>&, const ::std::string&, const ::std::string&, const bytes&, const ::Ice::Context&);
     /// \endcond
 
     /**
@@ -187,23 +166,6 @@ protected:
 /// \cond STREAM
 namespace Ice
 {
-
-template<>
-struct StreamableTraits<::ChannelSdk::SendRequest>
-{
-    static const StreamHelperCategory helper = StreamHelperCategoryStruct;
-    static const int minWireSize = 3;
-    static const bool fixedLength = false;
-};
-
-template<typename S>
-struct StreamReader<::ChannelSdk::SendRequest, S>
-{
-    static void read(S* istr, ::ChannelSdk::SendRequest& v)
-    {
-        istr->readAll(v.nodeid, v.id, v.data);
-    }
-};
 
 }
 /// \endcond
@@ -255,83 +217,7 @@ void _icePatchObjectPtr(IoChannelPtr&, const ::Ice::ObjectPtr&);
 namespace ChannelSdk
 {
 
-struct SendRequest
-{
-    ::std::string nodeid;
-    ::std::string id;
-    ::std::string data;
-
-    bool operator==(const SendRequest& rhs_) const
-    {
-        if(this == &rhs_)
-        {
-            return true;
-        }
-        if(nodeid != rhs_.nodeid)
-        {
-            return false;
-        }
-        if(id != rhs_.id)
-        {
-            return false;
-        }
-        if(data != rhs_.data)
-        {
-            return false;
-        }
-        return true;
-    }
-
-    bool operator<(const SendRequest& rhs_) const
-    {
-        if(this == &rhs_)
-        {
-            return false;
-        }
-        if(nodeid < rhs_.nodeid)
-        {
-            return true;
-        }
-        else if(rhs_.nodeid < nodeid)
-        {
-            return false;
-        }
-        if(id < rhs_.id)
-        {
-            return true;
-        }
-        else if(rhs_.id < id)
-        {
-            return false;
-        }
-        if(data < rhs_.data)
-        {
-            return true;
-        }
-        else if(rhs_.data < data)
-        {
-            return false;
-        }
-        return false;
-    }
-
-    bool operator!=(const SendRequest& rhs_) const
-    {
-        return !operator==(rhs_);
-    }
-    bool operator<=(const SendRequest& rhs_) const
-    {
-        return operator<(rhs_) || operator==(rhs_);
-    }
-    bool operator>(const SendRequest& rhs_) const
-    {
-        return !operator<(rhs_) && !operator==(rhs_);
-    }
-    bool operator>=(const SendRequest& rhs_) const
-    {
-        return !operator<(rhs_);
-    }
-};
+typedef ::std::vector< ::Ice::Byte> bytes;
 
 }
 
@@ -358,41 +244,41 @@ class IoChannel : public virtual ::Ice::Proxy<IoChannel, ::IceProxy::Ice::Object
 {
 public:
 
-    ::Ice::Int send(const ::ChannelSdk::SendRequest& s, const ::Ice::Context& context = ::Ice::noExplicitContext)
+    ::Ice::Int send(const ::std::string& nodeid, const ::std::string& msgid, const ::ChannelSdk::bytes& data, const ::Ice::Context& context = ::Ice::noExplicitContext)
     {
-        return end_send(_iceI_begin_send(s, context, ::IceInternal::dummyCallback, 0, true));
+        return end_send(_iceI_begin_send(nodeid, msgid, data, context, ::IceInternal::dummyCallback, 0, true));
     }
 
-    ::Ice::AsyncResultPtr begin_send(const ::ChannelSdk::SendRequest& s, const ::Ice::Context& context = ::Ice::noExplicitContext)
+    ::Ice::AsyncResultPtr begin_send(const ::std::string& nodeid, const ::std::string& msgid, const ::ChannelSdk::bytes& data, const ::Ice::Context& context = ::Ice::noExplicitContext)
     {
-        return _iceI_begin_send(s, context, ::IceInternal::dummyCallback, 0);
+        return _iceI_begin_send(nodeid, msgid, data, context, ::IceInternal::dummyCallback, 0);
     }
 
-    ::Ice::AsyncResultPtr begin_send(const ::ChannelSdk::SendRequest& s, const ::Ice::CallbackPtr& cb, const ::Ice::LocalObjectPtr& cookie = 0)
+    ::Ice::AsyncResultPtr begin_send(const ::std::string& nodeid, const ::std::string& msgid, const ::ChannelSdk::bytes& data, const ::Ice::CallbackPtr& cb, const ::Ice::LocalObjectPtr& cookie = 0)
     {
-        return _iceI_begin_send(s, ::Ice::noExplicitContext, cb, cookie);
+        return _iceI_begin_send(nodeid, msgid, data, ::Ice::noExplicitContext, cb, cookie);
     }
 
-    ::Ice::AsyncResultPtr begin_send(const ::ChannelSdk::SendRequest& s, const ::Ice::Context& context, const ::Ice::CallbackPtr& cb, const ::Ice::LocalObjectPtr& cookie = 0)
+    ::Ice::AsyncResultPtr begin_send(const ::std::string& nodeid, const ::std::string& msgid, const ::ChannelSdk::bytes& data, const ::Ice::Context& context, const ::Ice::CallbackPtr& cb, const ::Ice::LocalObjectPtr& cookie = 0)
     {
-        return _iceI_begin_send(s, context, cb, cookie);
+        return _iceI_begin_send(nodeid, msgid, data, context, cb, cookie);
     }
 
-    ::Ice::AsyncResultPtr begin_send(const ::ChannelSdk::SendRequest& s, const ::ChannelSdk::Callback_IoChannel_sendPtr& cb, const ::Ice::LocalObjectPtr& cookie = 0)
+    ::Ice::AsyncResultPtr begin_send(const ::std::string& nodeid, const ::std::string& msgid, const ::ChannelSdk::bytes& data, const ::ChannelSdk::Callback_IoChannel_sendPtr& cb, const ::Ice::LocalObjectPtr& cookie = 0)
     {
-        return _iceI_begin_send(s, ::Ice::noExplicitContext, cb, cookie);
+        return _iceI_begin_send(nodeid, msgid, data, ::Ice::noExplicitContext, cb, cookie);
     }
 
-    ::Ice::AsyncResultPtr begin_send(const ::ChannelSdk::SendRequest& s, const ::Ice::Context& context, const ::ChannelSdk::Callback_IoChannel_sendPtr& cb, const ::Ice::LocalObjectPtr& cookie = 0)
+    ::Ice::AsyncResultPtr begin_send(const ::std::string& nodeid, const ::std::string& msgid, const ::ChannelSdk::bytes& data, const ::Ice::Context& context, const ::ChannelSdk::Callback_IoChannel_sendPtr& cb, const ::Ice::LocalObjectPtr& cookie = 0)
     {
-        return _iceI_begin_send(s, context, cb, cookie);
+        return _iceI_begin_send(nodeid, msgid, data, context, cb, cookie);
     }
 
     ::Ice::Int end_send(const ::Ice::AsyncResultPtr& result);
 
 private:
 
-    ::Ice::AsyncResultPtr _iceI_begin_send(const ::ChannelSdk::SendRequest&, const ::Ice::Context&, const ::IceInternal::CallbackBasePtr&, const ::Ice::LocalObjectPtr& cookie = 0, bool sync = false);
+    ::Ice::AsyncResultPtr _iceI_begin_send(const ::std::string&, const ::std::string&, const ::ChannelSdk::bytes&, const ::Ice::Context&, const ::IceInternal::CallbackBasePtr&, const ::Ice::LocalObjectPtr& cookie = 0, bool sync = false);
 
 public:
 
@@ -459,7 +345,7 @@ public:
      */
     static const ::std::string& ice_staticId();
 
-    virtual ::Ice::Int send(const SendRequest& s, const ::Ice::Current& current = ::Ice::emptyCurrent) = 0;
+    virtual ::Ice::Int send(const ::std::string& nodeid, const ::std::string& msgid, const bytes& data, const ::Ice::Current& current = ::Ice::emptyCurrent) = 0;
     /// \cond INTERNAL
     bool _iceD_send(::IceInternal::Incoming&, const ::Ice::Current&);
     /// \endcond
@@ -493,36 +379,6 @@ inline bool operator<(const IoChannel& lhs, const IoChannel& rhs)
 /// \cond STREAM
 namespace Ice
 {
-
-template<>
-struct StreamableTraits< ::ChannelSdk::SendRequest>
-{
-    static const StreamHelperCategory helper = StreamHelperCategoryStruct;
-    static const int minWireSize = 3;
-    static const bool fixedLength = false;
-};
-
-template<typename S>
-struct StreamWriter< ::ChannelSdk::SendRequest, S>
-{
-    static void write(S* ostr, const ::ChannelSdk::SendRequest& v)
-    {
-        ostr->write(v.nodeid);
-        ostr->write(v.id);
-        ostr->write(v.data);
-    }
-};
-
-template<typename S>
-struct StreamReader< ::ChannelSdk::SendRequest, S>
-{
-    static void read(S* istr, ::ChannelSdk::SendRequest& v)
-    {
-        istr->read(v.nodeid);
-        istr->read(v.id);
-        istr->read(v.data);
-    }
-};
 
 }
 /// \endcond

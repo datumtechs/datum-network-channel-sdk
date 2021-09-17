@@ -17,11 +17,13 @@ using namespace std;
 class IoChannelI : public IoChannel 
 {
 public:
-    IoChannelI(map<string, shared_ptr<ClientConnection>>* ptr_client_conn_map)
+    IoChannelI(map<string, shared_ptr<ClientConnection>>* ptr_client_conn_map):IoChannel()
     {
         ptr_client_conn_map_ = ptr_client_conn_map;
     }
-    virtual int send(const SendRequest& s, const Ice::Current&);
+    // virtual int send(const SendRequest& s, const Ice::Current&);
+    virtual int send(const string& nodeid, const string& msgid, 
+        const bytes& data, const Ice::Current&);
 private:
     map<string, shared_ptr<ClientConnection>>* ptr_client_conn_map_ = nullptr;  
 };

@@ -4,7 +4,7 @@ SET(LIBNAME extio)
 project(${LIBNAME})
 
 include(./cmake/SetCommon.cmake)
-#add_definitions(-std=c++11)
+add_definitions(-std=c++11)
 
 # option
 # option(SSL_TYPE "" OFF)

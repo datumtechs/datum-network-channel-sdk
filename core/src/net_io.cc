@@ -29,6 +29,7 @@ bool ViaNetIO::StartServer(const string& taskid, const NodeInfo& server_info,
 
 #else
   // sync server
+  cout << "start server, address:" << server_info.address << endl;
   server_ = make_shared<SyncServer>(server_info, ptr_client_conn_map);
 #endif
 

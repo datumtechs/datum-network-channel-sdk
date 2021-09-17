@@ -81,7 +81,7 @@ bool BaseClient::checkConnect()
 		}
 		catch (const Ice::Exception& ex) 
 		{
-			cerr << ex << endl;
+			// cerr << ex << endl;
 			sleep(1);
 			continue;
 		}

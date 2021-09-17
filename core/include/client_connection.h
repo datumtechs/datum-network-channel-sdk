@@ -13,6 +13,7 @@
 #include <queue>
 using namespace std;
 
+typedef vector<unsigned char> bytes;
 
 /* 
 	其他客户端连接过来，保存数据
@@ -33,10 +34,11 @@ public:
 	map<string, shared_ptr<cycle_buffer>> mapbuffer_;
 	std::mutex mapbuffer_mtx_;
 #else
-	bool write(const string& msgid, const string& data);
+	// bool write(const string& msgid, const string& data);
+	bool write(const string& msgid, const bytes& data);
 	mutex mutex_;
 	condition_variable cv_;
-	unordered_map<string, shared_ptr<queue<string>>> map_queue_;
+	unordered_map<string, shared_ptr<queue<bytes>>> map_queue_;
 #endif
 
 };

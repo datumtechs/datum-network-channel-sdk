@@ -17,26 +17,30 @@ SyncClient::SyncClient(const ViaInfo& via_info, const string& taskid):
 ssize_t SyncClient::send(const string& self_nodeid, const string& remote_nodeid, 
     const string& msg_id, const char* data, const size_t nLen, int64_t timeout)
 {	
-  SendRequest req_info;
+  // SendRequest req_info;
   // 发送客户端的nodeid到服务器
-  req_info.nodeid = self_nodeid;
-  req_info.id = msg_id;
-  req_info.data = data, nLen;
-  
+  // req_info.nodeid = self_nodeid;
+  // req_info.id = msg_id;
+  // req_info.data = data;
   auto start_time = system_clock::now();
   auto end_time   = start_time;
   int64_t elapsed = 0;
   system_clock::time_point deadline = start_time + std::chrono::milliseconds(timeout);
   
+  Ice::ByteSeq vec_send_data;
+  vec_send_data.resize(nLen);
+  memcpy(&vec_send_data[0], data, nLen);
+
   do {
-    int status = 0;
+    int status = 1;
     auto time = std::chrono::steady_clock::now().time_since_epoch().count();
-    cout << "客户端开始发送时间戳:" << time << endl;
+    // cout << "客户端开始发送时间戳:" << time << endl;
     try{
       Ice::Context context;
-      status = stub_->send(req_info, context);
+      status = stub_->send(self_nodeid, msg_id, vec_send_data, context);
     } catch (const Ice::Exception& ex) {
-        cerr << ex << endl;
+        // cerr << ex << endl;
+        sleep(1);
         status = 1;
     }
     
@@ -51,10 +55,10 @@ ssize_t SyncClient::send(const string& self_nodeid, const string& remote_nodeid,
 
       if(elapsed >= timeout)
       {
-          return 0;
+        return 0;
       }
     }
   } while(true);
-	
+
 	return nLen;
 }

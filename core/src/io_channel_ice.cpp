@@ -95,10 +95,12 @@ ChannelSdk::IoChannel::_iceD_send(::IceInternal::Incoming& inS, const ::Ice::Cur
 {
     _iceCheckMode(::Ice::OperationMode::Normal, current.mode);
     auto istr = inS.startReadParams();
-    SendRequest iceP_s;
-    istr->readAll(iceP_s);
+    ::std::string iceP_nodeid;
+    ::std::string iceP_msgid;
+    bytes iceP_data;
+    istr->readAll(iceP_nodeid, iceP_msgid, iceP_data);
     inS.endReadParams();
-    int ret = this->send(::std::move(iceP_s), current);
+    int ret = this->send(::std::move(iceP_nodeid), ::std::move(iceP_msgid), ::std::move(iceP_data), current);
     auto ostr = inS.startWriteParams();
     ostr->writeAll(ret);
     inS.endWriteParams();
@@ -149,13 +151,13 @@ ChannelSdk::IoChannel::_iceDispatch(::IceInternal::Incoming& in, const ::Ice::Cu
 
 /// \cond INTERNAL
 void
-ChannelSdk::IoChannelPrx::_iceI_send(const ::std::shared_ptr<::IceInternal::OutgoingAsyncT<int>>& outAsync, const SendRequest& iceP_s, const ::Ice::Context& context)
+ChannelSdk::IoChannelPrx::_iceI_send(const ::std::shared_ptr<::IceInternal::OutgoingAsyncT<int>>& outAsync, const ::std::string& iceP_nodeid, const ::std::string& iceP_msgid, const bytes& iceP_data, const ::Ice::Context& context)
 {
     _checkTwowayOnly(iceC_ChannelSdk_IoChannel_send_name);
     outAsync->invoke(iceC_ChannelSdk_IoChannel_send_name, ::Ice::OperationMode::Normal, ::Ice::FormatType::DefaultFormat, context,
         [&](::Ice::OutputStream* ostr)
         {
-            ostr->writeAll(iceP_s);
+            ostr->writeAll(iceP_nodeid, iceP_msgid, iceP_data);
         },
         nullptr);
 }
@@ -173,10 +175,6 @@ const ::std::string&
 ChannelSdk::IoChannelPrx::ice_staticId()
 {
     return IoChannel::ice_staticId();
-}
-
-namespace Ice
-{
 }
 
 #else // C++98 mapping
@@ -209,7 +207,7 @@ void
 /// \endcond
 
 ::Ice::AsyncResultPtr
-IceProxy::ChannelSdk::IoChannel::_iceI_begin_send(const ::ChannelSdk::SendRequest& iceP_s, const ::Ice::Context& context, const ::IceInternal::CallbackBasePtr& del, const ::Ice::LocalObjectPtr& cookie, bool sync)
+IceProxy::ChannelSdk::IoChannel::_iceI_begin_send(const ::std::string& iceP_nodeid, const ::std::string& iceP_msgid, const ::ChannelSdk::bytes& iceP_data, const ::Ice::Context& context, const ::IceInternal::CallbackBasePtr& del, const ::Ice::LocalObjectPtr& cookie, bool sync)
 {
     _checkTwowayOnly(iceC_ChannelSdk_IoChannel_send_name, sync);
     ::IceInternal::OutgoingAsyncPtr result = new ::IceInternal::CallbackOutgoing(this, iceC_ChannelSdk_IoChannel_send_name, del, cookie, sync);
@@ -217,7 +215,9 @@ IceProxy::ChannelSdk::IoChannel::_iceI_begin_send(const ::ChannelSdk::SendReques
     {
         result->prepare(iceC_ChannelSdk_IoChannel_send_name, ::Ice::Normal, context);
         ::Ice::OutputStream* ostr = result->startWriteParams(::Ice::DefaultFormat);
-        ostr->write(iceP_s);
+        ostr->write(iceP_nodeid);
+        ostr->write(iceP_msgid);
+        ostr->write(iceP_data);
         result->endWriteParams();
         result->invoke(iceC_ChannelSdk_IoChannel_send_name);
     }
@@ -318,10 +318,14 @@ ChannelSdk::IoChannel::_iceD_send(::IceInternal::Incoming& inS, const ::Ice::Cur
 {
     _iceCheckMode(::Ice::Normal, current.mode);
     ::Ice::InputStream* istr = inS.startReadParams();
-    SendRequest iceP_s;
-    istr->read(iceP_s);
+    ::std::string iceP_nodeid;
+    ::std::string iceP_msgid;
+    bytes iceP_data;
+    istr->read(iceP_nodeid);
+    istr->read(iceP_msgid);
+    istr->read(iceP_data);
     inS.endReadParams();
-    ::Ice::Int ret = this->send(iceP_s, current);
+    ::Ice::Int ret = this->send(iceP_nodeid, iceP_msgid, iceP_data, current);
     ::Ice::OutputStream* ostr = inS.startWriteParams();
     ostr->write(ret);
     inS.endWriteParams();

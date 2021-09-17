@@ -69,11 +69,9 @@ BaseServer::BaseServer(const NodeInfo& server_info,
 	int npos = serAddress.find(":");
 	string ip = serAddress.substr(0, npos);
 	string port = serAddress.substr(npos+1, serAddress.length());
-	// string endpoints = "IoChannel:tcp -h " + ip + " -p " + port;
-	string endpoints = "IoChannel:tcp -h 127.0.0.1 -p 10000";
-	cout << "BaseServer::BaseServer endpoints:" << endpoints << endl;
+	string endpoints = "tcp -h " + ip + " -p " + port;
+	// cout << "BaseServer::BaseServer endpoints:" << endpoints << endl;
 	ic_ = Ice::initialize();
-	cout << "init succeed===" << endl;
 	adapter_ = ic_->createObjectAdapterWithEndpoints("IoChannelAdapter", endpoints);
-	cout << "create adapter succeed===" << endl;
+	// cout << "create adapter succeed===" << endl;
 }
