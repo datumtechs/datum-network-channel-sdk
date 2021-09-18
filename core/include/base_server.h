@@ -2,6 +2,7 @@
 // file base_server.h
 #pragma once
 #include "config.h"
+#include "IoChannelI.h"
 #include "client_connection.h"
 #include <unistd.h>
 #include <functional>
@@ -16,8 +17,6 @@
 #include <thread>
 using namespace ChannelSdk;
 using namespace std;
-
-#define RET_SUCCEED_CODE 0
 
 class BaseServer
 {
@@ -41,10 +40,10 @@ public:
 protected:
 	virtual bool close()
 	{
-		if (ic_) 
+		if (ptr_communicator_) 
 		{
 			try {
-				ic_->destroy();
+				ptr_communicator_->destroy();
 			} catch (const Ice::Exception& e) {
 				cerr << e << endl;
 			}
@@ -53,8 +52,9 @@ protected:
 	}
 
 protected:
-	Ice::CommunicatorPtr ic_;
-	Ice::ObjectAdapterPtr adapter_;
+	shared_ptr<Ice::CommunicatorHolder> ptr_holder_;
+	Ice::CommunicatorPtr ptr_communicator_;
+	Ice::ObjectAdapterPtr ptr_adapter_;
 	map<string, shared_ptr<ClientConnection>>* ptr_client_conn_map_ = nullptr;
 };
 

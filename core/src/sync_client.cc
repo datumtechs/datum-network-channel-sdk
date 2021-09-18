@@ -14,11 +14,6 @@ SyncClient::SyncClient(const ViaInfo& via_info, const string& taskid):
 ssize_t SyncClient::send(const string& self_nodeid, const string& remote_nodeid, 
     const string& msg_id, const char* data, const size_t nLen, int64_t timeout)
 {	
-  // SendRequest req_info;
-  // 发送客户端的nodeid到服务器
-  // req_info.nodeid = self_nodeid;
-  // req_info.id = msg_id;
-  // req_info.data = data;
   auto start_time = system_clock::now();
   auto end_time   = start_time;
   int64_t elapsed = 0;

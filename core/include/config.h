@@ -9,7 +9,7 @@ using namespace std;
 
 #include <rapidjson/document.h>
 using rapidjson::Document;
-
+#define RET_SUCCEED_CODE 0
 struct Node 
 {
   string DESC;

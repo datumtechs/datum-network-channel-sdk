@@ -32,11 +32,12 @@ public:
     virtual ssize_t send(const string& self_nodeid, const string& remote_nodeid, 
         const string& msg_id, const char* data, const size_t nLen, int64_t timeout = -1L) = 0;
 
-    virtual ~BaseClient(){ if(ic_) ic_->destroy();}
+    virtual ~BaseClient(){ if(ptr_communicator_) ptr_communicator_->destroy();}
 public:
 	string task_id_;
 protected:
-    Ice::CommunicatorPtr ic_;
+    shared_ptr<Ice::CommunicatorHolder> ptr_holder_;
+    Ice::CommunicatorPtr ptr_communicator_;
     IoChannelPrx stub_;
 };
 

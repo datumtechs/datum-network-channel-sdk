@@ -71,7 +71,15 @@ BaseServer::BaseServer(const NodeInfo& server_info,
 	string port = serAddress.substr(npos+1, serAddress.length());
 	string endpoints = "tcp -h " + ip + " -p " + port;
 	// cout << "BaseServer::BaseServer endpoints:" << endpoints << endl;
-	ic_ = Ice::initialize();
-	adapter_ = ic_->createObjectAdapterWithEndpoints("IoChannelAdapter", endpoints);
-	// cout << "create adapter succeed===" << endl;
+
+	// set properties
+	string key_endpoints = "IoChannel.Endpoints";
+	string value_endpoints = endpoints;
+	Ice::InitializationData initData;
+	initData.properties = Ice::createProperties();
+	initData.properties->setProperty(key_endpoints, value_endpoints);
+
+	ptr_holder_ = make_shared<Ice::CommunicatorHolder>(initData);
+	ptr_communicator_ = ptr_holder_->communicator();
+	ptr_adapter_ = ptr_communicator_->createObjectAdapter("IoChannel");
 }

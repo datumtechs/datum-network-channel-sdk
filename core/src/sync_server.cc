@@ -4,8 +4,8 @@
 bool SyncServer::wait()
 {
     //通信器在这里等待处理数据连接
-    if(ic_)
-        ic_->waitForShutdown();
+    if(ptr_communicator_)
+        ptr_communicator_->waitForShutdown();
 
     return true;
 }
@@ -14,27 +14,14 @@ SyncServer::SyncServer(const NodeInfo& server_info,
     map<string, shared_ptr<ClientConnection>>* ptr_client_conn_map):
     BaseServer(server_info, ptr_client_conn_map)
 {
-    Ice::ObjectPtr object = new IoChannelI(ptr_client_conn_map);
+	string proxy_name = "IoChannel";
 	Ice::Identity id ;
-	id.name = "IoChannel";
+	id.name = proxy_name;
 	//增加一个适配器
-	adapter_->add(object, id);
+    Ice::ObjectPtr object = new IoChannelI(ptr_client_conn_map);
+	ptr_adapter_->add(object, id);
 	//激发启动一个通信器
-	adapter_->activate();
+	ptr_adapter_->activate();
 	//通信器在这里等待处理数据连接
-	// ic_->waitForShutdown();
-}
-
-// int IoChannelI::send(const SendRequest& request, const Ice::Current&)
-int IoChannelI::send(const string& nodeid, const string& msgid, 
-        const bytes& data, const Ice::Current&)
-{
-    auto iter = ptr_client_conn_map_->find(nodeid);
-    if(iter == ptr_client_conn_map_->end())
-    {
-        return RET_SUCCEED_CODE;
-    }
-
-    iter->second->write(msgid, data);
-    return RET_SUCCEED_CODE;
+	// ptr_communicator_->waitForShutdown();
 }

@@ -51,22 +51,26 @@
 
 BaseClient::BaseClient(const ViaInfo& via_info, const string& taskid)
 {
-	// task_id_ = taskid;
-	// if(!MakeCredentials(via_info)){return;}
-	// auto channel = grpc::CreateChannel(via_info.address, creds_);
-	// stub_ = IoChannel::NewStub(channel);
-
 	task_id_ = taskid;
-	ic_ = Ice::initialize();
 	string serAddress = via_info.address;
 	int npos = serAddress.find(":");
 	string ip = serAddress.substr(0, npos);
 	string port = serAddress.substr(npos+1, serAddress.length());
-	// cout << "ip=" << ip << ", port=" << port << endl;
-	string endpoints = "IoChannel:tcp -h " + ip + " -p " + port;
-	Ice::ObjectPrx base = ic_->stringToProxy(endpoints)->ice_twoway()->ice_timeout(-1)->ice_secure(false);
-	// stub_ = IoChannelPrx::checkedCast(base);
-	stub_ = IoChannelPrx::uncheckedCast(base);
+	string proxy_name = "IoChannel";
+	string endpoints = proxy_name + ":tcp -h " + ip + " -p " + port;
+
+	// set properties
+	string key_proxy = "IoChannel.Proxy";
+	string value_proxy = endpoints;
+	Ice::InitializationData initData;
+	initData.properties = Ice::createProperties();
+	initData.properties->setProperty(key_proxy, value_proxy);
+	ptr_holder_ = make_shared<Ice::CommunicatorHolder>(initData);
+	ptr_communicator_ = ptr_holder_->communicator();
+	
+	// uncheckedCast 函数从不进行远程调用
+	stub_ = Ice::uncheckedCast<IoChannelPrx>(
+		ptr_communicator_->propertyToProxy(key_proxy)->ice_twoway()->ice_timeout(-1)->ice_secure(false));
 	if (!stub_)
 		throw "Invalid proxy";
 }
