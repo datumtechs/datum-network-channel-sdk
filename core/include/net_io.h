@@ -63,7 +63,7 @@ class BasicIO {
   /**
    * Initialize the client connection.
    */
-  virtual bool init(const string& taskid) = 0;
+  virtual bool init(const string& taskid, const useconds_t usec) = 0;
   virtual ssize_t recv(const string& remote_nodeid, const char* id, char* data, 
       uint64_t length, int64_t timeout) = 0;
   virtual ssize_t send(const string& remote_nodeid, const char* id, const char* data, 
@@ -101,7 +101,7 @@ class ViaNetIO : public BasicIO {
   bool StartServer(const string& taskid, const NodeInfo& server_info,
        map<string, shared_ptr<ClientConnection>>* ptr_client_conn_map);
 
-  bool init(const string& taskid);
+  bool init(const string& taskid, const useconds_t usec);
   ssize_t recv(const string& remote_nodeid, const char* id, char* data, uint64_t length, 
       int64_t timeout=-1);
   ssize_t send(const string& remote_nodeid, const char* id, const char* data, uint64_t length, 

@@ -27,7 +27,7 @@ public:
     // // Register the interface where the server node resides to via
     // bool SignUpToVia(const NodeInfo& server_info);
 
-    bool checkConnect();
+    bool CheckConnect(const useconds_t usec=1000000);
 
     virtual ssize_t send(const string& self_nodeid, const string& remote_nodeid, 
         const string& msg_id, const char* data, const size_t nLen, int64_t timeout = -1L) = 0;

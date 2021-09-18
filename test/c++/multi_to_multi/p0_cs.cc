@@ -25,7 +25,7 @@ string readFileIntoString(const string& filename)
 */
 const int max_time = 10000;
 
-bool start_send(GRpcChannel& channel_)
+bool start_send(TcpChannel& channel_)
 {
     // 多线程接收
     auto send_f = [&](const string& sid) -> bool {
@@ -58,7 +58,7 @@ bool start_send(GRpcChannel& channel_)
     return true;
 }
 
-bool start_recv(GRpcChannel& channel_)
+bool start_recv(TcpChannel& channel_)
 {
     // 多线程接收
     auto recv_f = [&](const string& cid) -> bool {
@@ -112,7 +112,7 @@ int main(int argc, char *argv[])
         sleep_time = int64_t(argv[1]);
     }
 
-    GRpcChannel channel_(io_);
+    TcpChannel channel_(io_);
     string data = "";
     
     while(true)

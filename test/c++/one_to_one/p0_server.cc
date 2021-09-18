@@ -45,7 +45,7 @@ int main(int argc, char *argv[])
     this_thread::sleep_for(std::chrono::milliseconds(sleep_time));
 
     cout << "start to call recv1========" << endl;
-    GRpcChannel channel_(io_);
+    TcpChannel channel_(io_);
     string send_nodeid = "p1";
     string send_msg_id = "0x1111";
     string data = "";

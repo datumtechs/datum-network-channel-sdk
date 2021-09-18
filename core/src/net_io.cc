@@ -36,7 +36,7 @@ bool ViaNetIO::StartServer(const string& taskid, const NodeInfo& server_info,
   return true;
 }
 
-bool ViaNetIO::init(const string& taskid) 
+bool ViaNetIO::init(const string& taskid, const useconds_t usec) 
 {
   // 初始化客户端连接过来的缓存
   uint32_t client_size = client_nodeids_.size();
@@ -64,7 +64,7 @@ bool ViaNetIO::init(const string& taskid)
     // gpr_log(GPR_INFO, "init async client connect, sids: %s.", via_server_infos_[i].id.c_str()); 
 #else
     nid_to_server_map_[server_node_id] = make_shared<SyncClient>(via_server_infos_[i], taskid);
-    nid_to_server_map_[server_node_id]->checkConnect();
+    nid_to_server_map_[server_node_id]->CheckConnect(usec);
     // gpr_log(GPR_INFO, "init sync client connect, sids: %s.", via_server_infos_[i].id.c_str());
 #endif
   

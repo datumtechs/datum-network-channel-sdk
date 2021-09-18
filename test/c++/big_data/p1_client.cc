@@ -38,7 +38,7 @@ int main(int argc, char *argv[])
     shared_ptr<BasicIO> io_ = io_impl.CreateChannel("p1", io_config_str, 
             is_start_server);
 
-    GRpcChannel channel_(io_);
+    TcpChannel channel_(io_);
     int max_time = 1;
     string send_nodeid = "p0";
     string send_msg_id = "";

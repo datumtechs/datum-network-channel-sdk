@@ -36,7 +36,11 @@ so_libs = glob.glob('build/lib/lib*.so')
 for file_name in so_libs:
     shutil.copy(file_name, save_lib_dir)
 
-cc_module_name = "grpc"
+ice_so_libs = glob.glob('third_party/ice/lib/lib*.so*')
+for file_name in ice_so_libs:
+    shutil.copy(file_name, save_lib_dir)
+
+cc_module_name = "ice"
 build_ext_target = sub_dir_name + "/" + cc_module_name
 DOCLINES = __doc__.split('\n')
 __version__ = '1.0.0'

@@ -71,7 +71,7 @@ BaseClient::BaseClient(const ViaInfo& via_info, const string& taskid)
 		throw "Invalid proxy";
 }
 
-bool BaseClient::checkConnect()
+bool BaseClient::CheckConnect(const useconds_t usec)
 {
 	do
 	{
@@ -82,7 +82,7 @@ bool BaseClient::checkConnect()
 		catch (const Ice::Exception& ex) 
 		{
 			// cerr << ex << endl;
-			sleep(1);
+			usleep(usec);
 			continue;
 		}
 		break;

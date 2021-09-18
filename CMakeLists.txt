@@ -69,10 +69,10 @@ file(GLOB_RECURSE srcs core/src/*.cc core/src/*.cpp)
 add_library(${LIBNAME} SHARED ${srcs})
 target_include_directories(${LIBNAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/core/include)
 
-set(THIRD_PARTY_DIR /home/luodahui/core/ice/cpp)
-include_directories(${THIRD_PARTY_DIR}/include)
-link_directories(${THIRD_PARTY_DIR}/lib)
-#link_libraries(Ice++11)
+# ice
+set(THIRD_PARTY_DIR ${CMAKE_CURRENT_SOURCE_DIR}/third_party)
+include_directories(${THIRD_PARTY_DIR}/ice/include)
+link_directories(${THIRD_PARTY_DIR}/ice/lib)
 link_libraries(Ice)
 
 target_link_libraries(${LIBNAME} PUBLIC Ice pthread)

@@ -39,7 +39,7 @@ int main(int argc, char *argv[])
 
     cout << "start send========" << endl;
     // 创建channel
-    GRpcChannel channel_(io_);
+    TcpChannel channel_(io_);
     string send_nodeid = "p0";
     string send_msg_id = "0x1111";
     string data = "this is p1 client send msg!";

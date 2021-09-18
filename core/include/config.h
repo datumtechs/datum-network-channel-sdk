@@ -178,6 +178,7 @@ class ChannelConfig {
   string task_id_ = "";
   string root_cert_ = "";
   uint8_t log_level_ = 0; // 0:Debug, 1:Info, 2: Error
+  float ping_time_ = 1.0; // Interval (unit: s) for ping the server when the client is connected to the server.  
   NODE_TYPE node_type_ = NODE_TYPE_INVALID;
   map<string, NodeInfoConfig> node_info_config_;
   map<string, string> nodeid_to_via_;

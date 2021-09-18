@@ -24,7 +24,7 @@ string readFileIntoString(const string& filename)
 多对一：多个客户端发送，一个服务器接收
 */
 
-bool start_recv(GRpcChannel& channel_)
+bool start_recv(TcpChannel& channel_)
 {
     // 多线程接收
     int max_time = 10000;
@@ -79,7 +79,7 @@ int main(int argc, char *argv[])
         sleep_time = int64_t(argv[1]);
     }
     // sleep(sleep_time);
-    GRpcChannel channel_(io_);
+    TcpChannel channel_(io_);
     string data = "";
     while(true)
     {

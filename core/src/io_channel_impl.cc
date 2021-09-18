@@ -1,5 +1,5 @@
 #include "io_channel_impl.h"
-#include "grpc_channel.h"
+#include "tcp_channel.h"
 #include <set>
 
 string IoChannelImpl::recv_msg(const string& node_id, const string& msg_id, uint64_t msg_len, 
@@ -30,11 +30,11 @@ IChannel* IoChannelImpl::CreateViaChannel(const NodeInfo& node_info,
 {
   shared_ptr<BasicIO> net_io =  nullptr;
   net_io = make_shared<ViaNetIO>(node_info, serverInfos, clientNodeIds, error_callback);
-  if (net_io->init(config->task_id_)) 
+  if (net_io->init(config->task_id_, config->ping_time_*1000000)) 
   { 
-    GRpcChannel* grpc_channel = new GRpcChannel(net_io, config, node_info);
-    grpc_channel->SetConnectedNodeIDs(clientNodeIds);
-    io_channel_ = grpc_channel;
+    TcpChannel* tcp_channel = new TcpChannel(net_io, config, node_info);
+    tcp_channel->SetConnectedNodeIDs(clientNodeIds);
+    io_channel_ = tcp_channel;
 
     return io_channel_;
   }

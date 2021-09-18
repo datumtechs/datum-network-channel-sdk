@@ -40,21 +40,6 @@ function run_compile() {
     echo -e "${GREEN}Compile executed successfully.${NC}"
 }
 
-function run_compile_proto() {
-    echo -e "${GREEN}start compile proto file.${NC}"
-    proto_file_dir=./protos
-    core_dir=./core/src/
-    include_dir=./core/include/
-
-    protoc -I protos --grpc_out=$proto_file_dir --plugin=protoc-gen-grpc=`which grpc_cpp_plugin` \
-      $proto_file_dir/*.proto
-    protoc -I protos --cpp_out=$proto_file_dir $proto_file_dir/*.proto
-
-    mv $proto_file_dir/*.cc $core_dir
-    mv $proto_file_dir/*.h $include_dir
-    echo -e "${GREEN}compile proto file successfully.${NC}"
-}
-
 function run_compile_ice() {
     echo -e "${GREEN}start compile ice file.${NC}"
     ice_file_dir=./ice

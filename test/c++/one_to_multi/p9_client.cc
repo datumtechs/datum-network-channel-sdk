@@ -39,7 +39,7 @@ int main(int argc, char *argv[])
             is_start_server);
 
     cout << "start send to p0========" << endl;
-    GRpcChannel channel_(io_);
+    TcpChannel channel_(io_);
     int max_time = 10000;
     string send_nodeid = "p0";
     string send_msg_id = "0x1111";

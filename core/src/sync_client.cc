@@ -1,9 +1,6 @@
 // file sync_client.cc
 #include "sync_client.h"
 
-#if USE_BUFFER
-#include "simple_buffer.h"
-#endif
 #include <thread>
 #include <chrono>   
 using namespace chrono;
@@ -39,7 +36,7 @@ ssize_t SyncClient::send(const string& self_nodeid, const string& remote_nodeid,
       Ice::Context context;
       status = stub_->send(self_nodeid, msg_id, vec_send_data, context);
     } catch (const Ice::Exception& ex) {
-        // cerr << ex << endl;
+        cerr << ex << endl;
         sleep(1);
         status = 1;
     }

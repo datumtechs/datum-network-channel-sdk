@@ -1,9 +1,6 @@
 // file async_server.cc
 #include "async_server.h"
 
-// #if USE_BUFFER
-// #include "simple_buffer.h"
-// #endif
 // #include <thread>
 // #include <chrono>   
 // using namespace chrono;
@@ -70,13 +67,8 @@
 // 		// The msgid is already included in the data  
 // 		const string& data = request_.data();
 
-// 		#if USE_BUFFER
-// 			iter->second->buffer_->write(data.data(), data.size());
-// 		#else
 // 			const string& msgid = request_.id();
 // 			iter->second->write(msgid, data);
-// 		#endif
-// 	#endif
 // 	}
 // }
 

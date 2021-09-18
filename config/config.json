@@ -1,7 +1,8 @@
 {
 	"TASK_ID": "task-1",
 	"ROOT_CERT": "gmssl_key/CA.crt",
-	"LOG_LEVEL":0,
+	"LOG_LEVEL": 0,
+	"PING_TIME": 1,
 	"NODE_INFO": [
 		{
 			"NODE_ID": "p0",

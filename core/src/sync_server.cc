@@ -1,8 +1,5 @@
 // file sync_server.cc
 #include "sync_server.h"
-#if USE_BUFFER
-#include "simple_buffer.h"
-#endif
 
 bool SyncServer::wait()
 {
