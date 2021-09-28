@@ -25,18 +25,6 @@ public:
 		map<string, shared_ptr<ClientConnection>>* ptr_client_conn_map);
 	virtual ~BaseServer(){}
 
-#if ASYNC_SERVER
-	virtual void Handle_Event(const int numEvent) = 0;
-	virtual int get_thread_count() = 0;
-#if USE_CACHE
-	#if MULTI_LOCKS
-		virtual void Handle_Data(const string& nodeid) = 0;
-	#else 
-		virtual void Handle_Data() = 0;
-	#endif
-#endif
-#endif
-
 protected:
 	virtual bool close()
 	{
@@ -44,6 +32,7 @@ protected:
 		{
 			try {
 				ptr_communicator_->destroy();
+				ptr_communicator_->shutdown();
 			} catch (const Ice::Exception& e) {
 				cerr << e << endl;
 			}

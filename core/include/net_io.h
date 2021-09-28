@@ -35,17 +35,6 @@ class BasicIO {
  public:
   virtual ~BasicIO()
   {
-#if ASYNC_SERVER
-    for(auto& _thread : handle_threads_)
-    {
-      _thread.detach();
-    }
-    for(auto& _thread : handle_data_threads_)
-    {
-      _thread.detach();
-    }
-#endif
-
 #if ASYNC_CLIENT
     for(auto& _thread : clients_thread_)
     {
@@ -82,12 +71,7 @@ class BasicIO {
   map<string, shared_ptr<ClientConnection>> client_conn_map;
   error_callback handler;
 
-#if ASYNC_SERVER
-  vector<std::thread> handle_threads_;
-  vector<std::thread> handle_data_threads_;
-#endif
   shared_ptr<BaseServer> server_ = nullptr;
-  shared_ptr<BaseClient> via_client_ = nullptr;
 };
 
 

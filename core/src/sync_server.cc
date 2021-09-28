@@ -1,6 +1,6 @@
 // file sync_server.cc
 #include "sync_server.h"
-
+#ifndef ASYNC_SERVER
 bool SyncServer::wait()
 {
     //通信器在这里等待处理数据连接
@@ -25,3 +25,4 @@ SyncServer::SyncServer(const NodeInfo& server_info,
 	//通信器在这里等待处理数据连接
 	// ptr_communicator_->waitForShutdown();
 }
+#endif

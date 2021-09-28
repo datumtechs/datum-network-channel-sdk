@@ -49,6 +49,12 @@
 // 	return true;
 // }
 
+BaseClient::~BaseClient()
+{ 
+	if(ptr_communicator_) 
+		ptr_communicator_->shutdown();
+}
+
 BaseClient::BaseClient(const ViaInfo& via_info, const string& taskid)
 {
 	task_id_ = taskid;

@@ -65,7 +65,7 @@ fi
 cmd=${1}
 if [ "${cmd}" = "compile" ]; then
     build_type=Release
-    server_type=SYNC
+    server_type=ASYNC
     client_type=SYNC
     python_version=$(python3 -c 'import sys;ver=sys.version_info;print(str(ver[0])+"."+str(ver[1]))')   
     ssl_type=0

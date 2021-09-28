@@ -1,5 +1,6 @@
 // file sync_server.h
 #pragma once
+#ifndef ASYNC_SERVER
 #include "base_server.h"
 #include "config.h"
 #include "client_connection.h"
@@ -23,6 +24,5 @@ public:
     ~SyncServer(){close();}
 
     SyncServer(const NodeInfo& server_info, map<string, shared_ptr<ClientConnection>>* ptr_client_conn_map);
-private:
-    std::mutex mtx_;
 };
+#endif

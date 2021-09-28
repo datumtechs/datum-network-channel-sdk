@@ -32,7 +32,7 @@ public:
     virtual ssize_t send(const string& self_nodeid, const string& remote_nodeid, 
         const string& msg_id, const char* data, const size_t nLen, int64_t timeout = -1L) = 0;
 
-    virtual ~BaseClient(){ if(ptr_communicator_) ptr_communicator_->destroy();}
+    virtual ~BaseClient();
 public:
 	string task_id_;
 protected:

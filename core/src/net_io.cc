@@ -17,19 +17,12 @@ bool ViaNetIO::StartServer(const string& taskid, const NodeInfo& server_info,
     map<string, shared_ptr<ClientConnection>>* ptr_client_conn_map)
 {
 #if ASYNC_SERVER
+  cout << "start async server, address:" << server_info.address << endl;
   // async server
   server_ = make_shared<AsyncServer>(server_info, ptr_client_conn_map);
-  int thread_count = server_->get_thread_count();
-
-  handle_threads_.resize(thread_count);
-  for(int i = 0; i < thread_count; ++i)
-  {
-    handle_threads_[i] = thread(&BaseServer::Handle_Event, server_, i);
-  }
-
 #else
+  cout << "start sync server, address:" << server_info.address << endl;
   // sync server
-  cout << "start server, address:" << server_info.address << endl;
   server_ = make_shared<SyncServer>(server_info, ptr_client_conn_map);
 #endif
 
