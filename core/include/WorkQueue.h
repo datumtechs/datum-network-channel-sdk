@@ -22,10 +22,13 @@ private:
 
     struct CallbackEntry
     {
-        AMD_IoChannel_sendPtr cb;
-        string nodeid;
-        string msgid;
-        bytes data;
+        CallbackEntry(const AMD_IoChannel_sendPtr& cb, const string& nodeid, 
+            const string& msgid, const bytes& data):_cb(cb), _nodeid(nodeid), _msgid(msgid), _data(data){}
+
+        AMD_IoChannel_sendPtr _cb;
+        string _nodeid;
+        string _msgid;
+        bytes _data;
     };
 
     IceUtil::Monitor<IceUtil::Mutex> _monitor;

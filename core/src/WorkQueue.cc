@@ -27,13 +27,13 @@ void WorkQueue::run()
             CallbackEntry entry = _callbacks.front();
             if(!_done)
             {
-                auto iter = ptr_client_conn_map_->find(entry.nodeid);
+                entry._cb->ice_response(0);
+                auto iter = ptr_client_conn_map_->find(entry._nodeid);
                 if(iter != ptr_client_conn_map_->end())
                 {
-                    iter->second->write(entry.msgid, entry.data);
+                    iter->second->write(entry._msgid, entry._data);
                 }
                 _callbacks.pop_front();
-                entry.cb->ice_response(0);
             }
         }
     }
@@ -44,7 +44,7 @@ void WorkQueue::run()
     list<CallbackEntry>::const_iterator p;
     for(p = _callbacks.begin(); p != _callbacks.end(); ++p)
     {
-        (*p).cb->ice_exception(SendDataException());
+        (*p)._cb->ice_exception(SendDataException());
     }
 }
 
@@ -57,12 +57,7 @@ void WorkQueue::add(const AMD_IoChannel_sendPtr& cb, const string& nodeid,
         //
         // Add work item.
         //
-        CallbackEntry entry;
-        entry.cb = cb;
-        entry.nodeid = nodeid;
-        entry.msgid = msgid;
-        entry.data = data;
-
+        CallbackEntry entry(cb, nodeid, msgid, data);
         if(0 == _callbacks.size())
         {
             _monitor.notify();

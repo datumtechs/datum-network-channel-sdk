@@ -8,7 +8,7 @@ IoChannelI::IoChannelI(map<string, shared_ptr<ClientConnection>>* ptr_client_con
 #endif
 
 void IoChannelI::send_async(const AMD_IoChannel_sendPtr& cb, const string& nodeid, 
-      const string& msgid, const bytes& data,const Ice::Current&)
+      const string& msgid, const bytes& data, const Ice::Current&)
 {
 #if ASYNC_SERVER
     ptr_workQueue_->add(cb, nodeid, msgid, data);  
