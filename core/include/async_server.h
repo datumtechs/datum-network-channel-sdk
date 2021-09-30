@@ -28,7 +28,8 @@ public:
     AsyncServer(const NodeInfo& server_info, 
         map<string, shared_ptr<ClientConnection>>* ptr_client_conn_map);
 private:
-    WorkQueuePtr ptr_workQueue_;
+    // Each nodeID corresponds to a work queue, reducing queue query judgment.
+    map<string, WorkQueuePtr> map_noide_to_wq_;
 };
 #endif
 

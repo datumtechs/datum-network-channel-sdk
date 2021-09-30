@@ -4,8 +4,8 @@
 
 using namespace std;
 
-WorkQueue::WorkQueue(map<string, shared_ptr<ClientConnection>>* ptr_client_conn_map) :
-    _done(false), ptr_client_conn_map_(ptr_client_conn_map)
+WorkQueue::WorkQueue(const string& nodeid, shared_ptr<ClientConnection> ptr_client_conn) :
+    _done(false), ptr_client_conn_(ptr_client_conn), nodeid_(nodeid)
 {
 }
 
@@ -28,11 +28,7 @@ void WorkQueue::run()
             if(!_done)
             {
                 entry._cb->ice_response(0);
-                auto iter = ptr_client_conn_map_->find(entry._nodeid);
-                if(iter != ptr_client_conn_map_->end())
-                {
-                    iter->second->write(entry._msgid, entry._data);
-                }
+                ptr_client_conn_->write(entry._msgid, entry._data);
                 _callbacks.pop_front();
             }
         }
@@ -48,8 +44,7 @@ void WorkQueue::run()
     }
 }
 
-void WorkQueue::add(const AMD_IoChannel_sendPtr& cb, const string& nodeid, 
-        const string& msgid, const bytes& data)
+void WorkQueue::add(const AMD_IoChannel_sendPtr& cb, const string& msgid, const bytes& data)
 {
     IceUtil::Monitor<IceUtil::Mutex>::Lock lock(_monitor);
     if(!_done)
@@ -57,7 +52,7 @@ void WorkQueue::add(const AMD_IoChannel_sendPtr& cb, const string& nodeid,
         //
         // Add work item.
         //
-        CallbackEntry entry(cb, nodeid, msgid, data);
+        CallbackEntry entry(cb, msgid, data);
         if(0 == _callbacks.size())
         {
             _monitor.notify();

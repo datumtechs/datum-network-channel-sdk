@@ -11,10 +11,9 @@ using namespace std;
 class WorkQueue : public IceUtil::Thread
 {
 public:
-    WorkQueue(map<string, shared_ptr<ClientConnection>>* ptr_client_conn_map);
+    WorkQueue(const string& nodeid, shared_ptr<ClientConnection> ptr_client_conn);
     virtual void run();
-    void add(const AMD_IoChannel_sendPtr&, const string& nodeid, 
-        const string& msgid, const bytes& data);
+    void add(const AMD_IoChannel_sendPtr&, const string& msgid, const bytes& data);
 
     void destroy();
 
@@ -22,11 +21,10 @@ private:
 
     struct CallbackEntry
     {
-        CallbackEntry(const AMD_IoChannel_sendPtr& cb, const string& nodeid, 
-            const string& msgid, const bytes& data):_cb(cb), _nodeid(nodeid), _msgid(msgid), _data(data){}
+        CallbackEntry(const AMD_IoChannel_sendPtr& cb,
+            const string& msgid, const bytes& data):_cb(cb), _msgid(msgid), _data(data){}
 
         AMD_IoChannel_sendPtr _cb;
-        string _nodeid;
         string _msgid;
         bytes _data;
     };
@@ -34,8 +32,8 @@ private:
     IceUtil::Monitor<IceUtil::Mutex> _monitor;
     std::list<CallbackEntry> _callbacks;
     bool _done;
-
-    map<string, shared_ptr<ClientConnection>>* ptr_client_conn_map_ = nullptr;  
+    shared_ptr<ClientConnection> ptr_client_conn_; 
+    string nodeid_;
 };
 
 typedef IceUtil::Handle<WorkQueue> WorkQueuePtr;
