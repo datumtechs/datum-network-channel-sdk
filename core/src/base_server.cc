@@ -61,10 +61,8 @@ using namespace chrono;
 // }
 
 
-BaseServer::BaseServer(const NodeInfo& server_info, 
-	map<string, shared_ptr<ClientConnection>>* ptr_client_conn_map)
+BaseServer::BaseServer(const NodeInfo& server_info)
 {
-	ptr_client_conn_map_ = ptr_client_conn_map;
 	string serAddress = server_info.address;
 	int npos = serAddress.find(":");
 	string ip = serAddress.substr(0, npos);

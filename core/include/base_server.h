@@ -21,8 +21,7 @@ using namespace std;
 class BaseServer
 {
 public:
-	BaseServer(const NodeInfo& server_info, 
-		map<string, shared_ptr<ClientConnection>>* ptr_client_conn_map);
+	BaseServer(const NodeInfo& server_info);
 	virtual ~BaseServer(){}
 
 protected:

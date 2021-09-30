@@ -22,7 +22,7 @@ void IoChannelI::send_async(const AMD_IoChannel_sendPtr& cb, const string& nodei
     if(iter != ptr_client_conn_map_->end())
     {
         iter->second->write(msgid, data);
-    }
+    } 
     cb->ice_response(RET_SUCCEED_CODE);
 #endif
 }

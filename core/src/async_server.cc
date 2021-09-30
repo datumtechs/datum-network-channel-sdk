@@ -22,8 +22,7 @@ bool AsyncServer::wait()
 }
 
 AsyncServer::AsyncServer(const NodeInfo& server_info, 
-    map<string, shared_ptr<ClientConnection>>* ptr_client_conn_map):
-    BaseServer(server_info, ptr_client_conn_map)
+    map<string, shared_ptr<ClientConnection>>* ptr_client_conn_map): BaseServer(server_info)
 {
     for(auto &v : *ptr_client_conn_map)
     {

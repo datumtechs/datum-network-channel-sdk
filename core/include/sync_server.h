@@ -23,6 +23,6 @@ public:
     bool wait();
     ~SyncServer(){close();}
 
-    SyncServer(const NodeInfo& server_info, map<string, shared_ptr<ClientConnection>>* ptr_client_conn_map);
+    SyncServer(const NodeInfo& server_info, map<string, shared_ptr<ClientConnection>>*);
 };
 #endif

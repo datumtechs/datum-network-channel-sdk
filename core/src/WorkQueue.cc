@@ -27,7 +27,8 @@ void WorkQueue::run()
             CallbackEntry entry = _callbacks.front();
             if(!_done)
             {
-                entry._cb->ice_response(0);
+                //// A response to a client request is advanced to a work queue
+                // entry._cb->ice_response(0);
                 ptr_client_conn_->write(entry._msgid, entry._data);
                 _callbacks.pop_front();
             }
@@ -49,6 +50,7 @@ void WorkQueue::add(const AMD_IoChannel_sendPtr& cb, const string& msgid, const 
     IceUtil::Monitor<IceUtil::Mutex>::Lock lock(_monitor);
     if(!_done)
     {
+        cb->ice_response(0);
         //
         // Add work item.
         //
