@@ -71,6 +71,7 @@ BaseClient::BaseClient(const ViaInfo& via_info, const string& taskid)
 	Ice::InitializationData initData;
 	initData.properties = Ice::createProperties();
 	initData.properties->setProperty(key_proxy, value_proxy);
+
 	ptr_holder_ = make_shared<Ice::CommunicatorHolder>(initData);
 	ptr_communicator_ = ptr_holder_->communicator();
 	

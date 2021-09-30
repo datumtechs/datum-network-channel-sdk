@@ -78,7 +78,11 @@ BaseServer::BaseServer(const NodeInfo& server_info,
 	Ice::InitializationData initData;
 	initData.properties = Ice::createProperties();
 	initData.properties->setProperty(key_endpoints, value_endpoints);
-
+	// There is no limit to the size of the received message
+	initData.properties->setProperty("Ice.MessageSizeMax", "0");
+	// initData.properties->setProperty("Ice.Trace.Protocol", "1");
+	// initData.properties->setProperty("Ice.Trace.ThreadPool", "1");
+	
 	ptr_holder_ = make_shared<Ice::CommunicatorHolder>(initData);
 	ptr_communicator_ = ptr_holder_->communicator();
 	ptr_adapter_ = ptr_communicator_->createObjectAdapter("IoChannel");
