@@ -4,8 +4,8 @@
 namespace py = pybind11;
 #include "api_manager.h"
 
-// 定义模块名称(ice)
-PYBIND11_MODULE(ice, m) {
+// 定义模块名称(pyio)
+PYBIND11_MODULE(pyio, m) {
 
 #if USE_ALONE
   // 单独使用时需要导出IChannel接口; 因为在Rosetta中IChannel对象已经导出, 所以再导出会有冲突;

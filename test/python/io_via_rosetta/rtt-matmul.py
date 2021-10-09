@@ -5,8 +5,8 @@ import datetime
 import latticex.rosetta as rtt
 import tensorflow as tf
 
-import channel_sdk.grpc as grpc
-io_channel = grpc.APIManager()
+import channel_sdk.pyio as io
+io_channel = io.APIManager()
 from config import cfg
 from protos import via_svc_pb2
 import os

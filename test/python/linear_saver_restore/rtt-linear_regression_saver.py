@@ -65,8 +65,8 @@ def fun(a, b, c, d, e):
 using_external_io = True
 if using_external_io:
     print("use external io=================================")
-    import channel_sdk.grpc as grpc
-    io_channel = grpc.APIManager()
+    import channel_sdk.pyio as io
+    io_channel = io.APIManager()
     channel = io_channel.create_channel(node_id_, strJson)
     cfg = {'pass_via': False}
     # 注册服务

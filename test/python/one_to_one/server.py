@@ -1,5 +1,5 @@
-import channel_sdk.ice as ice
-io_channel = ice.APIManager()
+import channel_sdk.pyio as io
+io_channel = io.APIManager()
 import faulthandler
 import json
 import os
