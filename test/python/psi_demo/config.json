@@ -1,0 +1,51 @@
+{
+	"TASK_ID": "",
+	"ROOT_CERT": "/mnt/hgfs/Share/certs/CA.crt",
+	"LOG_LEVEL": 2,
+	"NODE_INFO": [
+		{
+			"NODE_ID": "P0",
+			"ADDRESS": "127.0.0.1:10000",
+			"VIA": "VIA0",
+			"SERVER_KEY":"cert/server.key",
+			"SERVER_CERT":"cert/server.crt",
+			"CLIENT_KEY":"cert/client.key",
+			"CLIENT_CERT":"cert/client.crt",
+
+			"SERVER_SIGN_KEY": "/mnt/hgfs/Share/certs/SS00.key",
+			"SERVER_SIGN_CERT": "/mnt/hgfs/Share/certs/SS00.crt",
+			"SERVER_ENC_KEY": "/mnt/hgfs/Share/certs/SE00.key",
+			"SERVER_ENC_CERT": "/mnt/hgfs/Share/certs/SE00.crt",
+			"CLIENT_SIGN_KEY": "/mnt/hgfs/Share/certs/CS01.key",
+			"CLIENT_SIGN_CERT": "/mnt/hgfs/Share/certs/CS01.crt",
+			"CLIENT_ENC_KEY": "/mnt/hgfs/Share/certs/CE01.key",
+			"CLIENT_ENC_CERT": "/mnt/hgfs/Share/certs/CE01.crt"
+		},
+		{
+			"NODE_ID": "P1",
+			"ADDRESS": "127.0.0.1:10001",
+			"VIA": "VIA1",
+			"SERVER_KEY":"cert/server.key",
+			"SERVER_CERT":"cert/server.crt",
+			"CLIENT_KEY":"cert/client.key",
+			"CLIENT_CERT":"cert/client.crt",
+
+			"SERVER_SIGN_KEY": "/mnt/hgfs/Share/certs/SS00.key",
+			"SERVER_SIGN_CERT": "/mnt/hgfs/Share/certs/SS00.crt",
+			"SERVER_ENC_KEY": "/mnt/hgfs/Share/certs/SE00.key",
+			"SERVER_ENC_CERT": "/mnt/hgfs/Share/certs/SE00.crt",
+			"CLIENT_SIGN_KEY": "/mnt/hgfs/Share/certs/CS01.key",
+			"CLIENT_SIGN_CERT": "/mnt/hgfs/Share/certs/CS01.crt",
+			"CLIENT_ENC_KEY": "/mnt/hgfs/Share/certs/CE01.key",
+			"CLIENT_ENC_CERT": "/mnt/hgfs/Share/certs/CE01.crt"
+		}
+	],
+	"VIA_INFO": {
+		"VIA0": "127.0.0.1:10031",
+		"VIA1": "127.0.0.1:10032"
+	},
+	"COMPUTATION_NODES": {
+		"P0": "P0",
+		"P1": "P1"
+	}
+}
