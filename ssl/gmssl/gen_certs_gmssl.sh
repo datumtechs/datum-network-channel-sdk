@@ -2,6 +2,7 @@
 #set -x
 
 #OPENSSL_CMD=$HOME/.local/GMTASSL/bin/gmtassl
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:../../third_party/gmssl/lib
 OPENSSL_CMD=../../third_party/gmssl/lib/gmtassl
 OPENSSL_CNF=""                      # Tassl
 OPENSSL_CNF="-config ./openssl.cnf" # GmSSL
@@ -95,39 +96,39 @@ function gen_cert() {
 }
 
 # generate root certifcates [usage: root subj]
-gen_root CA "/C=CN/ST=GD/L=SZ/O=PlatON/OU=PCS/CN=Root CA (SM2)"
+gen_root CA "/C=CN/ST=GD/L=SZ/O=juzhenyuan/OU=PCS/CN=Root CA (SM2)"
 
 # generate middle certifcates [usage: sig|enc root middle subj]
-gen_cert sig CA SS "/C=CN/ST=GD/L=SZ/O=PlatON/OU=PCS/CN=127.0.0.1 Server Sign (SM2)"
-gen_cert enc CA SE "/C=CN/ST=GD/L=SZ/O=PlatON/OU=PCS/CN=127.0.0.1 Server Enc (SM2)"
-gen_cert sig CA CS "/C=CN/ST=GD/L=SZ/O=PlatON/OU=PCS/CN=127.0.0.1 Client Sign (SM2)"
-gen_cert enc CA CE "/C=CN/ST=GD/L=SZ/O=PlatON/OU=PCS/CN=127.0.0.1 Client Enc (SM2)"
+gen_cert sig CA SS "/C=CN/ST=GD/L=SZ/O=juzhenyuan/OU=PCS/CN=127.0.0.1 Server Sign (SM2)"
+gen_cert enc CA SE "/C=CN/ST=GD/L=SZ/O=juzhenyuan/OU=PCS/CN=127.0.0.1 Server Enc (SM2)"
+gen_cert sig CA CS "/C=CN/ST=GD/L=SZ/O=juzhenyuan/OU=PCS/CN=127.0.0.1 Client Sign (SM2)"
+gen_cert enc CA CE "/C=CN/ST=GD/L=SZ/O=juzhenyuan/OU=PCS/CN=127.0.0.1 Client Enc (SM2)"
 
-# MPC (P0)
-gen_cert sig CA SS00 "/C=CN/ST=GD/L=SZ/O=PlatON/OU=PCS/CN=127.0.0.1 Server Sign (SM2) P0"
-gen_cert enc CA SE00 "/C=CN/ST=GD/L=SZ/O=PlatON/OU=PCS/CN=127.0.0.1 Server Enc (SM2) P0"
-gen_cert sig CA CS01 "/C=CN/ST=GD/L=SZ/O=PlatON/OU=PCS/CN=127.0.0.1 Client Sign (SM2) P0"
-gen_cert enc CA CE01 "/C=CN/ST=GD/L=SZ/O=PlatON/OU=PCS/CN=127.0.0.1 Client Enc (SM2) P0"
-gen_cert sig CA CS02 "/C=CN/ST=GD/L=SZ/O=PlatON/OU=PCS/CN=127.0.0.1 Client Sign (SM2) P0"
-gen_cert enc CA CE02 "/C=CN/ST=GD/L=SZ/O=PlatON/OU=PCS/CN=127.0.0.1 Client Enc (SM2) P0"
-# MPC (P1)
-gen_cert sig CA SS11 "/C=CN/ST=GD/L=SZ/O=PlatON/OU=PCS/CN=127.0.0.1 Server Sign (SM2) P1"
-gen_cert enc CA SE11 "/C=CN/ST=GD/L=SZ/O=PlatON/OU=PCS/CN=127.0.0.1 Server Enc (SM2) P1"
-gen_cert sig CA CS10 "/C=CN/ST=GD/L=SZ/O=PlatON/OU=PCS/CN=127.0.0.1 Client Sign (SM2) P1"
-gen_cert enc CA CE10 "/C=CN/ST=GD/L=SZ/O=PlatON/OU=PCS/CN=127.0.0.1 Client Enc (SM2) P1"
-gen_cert sig CA CS12 "/C=CN/ST=GD/L=SZ/O=PlatON/OU=PCS/CN=127.0.0.1 Client Sign (SM2) P1"
-gen_cert enc CA CE12 "/C=CN/ST=GD/L=SZ/O=PlatON/OU=PCS/CN=127.0.0.1 Client Enc (SM2) P1"
-# MPC (P2)
-gen_cert sig CA SS22 "/C=CN/ST=GD/L=SZ/O=PlatON/OU=PCS/CN=127.0.0.1 Server Sign (SM2) P2"
-gen_cert enc CA SE22 "/C=CN/ST=GD/L=SZ/O=PlatON/OU=PCS/CN=127.0.0.1 Server Enc (SM2) P2"
-gen_cert sig CA CS20 "/C=CN/ST=GD/L=SZ/O=PlatON/OU=PCS/CN=127.0.0.1 Client Sign (SM2) P2"
-gen_cert enc CA CE20 "/C=CN/ST=GD/L=SZ/O=PlatON/OU=PCS/CN=127.0.0.1 Client Enc (SM2) P2"
-gen_cert sig CA CS21 "/C=CN/ST=GD/L=SZ/O=PlatON/OU=PCS/CN=127.0.0.1 Client Sign (SM2) P2"
-gen_cert enc CA CE21 "/C=CN/ST=GD/L=SZ/O=PlatON/OU=PCS/CN=127.0.0.1 Client Enc (SM2) P2"
+# # MPC (P0)
+# gen_cert sig CA SS00 "/C=CN/ST=GD/L=SZ/O=juzhenyuan/OU=PCS/CN=127.0.0.1 Server Sign (SM2) P0"
+# gen_cert enc CA SE00 "/C=CN/ST=GD/L=SZ/O=juzhenyuan/OU=PCS/CN=127.0.0.1 Server Enc (SM2) P0"
+# gen_cert sig CA CS01 "/C=CN/ST=GD/L=SZ/O=juzhenyuan/OU=PCS/CN=127.0.0.1 Client Sign (SM2) P0"
+# gen_cert enc CA CE01 "/C=CN/ST=GD/L=SZ/O=juzhenyuan/OU=PCS/CN=127.0.0.1 Client Enc (SM2) P0"
+# gen_cert sig CA CS02 "/C=CN/ST=GD/L=SZ/O=juzhenyuan/OU=PCS/CN=127.0.0.1 Client Sign (SM2) P0"
+# gen_cert enc CA CE02 "/C=CN/ST=GD/L=SZ/O=juzhenyuan/OU=PCS/CN=127.0.0.1 Client Enc (SM2) P0"
+# # MPC (P1)
+# gen_cert sig CA SS11 "/C=CN/ST=GD/L=SZ/O=juzhenyuan/OU=PCS/CN=127.0.0.1 Server Sign (SM2) P1"
+# gen_cert enc CA SE11 "/C=CN/ST=GD/L=SZ/O=juzhenyuan/OU=PCS/CN=127.0.0.1 Server Enc (SM2) P1"
+# gen_cert sig CA CS10 "/C=CN/ST=GD/L=SZ/O=juzhenyuan/OU=PCS/CN=127.0.0.1 Client Sign (SM2) P1"
+# gen_cert enc CA CE10 "/C=CN/ST=GD/L=SZ/O=juzhenyuan/OU=PCS/CN=127.0.0.1 Client Enc (SM2) P1"
+# gen_cert sig CA CS12 "/C=CN/ST=GD/L=SZ/O=juzhenyuan/OU=PCS/CN=127.0.0.1 Client Sign (SM2) P1"
+# gen_cert enc CA CE12 "/C=CN/ST=GD/L=SZ/O=juzhenyuan/OU=PCS/CN=127.0.0.1 Client Enc (SM2) P1"
+# # MPC (P2)
+# gen_cert sig CA SS22 "/C=CN/ST=GD/L=SZ/O=juzhenyuan/OU=PCS/CN=127.0.0.1 Server Sign (SM2) P2"
+# gen_cert enc CA SE22 "/C=CN/ST=GD/L=SZ/O=juzhenyuan/OU=PCS/CN=127.0.0.1 Server Enc (SM2) P2"
+# gen_cert sig CA CS20 "/C=CN/ST=GD/L=SZ/O=juzhenyuan/OU=PCS/CN=127.0.0.1 Client Sign (SM2) P2"
+# gen_cert enc CA CE20 "/C=CN/ST=GD/L=SZ/O=juzhenyuan/OU=PCS/CN=127.0.0.1 Client Enc (SM2) P2"
+# gen_cert sig CA CS21 "/C=CN/ST=GD/L=SZ/O=juzhenyuan/OU=PCS/CN=127.0.0.1 Client Sign (SM2) P2"
+# gen_cert enc CA CE21 "/C=CN/ST=GD/L=SZ/O=juzhenyuan/OU=PCS/CN=127.0.0.1 Client Enc (SM2) P2"
 
 # remove pfx/pem at present, 11/20/2020
 # rm -rf $CERTS_DIR/*.pem $CERTS_DIR/*.pfx $CERTS_DIR/*.srl
-rm -rf $CERTS_DIR/*.pfx $CERTS_DIR/*.srl
+rm -rf $CERTS_DIR/*.pfx $CERTS_DIR/*.srl ./*.pem
 
 # Show all files
 ls -al $CERTS_DIR/*.key $CERTS_DIR/*.crt $CERTS_DIR/*.pem
