@@ -81,6 +81,10 @@ void CallData::Proceed(void* ptr_save, void* ptr_mtx, void* ptr_cv)
 		#endif
 	#endif
 	}
+	else
+	{
+		delete this;
+	}
 }
 
 bool AsyncServer::close()
