@@ -25,7 +25,7 @@ mkdir build && cd build
   包括异步和同步两种类型；
 
   ```bash
-  cmake -DASYNC_SERVER=1
+  cmake -DASYNC_SERVER=1 ..
   ```
 
   > 说明：
@@ -40,7 +40,7 @@ mkdir build && cd build
   包括异步和同步两种类型；
 
   ```bash
-  cmake -DASYNC_CLIENT=1
+  cmake -DASYNC_CLIENT=1 .. 
   ```
 
   > 说明：

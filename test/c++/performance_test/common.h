@@ -131,8 +131,10 @@ public:
         // cout << io_config_str << endl;
 
         // 启动服务
-        channel = CreateChannel(self_nid, io_config_str, nullptr);
-
+        IChannel* ptr_channel = 
+            IoChannelImpl::Instance()->CreateIoChannel(self_nid, io_config_str, nullptr);
+                    
+        shared_ptr<IChannel> channel(ptr_channel);
         send_object = make_shared<Send_Object>(channel, self_nid, send_data, msg_len, record_count);
         recv_object = make_shared<Recv_Object>(channel, self_nid, msg_len, record_count);
 
