@@ -63,6 +63,7 @@ int main(int argc, char *argv[])
         // this_thread::sleep_for(std::chrono::milliseconds(sleep_time));
         // cout << "start to call recv2========" << endl;
         // data = "";
+        memset(szData, 0, 1024);
         ptr_channel->Recv(send_nodeid.c_str(), send_msg_id.c_str(), szData, 100);
         cout << "recv from:" << send_nodeid << ", szData: " << szData << endl;
     }

@@ -50,9 +50,14 @@ int main(int argc, char *argv[])
 
     cout << "start cycle to send========" << endl;
     timeout = 5000;
+    int i = 0;
     while(true) 
     {
         this_thread::sleep_for(std::chrono::milliseconds(timeout));
+        ++i;
+        data = std::to_string(i);
+        cout << "Send, nodeid:" << send_nodeid << ", msg_id:"  << send_msg_id 
+            << ", data:" << data << endl;
         ptr_channel->Send(send_nodeid.c_str(), send_msg_id.c_str(), data.c_str(), data.size(), timeout);
     }
     

@@ -87,8 +87,8 @@ ssize_t GRpcChannel::Send(const char* node_id, const char* id, const char* data,
         int64_t timeout) 
 {
   if(nullptr == _net_io){cout << "create io failed!" << endl; return 0;}
-  cout << "GRpcChannel::Send, nodeid:" << node_id << ", msg_id:"  << id  
-    << ", length:" << length << endl;
+  // cout << "GRpcChannel::Send, nodeid:" << node_id << ", msg_id:"  << id  
+  //   << ", length:" << length << endl;
   return _net_io->send(node_id, id, data, length, timeout);
 }
 
