@@ -4,6 +4,7 @@
 #include <sstream>
 #include <iostream>
 #include <stdlib.h>
+#include <unistd.h>
 using namespace std;
 
 
@@ -28,45 +29,41 @@ int main(int argc, char *argv[])
     string io_config_str = readFileIntoString(fn);
     cout << io_config_str << endl;
 
-    IoChannelImpl io_impl;
-
     // 启动服务
     string address = "127.0.0.1:11111";
     bool is_start_server = true;
-    shared_ptr<BasicIO> io_ = io_impl.CreateChannel("p0", io_config_str, 
-            is_start_server, address, nullptr);
+    string self_nid = "p0";
 
+    IChannel* ptr_channel = 
+            IoChannelImpl::Instance()->CreateIoChannel(self_nid, io_config_str, nullptr);
+
+    cout << "create io channel succeed, self nodeid:" << self_nid << endl;
     cout << "start sleep!" << endl;
-    int64_t sleep_time = 10000;
+    int64_t sleep_time = 100;
     if(argc >= 2)
     {
         sleep_time = int64_t(argv[1]);
     }
-    this_thread::sleep_for(std::chrono::milliseconds(sleep_time));
+    // this_thread::sleep_for(std::chrono::milliseconds(sleep_time));
 
     cout << "start to call recv1========" << endl;
-    TcpChannel channel_(io_);
     string send_nodeid = "p1";
     string send_msg_id = "0x1111";
-    string data = "";
-    channel_.Recv(send_nodeid, send_msg_id, data);
-    cout << "recv from:" << send_nodeid << ", data: " << data << endl;
+    // string data = "";
+    char szData[1024] = "";
+    ptr_channel->Recv(send_nodeid.c_str(), send_msg_id.c_str(), szData, 100);
+    cout << "recv from:" << send_nodeid << ", szData: " << szData << endl;
 
-    // while(true)
+    while(true)
     {
-        cout << "start sleep!" << endl;
-        this_thread::sleep_for(std::chrono::milliseconds(sleep_time));
-        cout << "start to call recv2========" << endl;
-        data = "";
-        channel_.Recv(send_nodeid, send_msg_id, data);
-        cout << "recv from:" << send_nodeid << ", data: " << data << endl;
-    }
-    io_impl.CloseServer();
-    if(is_start_server)
-    {
-        io_impl.WaitServer();
+        // cout << "start sleep!" << endl;
+        // this_thread::sleep_for(std::chrono::milliseconds(sleep_time));
+        // cout << "start to call recv2========" << endl;
+        // data = "";
+        memset(szData, 0, 1024);
+        ptr_channel->Recv(send_nodeid.c_str(), send_msg_id.c_str(), szData, 100);
+        cout << "recv from:" << send_nodeid << ", szData: " << szData << endl;
     }
     
     return 0;
 }
-

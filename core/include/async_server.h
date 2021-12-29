@@ -10,7 +10,6 @@
 #include <mutex>
 #include<chrono>
 #include<thread>
-#include<map>
 #include<queue>
 #include <Ice/Ice.h>
 #include "io_channel_ice.h"
@@ -26,10 +25,10 @@ public:
     ~AsyncServer();
 
     AsyncServer(const NodeInfo& server_info, 
-        map<string, shared_ptr<ClientConnection>>* ptr_client_conn_map);
+        unordered_map<string, shared_ptr<ClientConnection>>* ptr_client_conn_map);
 private:
     // Each nodeID corresponds to a work queue, reducing queue query judgment.
-    map<string, WorkQueuePtr> map_noide_to_wq_;
+    unordered_map<string, WorkQueuePtr> map_noide_to_wq_;
 };
 #endif
 

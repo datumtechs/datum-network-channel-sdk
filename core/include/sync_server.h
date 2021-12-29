@@ -9,7 +9,6 @@
 #include <mutex>
 #include<chrono>
 #include<thread>
-#include<map>
 #include<queue>
 #include <Ice/Ice.h>
 #include "io_channel_ice.h"
@@ -23,6 +22,6 @@ public:
     bool wait();
     ~SyncServer(){close();}
 
-    SyncServer(const NodeInfo& server_info, map<string, shared_ptr<ClientConnection>>*);
+    SyncServer(const NodeInfo& server_info, unordered_map<string, shared_ptr<ClientConnection>>*);
 };
 #endif

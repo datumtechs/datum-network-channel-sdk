@@ -1,10 +1,10 @@
 #include "IoChannelI.h"
 
 #ifdef ASYNC_SERVER
-IoChannelI::IoChannelI(map<string, WorkQueuePtr>* ptr_noide_to_wq_map):
+IoChannelI::IoChannelI(unordered_map<string, WorkQueuePtr>* ptr_noide_to_wq_map):
   ptr_noide_to_wq_map_(ptr_noide_to_wq_map){}
 #else
-IoChannelI::IoChannelI(map<string, shared_ptr<ClientConnection>>* ptr_client_conn_map):
+IoChannelI::IoChannelI(unordered_map<string, shared_ptr<ClientConnection>>* ptr_client_conn_map):
   ptr_client_conn_map_(ptr_client_conn_map){}
 #endif
 

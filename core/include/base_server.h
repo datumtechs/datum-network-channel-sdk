@@ -10,7 +10,6 @@
 #include <memory>
 #include <iostream>
 #include <cmath>
-#include <map>
 #include "assert.h"
 #include <Ice/Ice.h>
 #include <io_channel_ice.h>
@@ -43,6 +42,6 @@ protected:
 	shared_ptr<Ice::CommunicatorHolder> ptr_holder_;
 	Ice::CommunicatorPtr ptr_communicator_;
 	Ice::ObjectAdapterPtr ptr_adapter_;
-	map<string, shared_ptr<ClientConnection>>* ptr_client_conn_map_ = nullptr;
+	unordered_map<string, shared_ptr<ClientConnection>>* ptr_client_conn_map_ = nullptr;
 };
 

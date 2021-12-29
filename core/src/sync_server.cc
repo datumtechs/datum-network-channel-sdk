@@ -11,7 +11,7 @@ bool SyncServer::wait()
 }
 
 SyncServer::SyncServer(const NodeInfo& server_info, 
-    map<string, shared_ptr<ClientConnection>>* ptr_client_conn_map): BaseServer(server_info)
+    unordered_map<string, shared_ptr<ClientConnection>>* ptr_client_conn_map): BaseServer(server_info)
 {
 	string proxy_name = "IoChannel";
 	Ice::Identity id ;

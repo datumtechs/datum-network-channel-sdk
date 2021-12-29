@@ -26,13 +26,11 @@ ssize_t SyncClient::send(const string& self_nodeid, const string& remote_nodeid,
   do {
     int status = 1;
     auto time = std::chrono::steady_clock::now().time_since_epoch().count();
-    // cout << "客户端开始发送时间戳:" << time << endl;
     try{
       Ice::Context context;
       status = stub_->send(self_nodeid, msg_id, vec_send_data, context);
     } catch (const Ice::Exception& ex) {
         cerr << ex << endl;
-        sleep(1);
         status = 1;
     }
     
@@ -47,8 +45,10 @@ ssize_t SyncClient::send(const string& self_nodeid, const string& remote_nodeid,
 
       if(elapsed >= timeout)
       {
+        cout << "send data timeout, please check." << endl;
         return 0;
       }
+      sleep(1);
     }
   } while(true);
 

@@ -4,6 +4,7 @@
 #include <sstream>
 #include <iostream>
 #include <stdlib.h>
+#include <unistd.h>
 using namespace std;
 
 
@@ -28,28 +29,38 @@ int main(int argc, char *argv[])
     string io_config_str = readFileIntoString(fn);
     cout << io_config_str << endl;
 
-    IoChannelImpl io_impl;
-
     // 启动服务
     string address = "";
     bool is_start_server = false;
-    // 创建io
-    shared_ptr<BasicIO> io_ = io_impl.CreateChannel("p1", io_config_str, 
-            is_start_server);
+    string self_nid = "p1";
+    IChannel* ptr_channel = 
+            IoChannelImpl::Instance()->CreateIoChannel(self_nid, io_config_str, nullptr);
 
-    cout << "start send========" << endl;
+    cout << "create io channel succeed, self nodeid:" << self_nid << endl;
     // 创建channel
-    TcpChannel channel_(io_);
     string send_nodeid = "p0";
     string send_msg_id = "0x1111";
     string data = "this is p1 client send msg!";
-    channel_.Send(send_nodeid, send_msg_id, data);
-    
-    if(is_start_server)
+    int64_t timeout = 10000;
+    cout << "start send111========" << endl;
+    ptr_channel->Send(send_nodeid.c_str(), send_msg_id.c_str(), data.c_str(), data.size(), timeout);
+
+    this_thread::sleep_for(std::chrono::milliseconds(timeout));
+    cout << "start send222========" << endl;
+    ptr_channel->Send(send_nodeid.c_str(), send_msg_id.c_str(), data.c_str(), data.size(), timeout);
+
+    cout << "start cycle to send========" << endl;
+    timeout = 5000;
+    int i = 0;
+    while(true) 
     {
-        io_impl.WaitServer();
+        this_thread::sleep_for(std::chrono::milliseconds(timeout));
+        ++i;
+        data = std::to_string(i);
+        cout << "Send, nodeid:" << send_nodeid << ", msg_id:"  << send_msg_id 
+            << ", data:" << data << endl;
+        ptr_channel->Send(send_nodeid.c_str(), send_msg_id.c_str(), data.c_str(), data.size(), timeout);
     }
     
     return 0;
 }
-
