@@ -36,12 +36,10 @@ void WorkQueue::run()
     }
 
     //
-    // Throw exception for any outstanding requests.
+    // Throw exception for any outstanding requests
     //
-    list<CallbackEntry>::const_iterator p;
-    for(p = _callbacks.begin(); p != _callbacks.end(); ++p)
-    {
-        (*p)._cb->ice_exception(SendDataException());
+    for(auto& p: _callbacks) {
+        p._cb->ice_exception(SendDataException());
     }
 }
 
@@ -54,12 +52,13 @@ void WorkQueue::add(const AMD_IoChannel_sendPtr& cb, const string& msgid, const 
         //
         // Add work item.
         //
-        CallbackEntry entry(cb, msgid, data);
+        // CallbackEntry entry(cb, msgid, data);
         if(0 == _callbacks.size())
         {
             _monitor.notify();
         }
-        _callbacks.push_back(entry);
+        // _callbacks.push_back(entry);
+        _callbacks.emplace_back(cb, msgid, data);
     }
     else
     {

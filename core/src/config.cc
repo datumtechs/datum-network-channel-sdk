@@ -126,17 +126,17 @@ vector<NODE_TYPE> ChannelConfig::GetNodeType(const string& node_id) {
   vector<NODE_TYPE> node_types;
   for (int i = 0; i < data_config_.P.size(); i++) {
     if (node_id == data_config_.P[i].NODE_ID)
-      node_types.push_back(NODE_TYPE_DATA);
+      node_types.emplace_back(NODE_TYPE_DATA);
   }
 
   for (int i = 0; i < compute_config_.P.size(); i++) {
     if (node_id == compute_config_.P[i].NODE_ID)
-      node_types.push_back(NODE_TYPE_COMPUTE);
+      node_types.emplace_back(NODE_TYPE_COMPUTE);
   }
 
   for (int i = 0; i < result_config_.P.size(); i++) {
     if (node_id == result_config_.P[i].NODE_ID)
-      node_types.push_back(NODE_TYPE_RESULT);
+      node_types.emplace_back(NODE_TYPE_RESULT);
   }
 
   return node_types;
@@ -508,8 +508,8 @@ bool ChannelConfig::GetNodeInfos(vector<string>& clientNodeIds, vector<ViaInfo>&
     #endif
       // cout << "id: " << nid << ", via: " << viaTmp.via << ", address: " << viaTmp.address << endl;
       serverInfos.push_back(viaTmp);
-      clientNodeIds.push_back(nid);
-      nodeid_set.insert(nid);
+      clientNodeIds.emplace_back(nid);
+      nodeid_set.emplace(nid);
     }
   }  
   return true;

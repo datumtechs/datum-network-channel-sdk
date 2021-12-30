@@ -53,7 +53,7 @@ bool ViaNetIO::init(const string& taskid, const useconds_t usec)
     string server_node_id =  via_server_infos_[i].id;
 #if ASYNC_CLIENT
     nid_to_server_map_[server_node_id]  = make_shared<AsyncClient>(via_server_infos_[i], taskid);
-    clients_thread_.push_back(std::thread(&AsyncClient::AsyncCompleteRpc, nid_to_server_map_[server_node_id]));
+    clients_thread_.emplace_back(std::thread(&AsyncClient::AsyncCompleteRpc, nid_to_server_map_[server_node_id]));
     // gpr_log(GPR_INFO, "init async client connect, sids: %s.", via_server_infos_[i].id.c_str()); 
 #else
     nid_to_server_map_[server_node_id] = make_shared<SyncClient>(via_server_infos_[i], taskid);

@@ -14,12 +14,16 @@ bool ClientConnection::write(const string& msgid, const bytes& data)
   if(iter == map_queue_.end())
   {
     shared_ptr<queue<bytes>> ptr_data_queue_ = make_shared<queue<bytes>>();
-    ptr_data_queue_->push(data);
-    map_queue_.insert(std::pair<string,  shared_ptr<queue<bytes>>>(msgid, ptr_data_queue_));
+    // ptr_data_queue_->push(data);
+    // map_queue_.insert(std::pair<string, shared_ptr<queue<bytes>>>(msgid, ptr_data_queue_));
+
+    ptr_data_queue_->emplace(data);
+    map_queue_.emplace(msgid, ptr_data_queue_);
   }
   else
   {
-    iter->second->push(data);
+    // iter->second->push(data);
+    iter->second->emplace(data);
   }
   cv_.notify_all();
   return true;
