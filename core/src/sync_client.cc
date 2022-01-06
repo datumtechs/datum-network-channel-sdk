@@ -1,6 +1,5 @@
 // file sync_client.cc
 #include "sync_client.h"
-
 #include <thread>
 #include <chrono>   
 using namespace chrono;

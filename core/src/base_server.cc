@@ -1,5 +1,6 @@
 // file base_server.cc
 #include "base_server.h"
+#include "const.h"
 #include <thread>
 #include <chrono>   
 using namespace chrono;
@@ -71,11 +72,9 @@ BaseServer::BaseServer(const NodeInfo& server_info)
 	// cout << "BaseServer::BaseServer endpoints:" << endpoints << endl;
 
 	// set properties
-	string key_endpoints = "IoChannel.Endpoints";
-	string value_endpoints = endpoints;
 	Ice::InitializationData initData;
 	initData.properties = Ice::createProperties();
-	initData.properties->setProperty(key_endpoints, value_endpoints);
+	initData.properties->setProperty(c_server_endpoints_key, endpoints);
 	// There is no limit to the size of the received message
 	initData.properties->setProperty("Ice.MessageSizeMax", "0");
 	// initData.properties->setProperty("Ice.Trace.Protocol", "1");
@@ -83,5 +82,5 @@ BaseServer::BaseServer(const NodeInfo& server_info)
 	
 	ptr_holder_ = make_shared<Ice::CommunicatorHolder>(initData);
 	ptr_communicator_ = ptr_holder_->communicator();
-	ptr_adapter_ = ptr_communicator_->createObjectAdapter("IoChannel");
+	ptr_adapter_ = ptr_communicator_->createObjectAdapter(c_server_adapter_name);
 }

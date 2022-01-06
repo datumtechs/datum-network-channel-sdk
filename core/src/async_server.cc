@@ -30,9 +30,8 @@ AsyncServer::AsyncServer(const NodeInfo& server_info,
         map_noide_to_wq_[v.first] = new WorkQueue(v.first, v.second);
     }
 
-	string proxy_name = "IoChannel";
 	Ice::Identity id ;
-	id.name = proxy_name;
+	id.name = c_servant_id;
 	//增加一个适配器
     IoChannelPtr object = new IoChannelI(&map_noide_to_wq_);
 	ptr_adapter_->add(object, id);

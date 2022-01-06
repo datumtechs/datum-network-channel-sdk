@@ -10,7 +10,7 @@
 #include <cmath>
 #include "assert.h"
 #include "unistd.h"
-
+#include "const.h"
 #include <Ice/Ice.h>
 #include <io_channel_ice.h>
 #include <thread>

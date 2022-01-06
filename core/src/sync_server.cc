@@ -13,9 +13,8 @@ bool SyncServer::wait()
 SyncServer::SyncServer(const NodeInfo& server_info, 
     unordered_map<string, shared_ptr<ClientConnection>>* ptr_client_conn_map): BaseServer(server_info)
 {
-	string proxy_name = "IoChannel";
 	Ice::Identity id ;
-	id.name = proxy_name;
+	id.name = c_servant_id;
 	//增加一个适配器
     Ice::ObjectPtr object = new IoChannelI(ptr_client_conn_map);
 	ptr_adapter_->add(object, id);

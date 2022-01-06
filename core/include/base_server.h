@@ -2,6 +2,7 @@
 // file base_server.h
 #pragma once
 #include "config.h"
+#include "const.h"
 #include "IoChannelI.h"
 #include "client_connection.h"
 #include <unistd.h>

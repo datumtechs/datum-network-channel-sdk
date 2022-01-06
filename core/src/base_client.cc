@@ -1,6 +1,5 @@
 // file base_client.cc
 #include "base_client.h"
-
 // bool BaseClient::MakeCredentials(const ViaInfo& via_info)
 // {
 // 	#if(1 == SSL_TYPE)
@@ -62,15 +61,13 @@ BaseClient::BaseClient(const ViaInfo& via_info, const string& taskid)
 	int npos = serAddress.find(":");
 	string ip = serAddress.substr(0, npos);
 	string port = serAddress.substr(npos+1, serAddress.length());
-	string proxy_name = "IoChannel";
-	string endpoints = proxy_name + ":tcp -h " + ip + " -p " + port;
+	string endpoints = c_servant_id + ":tcp -h " + ip + " -p " + port;
 
 	// set properties
-	string key_proxy = "IoChannel.Proxy";
-	string value_proxy = endpoints;
+	string key_proxy = c_server_proxy_key;
 	Ice::InitializationData initData;
 	initData.properties = Ice::createProperties();
-	initData.properties->setProperty(key_proxy, value_proxy);
+	initData.properties->setProperty(key_proxy, endpoints);
 
 	ptr_holder_ = make_shared<Ice::CommunicatorHolder>(initData);
 	ptr_communicator_ = ptr_holder_->communicator();
