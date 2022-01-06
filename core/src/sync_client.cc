@@ -24,7 +24,7 @@ ssize_t SyncClient::send(const string& self_nodeid, const string& remote_nodeid,
 
   do {
     int status = 1;
-    auto time = std::chrono::steady_clock::now().time_since_epoch().count();
+    // auto time = std::chrono::steady_clock::now().time_since_epoch().count();
     try{
       Ice::Context context;
       status = stub_->send(self_nodeid, msg_id, vec_send_data, context);

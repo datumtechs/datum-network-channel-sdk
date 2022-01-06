@@ -1,5 +1,17 @@
 // file base_client.cc
 #include "base_client.h"
+#include <IceGrid/IceGrid.h>
+#include <Glacier2/Glacier2.h>
+
+class CloseCallbackI : public Ice::CloseCallback
+{
+public:
+    virtual void closed(const Ice::ConnectionPtr&)
+    {
+        cout << "The Glacier2 session has been destroyed." << endl;
+    }
+};
+
 // bool BaseClient::MakeCredentials(const ViaInfo& via_info)
 // {
 // 	#if(1 == SSL_TYPE)
@@ -56,25 +68,59 @@ BaseClient::~BaseClient()
 
 BaseClient::BaseClient(const ViaInfo& via_info, const string& taskid)
 {
+	// set properties
+	Ice::InitializationData initData;
+	initData.properties = Ice::createProperties();
 	task_id_ = taskid;
 	string serAddress = via_info.address;
 	int npos = serAddress.find(":");
-	string ip = serAddress.substr(0, npos);
-	string port = serAddress.substr(npos+1, serAddress.length());
-	string endpoints = c_servant_id + ":tcp -h " + ip + " -p " + port;
+	// 服务器地址为空，走Glacier2路由
+	if(-1 == npos) {
+		const string& ip = via_info.glacier2_info.Ip_;
+		const string& port = via_info.glacier2_info.Port_;
+		const string& app_name = via_info.glacier2_info.AppName_;
+		if(app_name.empty() || ip.empty() || port.empty()) {
+			string strErrMsg = "The service node: " + via_info.id + " doesn't configure Glacier2 address!";
+			cout << strErrMsg << endl;
+			throw (strErrMsg);
+		}
 
-	// set properties
-	string key_proxy = c_server_proxy_key;
-	Ice::InitializationData initData;
-	initData.properties = Ice::createProperties();
-	initData.properties->setProperty(key_proxy, endpoints);
+		// 设置Glacier2的路由信息, app_name为Glacier2服务名称, ip和port分别为Glacier2服务监听的地址以及端口
+		string strGlacier2Cfg = app_name + "/router:tcp -p " + port + " -h " + ip;
+		// cout << "strGlacier2Cfg:" << strGlacier2Cfg << endl;
+		initData.properties->setProperty(C_Glacier2_Router_Key, strGlacier2Cfg);
+      	ptr_holder_ = make_shared<Ice::CommunicatorHolder>(initData);
+		ptr_communicator_ = ptr_holder_->communicator();
+		
+		string servantAdapterId = C_Servant_Adapter_Id_Prefix + taskid + "_" + via_info.id;
+        string servantId = C_Servant_Id_Prefix + "_" + via_info.id;
+		// 寻找方式
+        string strProxy = servantId + "@" + servantAdapterId;
+		Glacier2::RouterPrx router = Glacier2::RouterPrx::checkedCast(ptr_communicator_->getDefaultRouter());
+    	Glacier2::SessionPrx session = router->createSession("", "");
 
-	ptr_holder_ = make_shared<Ice::CommunicatorHolder>(initData);
-	ptr_communicator_ = ptr_holder_->communicator();
-	
-	// uncheckedCast 函数从不进行远程调用
-	stub_ = Ice::uncheckedCast<IoChannelPrx>(
-		ptr_communicator_->propertyToProxy(key_proxy)->ice_twoway()->ice_timeout(-1)->ice_secure(false));
+		Ice::Int acmTimeout = router->getACMTimeout();
+		Ice::ConnectionPtr connection = router->ice_getCachedConnection();
+		assert(connection);
+		connection->setACM(acmTimeout, IceUtil::None, Ice::HeartbeatAlways);
+		connection->setCloseCallback(new CloseCallbackI());
+
+		stub_ = IoChannelPrx::uncheckedCast(ptr_communicator_->stringToProxy(strProxy));
+	} else {
+		// 直连
+		string ip = serAddress.substr(0, npos);
+		string port = serAddress.substr(npos+1, serAddress.length());
+		string endpoints = C_Servant_Id_Prefix + ":tcp -h " + ip + " -p " + port;
+		initData.properties->setProperty(C_Server_Proxy_Key, endpoints);
+
+		ptr_holder_ = make_shared<Ice::CommunicatorHolder>(initData);
+		ptr_communicator_ = ptr_holder_->communicator();
+		
+		// uncheckedCast 函数从不进行远程调用
+		stub_ = Ice::uncheckedCast<IoChannelPrx>(
+			ptr_communicator_->propertyToProxy(C_Server_Proxy_Key)->ice_twoway()->
+				ice_timeout(-1)->ice_secure(false));
+	}
 	if (!stub_)
 		throw "Invalid proxy";
 }

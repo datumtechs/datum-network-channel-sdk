@@ -22,6 +22,7 @@ public:
     bool wait();
     ~SyncServer(){close();}
 
-    SyncServer(const NodeInfo& server_info, unordered_map<string, shared_ptr<ClientConnection>>*);
+    SyncServer(const NodeInfo& server_info, const string& taskId, 
+        unordered_map<string, shared_ptr<ClientConnection>>*);
 };
 #endif

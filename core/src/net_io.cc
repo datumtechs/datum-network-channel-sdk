@@ -19,11 +19,11 @@ bool ViaNetIO::StartServer(const string& taskid, const NodeInfo& server_info,
 #if ASYNC_SERVER
   cout << "start async server, address:" << server_info.address << endl;
   // async server
-  server_ = make_shared<AsyncServer>(server_info, ptr_client_conn_map);
+  server_ = make_shared<AsyncServer>(server_info, taskid, ptr_client_conn_map);
 #else
   cout << "start sync server, address:" << server_info.address << endl;
   // sync server
-  server_ = make_shared<SyncServer>(server_info, ptr_client_conn_map);
+  server_ = make_shared<SyncServer>(server_info, taskid, ptr_client_conn_map);
 #endif
 
   return true;

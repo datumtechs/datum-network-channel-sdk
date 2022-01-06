@@ -21,8 +21,8 @@ bool AsyncServer::wait()
     return true;
 }
 
-AsyncServer::AsyncServer(const NodeInfo& server_info, 
-    unordered_map<string, shared_ptr<ClientConnection>>* ptr_client_conn_map): BaseServer(server_info)
+AsyncServer::AsyncServer(const NodeInfo& server_info, const string& taskId, 
+    unordered_map<string, shared_ptr<ClientConnection>>* ptr_client_conn_map): BaseServer(server_info, taskId)
 {
     for(auto &v : *ptr_client_conn_map)
     {
@@ -31,7 +31,7 @@ AsyncServer::AsyncServer(const NodeInfo& server_info,
     }
 
 	Ice::Identity id ;
-	id.name = c_servant_id;
+	id.name = C_Servant_Id_Prefix + "_" + server_info.id;
 	//增加一个适配器
     IoChannelPtr object = new IoChannelI(&map_noide_to_wq_);
 	ptr_adapter_->add(object, id);

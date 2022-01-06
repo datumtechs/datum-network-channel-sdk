@@ -24,7 +24,7 @@ public:
     bool wait();
     ~AsyncServer();
 
-    AsyncServer(const NodeInfo& server_info, 
+    AsyncServer(const NodeInfo& server_info, const string& taskId, 
         unordered_map<string, shared_ptr<ClientConnection>>* ptr_client_conn_map);
 private:
     // Each nodeID corresponds to a work queue, reducing queue query judgment.

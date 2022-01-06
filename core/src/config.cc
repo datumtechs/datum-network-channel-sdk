@@ -203,7 +203,7 @@ bool ChannelConfig::load(const string& node_id, const string& config_file) {
   return true;
 }
 
-bool ChannelConfig::parse_node_info(Document& doc, bool pass_via) 
+bool ChannelConfig::parse_node_info(Document& doc) 
 {
   if (doc.HasMember("NODE_INFO") && doc["NODE_INFO"].IsArray()) 
   {
@@ -218,6 +218,8 @@ bool ChannelConfig::parse_node_info(Document& doc, bool pass_via)
       // cout << "node info parse:" << cfg.node_.NODE_ID << endl;
       cfg.node_.ADDRESS = GetString(Node, "ADDRESS", "", false);
       cfg.node_.VIA = GetString(Node, "VIA", "", false);
+      cfg.node_.GRICER2 = GetString(Node, "GRICER2", "", false);
+      cfg.node_.ICEGRID = GetString(Node, "ICEGRID", "", false);
       cfg.node_.CA_CERT_PATH = GetString(doc, "ROOT_CERT", root_cert_.c_str(), false);
       #if(1 == SSL_TYPE)  
       {
@@ -240,14 +242,13 @@ bool ChannelConfig::parse_node_info(Document& doc, bool pass_via)
       #endif
 
       node_info_config_.insert(std::pair<string, NodeInfoConfig>(cfg.node_.NODE_ID, cfg));
-      if(pass_via_) 
-      {
-        nodeid_to_via_.insert(std::pair<string, string>(cfg.node_.NODE_ID, cfg.node_.VIA));
-      }
+      nodeid_to_via_.insert(std::pair<string, string>(cfg.node_.NODE_ID, cfg.node_.VIA));
+      nodeid_to_glacier2_.insert(std::pair<string, string>(cfg.node_.NODE_ID, cfg.node_.GRICER2));
+      nodeid_to_icegrid_.insert(std::pair<string, string>(cfg.node_.NODE_ID, cfg.node_.ICEGRID));
     }
     // cout << "parse " << Nodes.Size() << " node info success" << endl;
 
-    if (pass_via && doc.HasMember("VIA_INFO") && doc["VIA_INFO"].IsObject()) 
+    if (doc.HasMember("VIA_INFO") && doc["VIA_INFO"].IsObject()) 
     {
       Value& Vias = doc["VIA_INFO"];
 
@@ -257,8 +258,62 @@ bool ChannelConfig::parse_node_info(Document& doc, bool pass_via)
         string value = iter->value.GetString();
         via_to_address_.insert(std::pair<string, string>(name, value));
       }
+    }
+    
+    if (doc.HasMember("GRICER2_INFO") && doc["GRICER2_INFO"].IsObject()) 
+    {
+      Value& list_glacier2 = doc["GRICER2_INFO"];
+      for (auto iter = list_glacier2.MemberBegin(); iter != list_glacier2.MemberEnd(); iter++) 
+      {
+        string glacier2_name = iter->name.GetString();
+        if(list_glacier2[glacier2_name.c_str()].IsObject()) {
+          Value& glacier2_infos = list_glacier2[glacier2_name.c_str()];
+          IcePlugCfg glacier2_cfg;
+          for (auto iter = glacier2_infos.MemberBegin(); 
+              iter != glacier2_infos.MemberEnd(); iter++) 
+          {
+            string name = iter->name.GetString();
+            string value = iter->value.GetString();
+            if("APPNAME" == name) {
+              glacier2_cfg.AppName_ = value;
+            } else if ("IP" == name) {
+              glacier2_cfg.Ip_ = value;
+            } else if ("PORT" == name) {
+              glacier2_cfg.Port_ = value;
+            }
+            // cout << "name:" << name << ", value:" << value << endl;
+          }
+          glacier2_to_info_.insert(std::pair<string, IcePlugCfg>(glacier2_name, glacier2_cfg));
+        }
+      }
+    }
 
-    //  cout << "parse via info success" << endl;
+    if (doc.HasMember("ICE_GRID_INFO") && doc["ICE_GRID_INFO"].IsObject()) 
+    {
+      Value& list_iceGrid = doc["ICE_GRID_INFO"];
+      for (auto iter = list_iceGrid.MemberBegin(); iter != list_iceGrid.MemberEnd(); iter++) 
+      {
+        string grid_name = iter->name.GetString();
+        if(list_iceGrid[grid_name.c_str()].IsObject()) {
+          Value& grid_infos = list_iceGrid[grid_name.c_str()];
+          IcePlugCfg grid_cfg;
+          for (auto iter = grid_infos.MemberBegin(); 
+              iter != grid_infos.MemberEnd(); iter++) 
+          {
+            string name = iter->name.GetString();
+            string value = iter->value.GetString();
+            if("APPNAME" == name) {
+              grid_cfg.AppName_ = value;
+            } else if ("IP" == name) {
+              grid_cfg.Ip_ = value;
+            } else if ("PORT" == name) {
+              grid_cfg.Port_ = value;
+            }
+            // cout << "name:" << name << ", value:" << value << endl;
+          }
+          icegrid_to_info_.insert(std::pair<string, IcePlugCfg>(grid_name, grid_cfg));
+        }
+      }
     }
   }
   return true;
@@ -342,7 +397,6 @@ bool ChannelConfig::parse_result(Document& doc) {
 
 bool ChannelConfig::parse(Document& doc) {
   //! @todo the node_id__ID field in CONFIG.json have not yet used
-  // pass_via_ = GetBool(doc, "PASS_VIA", true, false);
   task_id_ = GetString(doc, "TASK_ID", "", false);
   root_cert_ = GetString(doc, "ROOT_CERT", "", false);
   log_level_ = GetInt(doc, "LOG_LEVEL", 2, false);
@@ -405,7 +459,7 @@ void ChannelConfig::CopyNodeInfo(NodeInfo& node_info, const Node& nodeInfo)
     node_info.client_enc_key_path_ = nodeInfo.CLIENT_ENC_KEY_PATH;
     node_info.client_enc_cert_path_ = nodeInfo.CLIENT_ENC_CERT_PATH;
   }
-#endif
+  #endif
 }
 
 bool ChannelConfig::isNodeType(const vector<NODE_TYPE>& vec_node_types, const NODE_TYPE nodeType)
@@ -449,12 +503,14 @@ bool ChannelConfig::GetNodeInfos(vector<string>& clientNodeIds, vector<ViaInfo>&
     // 获取计算节点的nodeid
     string nid = data_config_.P[i].NODE_ID;
     string via = nodeid_to_via_[nid];
+    string glacier2 = nodeid_to_glacier2_[nid];
     if (node_id != nid && nodeid_set.find(nid) == nodeid_set.end()) 
     {
       ViaInfo viaTmp;
       viaTmp.id = nid;
       viaTmp.via = via;
       viaTmp.address = via_to_address_[via];
+      viaTmp.glacier2_info = glacier2_to_info_[glacier2];
     #ifdef SSL_TYPE
       const Node& node = node_info_config_[nid].node_;
       GetCertInfosFromNode(viaTmp, node);
@@ -472,12 +528,14 @@ bool ChannelConfig::GetNodeInfos(vector<string>& clientNodeIds, vector<ViaInfo>&
     // 获取计算节点的nodeid
     string nid = compute_config_.P[i].NODE_ID;
     string via = nodeid_to_via_[nid];
+    string glacier2 = nodeid_to_glacier2_[nid];
     if (node_id != nid && nodeid_set.find(nid) == nodeid_set.end()) 
     {
       ViaInfo viaTmp;
       viaTmp.id = nid;
       viaTmp.via = via;
       viaTmp.address = via_to_address_[via];
+      viaTmp.glacier2_info = glacier2_to_info_[glacier2];
     #ifdef SSL_TYPE
       const Node& node = node_info_config_[nid].node_;
       GetCertInfosFromNode(viaTmp, node);
@@ -494,6 +552,7 @@ bool ChannelConfig::GetNodeInfos(vector<string>& clientNodeIds, vector<ViaInfo>&
     // cout << "handle compute node" << endl;
     string nid = result_config_.P[i].NODE_ID;
     string via = nodeid_to_via_[nid];
+    string glacier2 = nodeid_to_glacier2_[nid];
     if (node_id != nid && nodeid_set.find(nid) == nodeid_set.end()) 
     {
       ViaInfo viaTmp;
@@ -502,6 +561,7 @@ bool ChannelConfig::GetNodeInfos(vector<string>& clientNodeIds, vector<ViaInfo>&
       viaTmp.via = via;
       // via信息
       viaTmp.address = via_to_address_[viaTmp.via];
+      viaTmp.glacier2_info = glacier2_to_info_[glacier2];
     #ifdef SSL_TYPE
       const Node& node = node_info_config_[nid].node_;
       GetCertInfosFromNode(viaTmp, node);

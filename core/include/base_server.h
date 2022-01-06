@@ -21,7 +21,7 @@ using namespace std;
 class BaseServer
 {
 public:
-	BaseServer(const NodeInfo& server_info);
+	BaseServer(const NodeInfo& server_info, const string& taskId);
 	virtual ~BaseServer(){}
 
 protected:
@@ -40,6 +40,7 @@ protected:
 	}
 
 protected:
+	string taskId_;
 	shared_ptr<Ice::CommunicatorHolder> ptr_holder_;
 	Ice::CommunicatorPtr ptr_communicator_;
 	Ice::ObjectAdapterPtr ptr_adapter_;

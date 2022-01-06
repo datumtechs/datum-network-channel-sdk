@@ -10,11 +10,12 @@ bool SyncServer::wait()
     return true;
 }
 
-SyncServer::SyncServer(const NodeInfo& server_info, 
-    unordered_map<string, shared_ptr<ClientConnection>>* ptr_client_conn_map): BaseServer(server_info)
+SyncServer::SyncServer(const NodeInfo& server_info, const string& taskId,
+    unordered_map<string, shared_ptr<ClientConnection>>* ptr_client_conn_map): BaseServer(server_info, taskId)
 {
 	Ice::Identity id ;
-	id.name = c_servant_id;
+	id.name = C_Servant_Id_Prefix + "_" + server_info.id;
+
 	//增加一个适配器
     Ice::ObjectPtr object = new IoChannelI(ptr_client_conn_map);
 	ptr_adapter_->add(object, id);

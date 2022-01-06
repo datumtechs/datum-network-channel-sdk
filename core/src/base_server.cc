@@ -62,19 +62,40 @@ using namespace chrono;
 // }
 
 
-BaseServer::BaseServer(const NodeInfo& server_info)
+BaseServer::BaseServer(const NodeInfo& server_info, const string& taskId)
 {
-	string serAddress = server_info.address;
-	int npos = serAddress.find(":");
-	string ip = serAddress.substr(0, npos);
-	string port = serAddress.substr(npos+1, serAddress.length());
-	string endpoints = "tcp -h " + ip + " -p " + port;
-	// cout << "BaseServer::BaseServer endpoints:" << endpoints << endl;
-
+	taskId_ = taskId;
 	// set properties
 	Ice::InitializationData initData;
 	initData.properties = Ice::createProperties();
-	initData.properties->setProperty(c_server_endpoints_key, endpoints);
+	string serAddress = server_info.address;
+	int npos = serAddress.find(":");
+	if(-1 == npos) {
+		const string& ip = server_info.ice_grid_info.Ip_;
+		const string& port = server_info.ice_grid_info.Port_;
+		const string& app_name = server_info.ice_grid_info.AppName_;
+		if(app_name.empty() || ip.empty() || port.empty()) {
+			string strErrMsg = "The service node: " + server_info.id + " doesn't configure IceGrid address!";
+			cout << strErrMsg << endl;
+			throw (strErrMsg);
+		}
+		// 设置IceGrid的服务信息（用于servant信息的注册）
+        // string value_endpoints = "ChannelIceGrid/Locator:tcp -p 10032 -h 192.168.2.128";
+		string value_endpoints = app_name + "/Locator:tcp -p " + port + " -h " + ip;
+		// cout << "value_endpoints:" << value_endpoints << endl;
+        initData.properties->setProperty(C_IceGrid_Locator_Key, value_endpoints);
+        string servantAdapterId = C_Servant_Adapter_Id_Prefix + taskId_ + "_" + server_info.id;
+        initData.properties->setProperty(C_Servant_Endpoints_Key, C_Server_Tcp_Local);
+        initData.properties->setProperty(C_Servant_AdapterId_Key, servantAdapterId);
+	} else {
+		// 直连
+		string ip = serAddress.substr(0, npos);
+		string port = serAddress.substr(npos+1, serAddress.length());
+		string endpoints = "tcp -h " + ip + " -p " + port;
+		// cout << "BaseServer::BaseServer endpoints:" << endpoints << endl;
+		initData.properties->setProperty(C_Servant_Endpoints_Key, endpoints);
+	}
+
 	// There is no limit to the size of the received message
 	initData.properties->setProperty("Ice.MessageSizeMax", "0");
 	// initData.properties->setProperty("Ice.Trace.Protocol", "1");
@@ -82,5 +103,5 @@ BaseServer::BaseServer(const NodeInfo& server_info)
 	
 	ptr_holder_ = make_shared<Ice::CommunicatorHolder>(initData);
 	ptr_communicator_ = ptr_holder_->communicator();
-	ptr_adapter_ = ptr_communicator_->createObjectAdapter(c_server_adapter_name);
+	ptr_adapter_ = ptr_communicator_->createObjectAdapter(C_Servant_Adapter_Name);
 }

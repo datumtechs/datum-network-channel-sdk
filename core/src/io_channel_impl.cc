@@ -47,7 +47,6 @@ IChannel* IoChannelImpl::CreateIoChannel(const string& node_id, const string &co
         error_callback error_cb) 
 {
   shared_ptr<ChannelConfig> config = make_shared<ChannelConfig>(config_str);
-
   NodeInfo node_info;
   vector<ViaInfo> serverInfos;
   // 根据nodeid获取数据节点或计算节点或接收结果节点信息
@@ -58,6 +57,14 @@ IChannel* IoChannelImpl::CreateIoChannel(const string& node_id, const string &co
   // 获取本节点对应的via地址
   string via_name = config->nodeid_to_via_[node_info.id];
   node_info.via_address = config->via_to_address_[via_name];
+  // 获取本节点对应的glacier2地址
+  string glacier2_name = config->nodeid_to_glacier2_[node_info.id];
+  node_info.glacier2_info = config->glacier2_to_info_[glacier2_name];
+
+  // 获取本节点对应的IceGrid地址
+  string ice_grid_name = config->nodeid_to_icegrid_[node_info.id];
+  node_info.ice_grid_info = config->icegrid_to_info_[ice_grid_name];
+  /*
   if("" == node_info.via_address)
   {
     string strErrMsg = "The service node " + node_info.id + " does not have a VIA address!";
@@ -71,6 +78,7 @@ IChannel* IoChannelImpl::CreateIoChannel(const string& node_id, const string &co
     cout << strErrMsg << endl;
     throw (strErrMsg);
   }
+  */
     
   vector<string> clientNodeIds; 
   config->GetNodeInfos(clientNodeIds, serverInfos, node_id);

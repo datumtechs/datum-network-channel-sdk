@@ -17,6 +17,8 @@ struct Node
   string NAME;
   string ADDRESS;
   string VIA;
+  string GRICER2;
+  string ICEGRID;
   string CA_CERT_PATH;
 
 #if(1 == SSL_TYPE)
@@ -43,6 +45,8 @@ struct Node
       NAME.assign(node.NAME);
       ADDRESS.assign(node.ADDRESS);
       VIA.assign(node.VIA);
+      GRICER2.assign(node.GRICER2);
+      ICEGRID.assign(node.ICEGRID);
       CA_CERT_PATH.assign(node.CA_CERT_PATH);
 
       #if(1==SSL_TYPE)
@@ -93,10 +97,25 @@ class ComputeNodeConfig {
   vector<Node> P;
 };
 
+// ICE插件配置结构体
+struct IcePlugCfg {
+  string AppName_;
+  string Ip_;
+  string Port_;
+
+  IcePlugCfg() = default;
+  IcePlugCfg(const string& AppName, const string& Ip, const string& Port):
+    AppName_(AppName), Ip_(Ip), Port_(Port){}
+};
+
 struct NodeInfo {
   string id;
   string address;
   string via_address;
+  // string glacier2_address;
+  // string ice_grid_address;
+  IcePlugCfg glacier2_info;
+  IcePlugCfg ice_grid_info;
   string ca_cert_path_;
 #if(1==SSL_TYPE) 
   string server_key_path_;
@@ -117,14 +136,22 @@ struct NodeInfo {
 #endif
 
   NodeInfo() = default;
-  NodeInfo(const string& node_id, const string& addr, const string& via_addr) 
-    : id(node_id), address(addr), via_address(via_addr){}
+  // NodeInfo(const string& node_id, const string& addr, const string& via_addr,
+  //   const string& glacier2_addr, const string& ice_grid_addr): id(node_id), address(addr), 
+  //     via_address(via_addr), glacier2_address(glacier2_addr), ice_grid_address(ice_grid_addr),
+  //     glacier2_info(), ice_grid_info(){}
+
+  NodeInfo(const string& node_id, const string& addr, const string& via_addr,
+    const string& glacier2_addr, const string& ice_grid_addr): id(node_id), address(addr), 
+      via_address(via_addr),glacier2_info(), ice_grid_info(){}
 };
 
 struct ViaInfo {
   string id;
   string address;
   string via;
+   // 客户端连接glacier2信息
+  IcePlugCfg glacier2_info;
   string server_cert_path_;
 
   #if(1==SSL_TYPE)  
@@ -138,8 +165,8 @@ struct ViaInfo {
   #endif
 
   ViaInfo() = default;
-  ViaInfo(const string& node_id, const string& addr, const string& via_) 
-    : id(node_id), address(addr), via(via_){}
+  ViaInfo(const string& node_id, const string& addr, const string& via_, const string& glacier2_addr) 
+    : id(node_id), address(addr), via(via_), glacier2_info(){}
 };
 
 enum NODE_TYPE {
@@ -164,7 +191,7 @@ class ChannelConfig {
  private:
   bool load(const string& node_id, const string& config_file);
   bool parse(Document& doc);
-  bool parse_node_info(Document& doc, bool pass_via=true);
+  bool parse_node_info(Document& doc);
   bool parse_data(Document& doc);
   bool parse_compute(Document& doc);
   bool parse_result(Document& doc);
@@ -174,7 +201,6 @@ class ChannelConfig {
 
  public:
   string node_id_ = ""; // NOT USE AT PRESENT
-  bool pass_via_ = "true"; 
   string task_id_ = "";
   string root_cert_ = "";
   uint8_t log_level_ = 0; // 0:Debug, 1:Info, 2: Error
@@ -183,6 +209,11 @@ class ChannelConfig {
   map<string, NodeInfoConfig> node_info_config_;
   map<string, string> nodeid_to_via_;
   map<string, string> via_to_address_;
+  // ice config
+  map<string, string> nodeid_to_glacier2_;
+  map<string, string> nodeid_to_icegrid_;
+  map<string, IcePlugCfg> glacier2_to_info_;
+  map<string, IcePlugCfg> icegrid_to_info_;
   vector<string> data_nodes_;
   map<string, int> compute_nodes_;
   vector<string> result_nodes_;
