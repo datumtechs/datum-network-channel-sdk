@@ -1,0 +1,14 @@
+IceGrid.InstanceName=ChannelIceGrid2
+
+# IceGrid地址和ip
+Ice.Default.Locator=ChannelIceGrid2/Locator:tcp -p 10032 -h 192.168.2.128
+
+IceGrid.Registry.ReplicaName=Master
+IceGrid.Registry.Client.Endpoints=tcp -p 10032 -h 192.168.2.128
+IceGrid.Registry.Server.Endpoints=tcp -h 192.168.2.128
+IceGrid.Registry.Internal.Endpoints=tcp -h 192.168.2.128
+
+IceGrid.Registry.PermissionsVerifier=ChannelIceGrid2/NullPermissionsVerifier
+IceGrid.Registry.LMDB.MapSize=10
+IceGrid.Registry.LMDB.Path=deploy/lmdb/registry
+IceGrid.Registry.DynamicRegistration=1

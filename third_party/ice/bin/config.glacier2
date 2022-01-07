@@ -1,0 +1,21 @@
+Glacier2.InstanceName=ChannelGlacier2
+
+# 配置Registry的地址
+Ice.Default.Locator=ChannelIceGrid2/Locator:tcp -p 10032 -h 192.168.2.128
+
+Glacier2.Client.Endpoints=tcp -p 10031 -h 192.168.2.128
+Glacier2.PermissionsVerifier=ChannelGlacier2/NullPermissionsVerifier
+Glacier2.SessionTimeout=30
+Glacier2.Client.ForwardContext=1
+Glacier2.Server.ForwardContext=1
+
+# 设置跟踪日志
+Glacier2.Client.Trace.Reject=1
+# Glacier2.Client.Trace.Request=1
+# Glacier2.Server.Trace.Request=1
+# Glacier2.Client.Trace.Override=1
+# Glacier2.Server.Trace.Override=1
+# Glacier2.Trace.Session=1
+# Glacier2.Trace.RoutingTable=1
+
+Ice.Warn.Connections=1
