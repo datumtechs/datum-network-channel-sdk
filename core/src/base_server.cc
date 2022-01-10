@@ -92,7 +92,6 @@ BaseServer::BaseServer(const NodeInfo& server_info, const string& taskId)
 		string ip = serAddress.substr(0, npos);
 		string port = serAddress.substr(npos+1, serAddress.length());
 		string endpoints = "tcp -h " + ip + " -p " + port;
-		// cout << "BaseServer::BaseServer endpoints:" << endpoints << endl;
 		initData.properties->setProperty(C_Servant_Endpoints_Key, endpoints);
 	}
 

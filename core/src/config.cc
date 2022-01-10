@@ -509,13 +509,16 @@ bool ChannelConfig::GetNodeInfos(vector<string>& clientNodeIds, vector<ViaInfo>&
       ViaInfo viaTmp;
       viaTmp.id = nid;
       viaTmp.via = via;
-      viaTmp.address = via_to_address_[via];
+      viaTmp.via_address = via_to_address_[via];
+      if(viaTmp.via_address.empty()) {
+        viaTmp.via_address = data_config_.P[i].ADDRESS;
+      }
       viaTmp.glacier2_info = glacier2_to_info_[glacier2];
     #ifdef SSL_TYPE
       const Node& node = node_info_config_[nid].node_;
       GetCertInfosFromNode(viaTmp, node);
     #endif
-      // cout << "id: " << nid << ", via: " << viaTmp.via << ", address: " << viaTmp.address << endl;
+      // cout << "id: " << nid << ", via: " << viaTmp.via << ", via_address: " << viaTmp.via_address << endl;
       serverInfos.push_back(viaTmp);
       clientNodeIds.push_back(nid);
       nodeid_set.insert(nid);
@@ -534,13 +537,16 @@ bool ChannelConfig::GetNodeInfos(vector<string>& clientNodeIds, vector<ViaInfo>&
       ViaInfo viaTmp;
       viaTmp.id = nid;
       viaTmp.via = via;
-      viaTmp.address = via_to_address_[via];
+      viaTmp.via_address = via_to_address_[via];
+      if(viaTmp.via_address.empty()) {
+        viaTmp.via_address = compute_config_.P[i].ADDRESS;
+      }
       viaTmp.glacier2_info = glacier2_to_info_[glacier2];
     #ifdef SSL_TYPE
       const Node& node = node_info_config_[nid].node_;
       GetCertInfosFromNode(viaTmp, node);
     #endif
-      // cout << "id: " << nid << ", via: " << viaTmp.via << ", address: " << viaTmp.address << endl;
+      // cout << "id: " << nid << ", via: " << viaTmp.via << ", via_address: " << viaTmp.via_address << endl;
       serverInfos.push_back(viaTmp);
       clientNodeIds.push_back(nid);
       nodeid_set.insert(nid);
@@ -560,13 +566,16 @@ bool ChannelConfig::GetNodeInfos(vector<string>& clientNodeIds, vector<ViaInfo>&
       // 节点所在via
       viaTmp.via = via;
       // via信息
-      viaTmp.address = via_to_address_[viaTmp.via];
+      viaTmp.via_address = via_to_address_[viaTmp.via];
+      if(viaTmp.via_address.empty()) {
+        viaTmp.via_address = result_config_.P[i].ADDRESS;
+      }
       viaTmp.glacier2_info = glacier2_to_info_[glacier2];
     #ifdef SSL_TYPE
       const Node& node = node_info_config_[nid].node_;
       GetCertInfosFromNode(viaTmp, node);
     #endif
-      // cout << "id: " << nid << ", via: " << viaTmp.via << ", address: " << viaTmp.address << endl;
+      // cout << "id: " << nid << ", via: " << viaTmp.via << ", address: " << viaTmp.via_address << endl;
       serverInfos.push_back(viaTmp);
       clientNodeIds.emplace_back(nid);
       nodeid_set.emplace(nid);

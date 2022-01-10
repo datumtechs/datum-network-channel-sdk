@@ -72,7 +72,7 @@ BaseClient::BaseClient(const ViaInfo& via_info, const string& taskid)
 	Ice::InitializationData initData;
 	initData.properties = Ice::createProperties();
 	task_id_ = taskid;
-	string serAddress = via_info.address;
+	string serAddress = via_info.via_address;
 	int npos = serAddress.find(":");
 	// 服务器地址为空，走Glacier2路由
 	if(-1 == npos) {
@@ -89,6 +89,7 @@ BaseClient::BaseClient(const ViaInfo& via_info, const string& taskid)
 		string strGlacier2Cfg = app_name + "/router:tcp -p " + port + " -h " + ip;
 		// cout << "strGlacier2Cfg:" << strGlacier2Cfg << endl;
 		initData.properties->setProperty(C_Glacier2_Router_Key, strGlacier2Cfg);
+		initData.properties->setProperty("Ice.MessageSizeMax", "0");
       	ptr_holder_ = make_shared<Ice::CommunicatorHolder>(initData);
 		ptr_communicator_ = ptr_holder_->communicator();
 		
@@ -110,9 +111,10 @@ BaseClient::BaseClient(const ViaInfo& via_info, const string& taskid)
 		// 直连
 		string ip = serAddress.substr(0, npos);
 		string port = serAddress.substr(npos+1, serAddress.length());
-		string endpoints = C_Servant_Id_Prefix + ":tcp -h " + ip + " -p " + port;
+		string servantId = C_Servant_Id_Prefix + "_" + via_info.id;
+		string endpoints = servantId + ":tcp -h " + ip + " -p " + port;
 		initData.properties->setProperty(C_Server_Proxy_Key, endpoints);
-
+		initData.properties->setProperty("Ice.MessageSizeMax", "0");
 		ptr_holder_ = make_shared<Ice::CommunicatorHolder>(initData);
 		ptr_communicator_ = ptr_holder_->communicator();
 		
@@ -149,7 +151,7 @@ bool BaseClient::CheckConnect(const useconds_t usec)
 // {
 // 	task_id_ = taskid;
 // 	ViaInfo via_info;
-// 	via_info.address = node_info.via_address;
+// 	via_info.via_address = node_info.via_address;
 	
 // 	#if(1 == SSL_TYPE)
 // 		via_info.server_cert_path_ = node_info.ca_cert_path_;
@@ -164,7 +166,7 @@ bool BaseClient::CheckConnect(const useconds_t usec)
 // 	#endif
 
 // 	if(!MakeCredentials(via_info)){return;}
-// 	auto channel = grpc::CreateChannel(via_info.address, creds_);
+// 	auto channel = grpc::CreateChannel(via_info.via_address, creds_);
 // 	via_stub_ = VIAService::NewStub(channel);
 // }
 

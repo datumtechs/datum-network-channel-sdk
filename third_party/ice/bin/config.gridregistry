@@ -12,3 +12,5 @@ IceGrid.Registry.PermissionsVerifier=ChannelIceGrid2/NullPermissionsVerifier
 IceGrid.Registry.LMDB.MapSize=10
 IceGrid.Registry.LMDB.Path=deploy/lmdb/registry
 IceGrid.Registry.DynamicRegistration=1
+
+Ice.MessageSizeMax=0

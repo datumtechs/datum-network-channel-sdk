@@ -148,7 +148,7 @@ struct NodeInfo {
 
 struct ViaInfo {
   string id;
-  string address;
+  string via_address;
   string via;
    // 客户端连接glacier2信息
   IcePlugCfg glacier2_info;
@@ -165,8 +165,8 @@ struct ViaInfo {
   #endif
 
   ViaInfo() = default;
-  ViaInfo(const string& node_id, const string& addr, const string& via_, const string& glacier2_addr) 
-    : id(node_id), address(addr), via(via_), glacier2_info(){}
+  ViaInfo(const string& node_id, const string& via_addr, const string& via_, const string& glacier2_addr) 
+    : id(node_id), via_address(via_addr), via(via_), glacier2_info(){}
 };
 
 enum NODE_TYPE {
