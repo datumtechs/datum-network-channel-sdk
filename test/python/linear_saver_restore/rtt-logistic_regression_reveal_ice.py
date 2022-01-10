@@ -18,7 +18,7 @@ _parser.add_argument('--node_id', type=str, help="Node ID",
 _args, _unparsed = _parser.parse_known_args()
 node_id_ = _args.node_id
 
-configFilePath = 'config.json'
+configFilePath = 'config_ice.json'
 
 file_path = os.path.split(os.path.realpath(__file__))[0]
 config_file = os.path.join(file_path, configFilePath)
