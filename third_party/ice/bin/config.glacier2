@@ -1,8 +1,9 @@
 Glacier2.InstanceName=ChannelGlacier2
 
-# 配置Registry的地址
+# 配置IceGrid服务的ip和端口
 Ice.Default.Locator=ChannelIceGrid2/Locator:tcp -p 10032 -h 192.168.2.128
 
+# Glacier2服务的ip和端口
 Glacier2.Client.Endpoints=tcp -p 10031 -h 192.168.2.128
 Glacier2.PermissionsVerifier=ChannelGlacier2/NullPermissionsVerifier
 Glacier2.SessionTimeout=30
