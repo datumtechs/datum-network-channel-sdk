@@ -197,6 +197,26 @@ Channel Sdk通过使用IceGrid进行服务注册，和Ice的Glacier2进行消息
 
 > 为了避免误操作将服务进程退出，IceGrid服务在后台运行，服务日志文件在当前的logs目录下；
 
+### 查看ICE服务进程
+
+执行脚本：
+
+```bash
+./status.sh
+```
+
+> 服务启动成功后可看到IceGrid和Glacier2服务进程状态和对应的监听日志进程。
+
+### 退出ICE服务进程
+
+执行脚本：
+
+```bash
+./killall.sh
+```
+
+> 此命令可将IceGrid和Glacier2服务进程退出，并退出监听日志进程。
+
 ## 测试
 
 ### 单独使用测试
