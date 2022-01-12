@@ -8,7 +8,8 @@
 
 using namespace ChannelSdk;
 
-class IoChannelI : public ChannelSdk::IoChannel 
+// class IoChannelI : public ChannelSdk::IoChannel 
+class IoChannelI : public Ice::Blobject
 {
 public:
 #ifdef ASYNC_SERVER
@@ -17,8 +18,12 @@ public:
    IoChannelI(unordered_map<string, shared_ptr<ClientConnection>>*);
 #endif
 
+   // static call
    virtual void send_async(const AMD_IoChannel_sendPtr&, const string& nodeid, 
       const string& msgid, const bytes& data, const Ice::Current&);
+
+   // dynamic call
+   virtual bool ice_invoke(const std::vector<Ice::Byte>&, std::vector<Ice::Byte>&, const Ice::Current&);
 
 private:
 #ifdef ASYNC_SERVER

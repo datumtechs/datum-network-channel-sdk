@@ -59,7 +59,8 @@ bool ViaNetIO::init(const shared_ptr<ChannelConfig> config)
 #else
     nid_to_server_map_[server_node_id] = make_shared<SyncClient>(via_server_infos_[i], taskid);
     nid_to_server_map_[server_node_id]->SetSendTimeOut(config->send_timeout_*1000);
-    nid_to_server_map_[server_node_id]->CheckConnect(config->conn_timeout_*1000, config->ping_time_*1000000);
+    // nid_to_server_map_[server_node_id]->CheckByStaticCall(config->conn_timeout_*1000, config->ping_time_*1000000);
+    nid_to_server_map_[server_node_id]->CheckByDynamicCall(config->conn_timeout_*1000, config->ping_time_*1000000);
     // gpr_log(GPR_INFO, "init sync client connect, sids: %s.", via_server_infos_[i].id.c_str());
 #endif
   
