@@ -401,6 +401,8 @@ bool ChannelConfig::parse(Document& doc) {
   root_cert_ = GetString(doc, "ROOT_CERT", "", false);
   log_level_ = GetInt(doc, "LOG_LEVEL", 2, false);
   ping_time_ = GetFloat(doc, "PING_TIME", 1.0, false);
+  send_timeout_ = GetFloat(doc, "SEND_TIMEOUT", 5.0, false);
+  conn_timeout_ = GetFloat(doc, "CONNECT_TIMEOUT", 5.0, false);
   if(2 < log_level_)
     log_level_ = 2;
   if (!parse_node_info(doc)) {

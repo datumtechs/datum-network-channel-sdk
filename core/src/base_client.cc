@@ -2,6 +2,9 @@
 #include "base_client.h"
 #include <IceGrid/IceGrid.h>
 #include <Glacier2/Glacier2.h>
+#include <thread>
+#include <chrono>   
+using namespace chrono;
 
 class CloseCallbackI : public Ice::CloseCallback
 {
@@ -68,6 +71,7 @@ BaseClient::~BaseClient()
 
 BaseClient::BaseClient(const ViaInfo& via_info, const string& taskid)
 {
+	remote_nid_ = via_info.id;
 	// set properties
 	Ice::InitializationData initData;
 	initData.properties = Ice::createProperties();
@@ -127,17 +131,31 @@ BaseClient::BaseClient(const ViaInfo& via_info, const string& taskid)
 		throw "Invalid proxy";
 }
 
-bool BaseClient::CheckConnect(const useconds_t usec)
+bool BaseClient::CheckConnect(const uint64_t conn_timeout, const useconds_t usec)
 {
+	auto start_time = system_clock::now();
+	auto end_time   = start_time;
+	int64_t elapsed = 0;
 	do
 	{
 		try 
 		{
+			cout << "Attempt to connect to the remote node:" << remote_nid_ << endl;
 			stub_->ice_ping();
 		}
 		catch (const Ice::Exception& ex) 
 		{
 			// cerr << ex << endl;
+			end_time = system_clock::now();
+			elapsed = duration_cast<duration<int64_t, std::milli>>(end_time - start_time).count();
+			if(elapsed >= conn_timeout)
+			{        
+				string strErrMsg = "connect to remote nodeid:" + remote_nid_ + " timeout, The timeout period is: " + 
+				to_string(conn_timeout) + "ms.";
+				cout << strErrMsg << endl;
+				throw (strErrMsg);
+				// return 0;
+			}
 			usleep(usec);
 			continue;
 		}

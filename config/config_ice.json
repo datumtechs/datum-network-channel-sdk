@@ -1,22 +1,24 @@
 {
 	"TASK_ID": "task:0x0710cbc802457d4a5c228b1769c2925320a5ad3574ab44585b624c9839e98c7f",
 	"PING_TIME": 1,
+	"SEND_TIMEOUT": 10.0,
+	"CONNECT_TIMEOUT": 10.0,
 	"NODE_INFO": [
 		{
 			"NODE_ID": "p0",
-			"ADDRESS": " ",
+			"ADDRESS": "",
 			"GRICER2": "VIA0",
 			"ICEGRID": "GRID0"
 		},
 		{
 			"NODE_ID": "p1",
-			"ADDRESS": " ",
+			"ADDRESS": "",
 			"GRICER2": "VIA0",
 			"ICEGRID": "GRID0"
 		},
 		{
 			"NODE_ID": "p2",
-			"ADDRESS": " ",
+			"ADDRESS": "",
 			"GRICER2": "VIA0",
 			"ICEGRID": "GRID0"
 		}

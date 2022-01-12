@@ -12,19 +12,15 @@ SyncClient::SyncClient(const ViaInfo& via_info, const string& taskid):
 
 ssize_t SyncClient::send(const string& self_nodeid, const string& remote_nodeid, 
     const string& msg_id, const char* data, const size_t nLen, int64_t timeout)
-{	
+{
   auto start_time = system_clock::now();
   auto end_time   = start_time;
   int64_t elapsed = 0;
-  system_clock::time_point deadline = start_time + std::chrono::milliseconds(timeout);
-  
   Ice::ByteSeq vec_send_data;
   vec_send_data.resize(nLen);
   memcpy(&vec_send_data[0], data, nLen);
-
   do {
     int status = 1;
-    // auto time = std::chrono::steady_clock::now().time_since_epoch().count();
     try{
       Ice::Context context;
       status = stub_->send(self_nodeid, msg_id, vec_send_data, context);
@@ -41,11 +37,13 @@ ssize_t SyncClient::send(const string& self_nodeid, const string& remote_nodeid,
     {
       end_time = system_clock::now();
       elapsed = duration_cast<duration<int64_t, std::milli>>(end_time - start_time).count();
-
-      if(elapsed >= timeout)
-      {
-        cout << "send data timeout, please check." << endl;
-        return 0;
+      if(elapsed >= send_timeout_)
+      {        
+        string strErrMsg = "send data to nodeid:" + remote_nodeid + " timeout, The timeout period is: " + 
+          to_string(send_timeout_) + "ms.";
+        cout << strErrMsg << endl;
+        throw (strErrMsg);
+        // return 0;
       }
       sleep(1);
     }

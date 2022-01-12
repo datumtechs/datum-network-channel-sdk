@@ -30,7 +30,7 @@ IChannel* IoChannelImpl::CreateViaChannel(const NodeInfo& node_info,
 {
   shared_ptr<BasicIO> net_io =  nullptr;
   net_io = make_shared<ViaNetIO>(node_info, serverInfos, clientNodeIds, error_callback);
-  if (net_io->init(config->task_id_, config->ping_time_*1000000)) 
+  if (net_io->init(config))
   { 
     TcpChannel* tcp_channel = new TcpChannel(net_io, config, node_info);
     tcp_channel->SetConnectedNodeIDs(clientNodeIds);
