@@ -17,17 +17,22 @@ bool IoChannelI::ice_invoke(const vector<Ice::Byte>& inParams, vector<Ice::Byte>
       Ice::CommunicatorPtr communicator = current.adapter->getCommunicator();
       Ice::InputStream in(communicator, inParams);
       in.startEncapsulation();
+      
+      // Ice::Context ctx = current.ctx;
+      // string nodeid = ctx["nodeid"];
+      // string msgid = ctx["msgid"];
 
-      Ice::Context ctx = current.ctx;
-      string nodeid = ctx["nodeid"];
-      string msgid = ctx["msgid"];
       // cout << "recv from nodeid:" << nodeid << ", msgid:" << msgid << endl;
-      bytes data;
-      in.read(data);
-      auto iter = ptr_client_conn_map_->find(nodeid);
+      // bytes data;
+      // in.read(data);
+
+      ChannelSdk::DataStruct recvData;
+      in.read(recvData);
+      // cout << "recv data from nodeid:" << recvData.nodeid << ", msgid:" << recvData.msgid << endl;
+      auto iter = ptr_client_conn_map_->find(recvData.nodeid);
       if(iter != ptr_client_conn_map_->end())
       {
-        iter->second->write(msgid, data);
+        iter->second->write(recvData.msgid, recvData.data);
       }
       in.endEncapsulation(); 
   }

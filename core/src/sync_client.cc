@@ -16,26 +16,35 @@ ssize_t SyncClient::send(const string& self_nodeid, const string& remote_nodeid,
   auto start_time = system_clock::now();
   auto end_time   = start_time;
   int64_t elapsed = 0;
-  Ice::ByteSeq vec_send_data;
-  vec_send_data.resize(nLen);
-  memcpy(&vec_send_data[0], data, nLen);
 
-  Ice::Context ctx;
-  ctx.insert(std::pair<string, string>("nodeid", self_nodeid));
-  ctx.insert(std::pair<string, string>("msgid", msg_id));
+  ChannelSdk::DataStruct sendData;
+  sendData.msgid = msg_id;
+  sendData.nodeid = self_nodeid;
+  sendData.data.resize(nLen);
+  memcpy(&sendData.data[0], data, nLen);
+  // Ice::ByteSeq vec_send_data;
+  // vec_send_data.resize(nLen);
+  // memcpy(&vec_send_data[0], data, nLen);
+
+  // Ice::Context ctx;
+  // ctx.insert(std::pair<string, string>("nodeid", self_nodeid));
+  // ctx.insert(std::pair<string, string>("msgid", msg_id));
 
   do {
     int status = 0;
     try{
+      // static call
       // Ice::Context context;
       // status = stub_->send(self_nodeid, msg_id, vec_send_data, context);
+
+      // dynamic call
       Ice::ByteSeq inParams, outParams;
       Ice::OutputStream out(ptr_communicator_);
       out.startEncapsulation();
-      out.write(vec_send_data);
+      out.write(sendData);
       out.endEncapsulation();
       out.finished(inParams);
-      if(!stub_->ice_invoke("send", Ice::Normal, inParams, outParams, ctx))
+      if(!stub_->ice_invoke("send", Ice::Normal, inParams, outParams))
       {
           cout << "Send data to remote node:" << remote_nid_ << " failed, wait..." << endl;
           status = 1;
