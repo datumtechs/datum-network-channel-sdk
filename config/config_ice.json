@@ -3,24 +3,37 @@
 	"PING_TIME": 1,
 	"SEND_TIMEOUT": 10.0,
 	"CONNECT_TIMEOUT": 10.0,
+	"ROOT_CERT": "ca.pem",
 	"NODE_INFO": [
 		{
 			"NODE_ID": "p0",
 			"ADDRESS": "",
 			"GRICER2": "VIA0",
-			"ICEGRID": "GRID0"
+			"ICEGRID": "GRID0",
+			"CERT_DIR": "/home/luodahui/core/channel-sdk/ssl/openssl",
+			"SERVER_CERT": "server.pem",
+			"CLIENT_CERT": "client.pem",
+			"PASSWORD": "123456"
 		},
 		{
 			"NODE_ID": "p1",
 			"ADDRESS": "",
 			"GRICER2": "VIA0",
-			"ICEGRID": "GRID0"
+			"ICEGRID": "GRID0",
+			"CERT_DIR": "/home/luodahui/core/channel-sdk/ssl/openssl",
+			"SERVER_CERT": "server.pem",
+			"CLIENT_CERT": "client.pem",
+			"PASSWORD": "123456"
 		},
 		{
 			"NODE_ID": "p2",
 			"ADDRESS": "",
 			"GRICER2": "VIA0",
-			"ICEGRID": "GRID0"
+			"ICEGRID": "GRID0",
+			"CERT_DIR": "/home/luodahui/core/channel-sdk/ssl/openssl",
+			"SERVER_CERT": "server.pem",
+			"CLIENT_CERT": "client.pem",
+			"PASSWORD": "123456"
 		}
 	],
 	"GRICER2_INFO": {

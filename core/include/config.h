@@ -19,14 +19,14 @@ struct Node
   string VIA;
   string GRICER2;
   string ICEGRID;
+  string CERT_DIR;
   string CA_CERT_PATH;
-
-#if(1 == SSL_TYPE)
   string SERVER_KEY_PATH;
   string SERVER_CERT_PATH;
   string CLIENT_KEY_PATH;
   string CLIENT_CERT_PATH;
-#elif(2 == SSL_TYPE)
+  string PASSWORD;
+#if(2 == SSL_TYPE)
   string SERVER_SIGN_KEY_PATH;
   string SERVER_SIGN_CERT_PATH;
   string SERVER_ENC_KEY_PATH;
@@ -47,16 +47,15 @@ struct Node
       VIA.assign(node.VIA);
       GRICER2.assign(node.GRICER2);
       ICEGRID.assign(node.ICEGRID);
+      CERT_DIR.assign(node.CERT_DIR);
       CA_CERT_PATH.assign(node.CA_CERT_PATH);
 
-      #if(1==SSL_TYPE)
-      {
-        SERVER_KEY_PATH.assign(node.SERVER_KEY_PATH);
-        SERVER_CERT_PATH.assign(node.SERVER_CERT_PATH);
-        CLIENT_KEY_PATH.assign(node.CLIENT_KEY_PATH);
-        CLIENT_CERT_PATH.assign(node.CLIENT_CERT_PATH);
-      }  
-      #elif(2 == SSL_TYPE)
+      SERVER_KEY_PATH.assign(node.SERVER_KEY_PATH);
+      SERVER_CERT_PATH.assign(node.SERVER_CERT_PATH);
+      CLIENT_KEY_PATH.assign(node.CLIENT_KEY_PATH);
+      CLIENT_CERT_PATH.assign(node.CLIENT_CERT_PATH); 
+      PASSWORD.assign(node.PASSWORD); 
+      #if(2 == SSL_TYPE)
       {
         SERVER_SIGN_KEY_PATH.assign(node.SERVER_SIGN_KEY_PATH);
         SERVER_SIGN_CERT_PATH.assign(node.SERVER_SIGN_CERT_PATH);
@@ -117,13 +116,15 @@ struct NodeInfo {
   IcePlugCfg glacier2_info;
   IcePlugCfg ice_grid_info;
   string ca_cert_path_;
-#if(1==SSL_TYPE) 
+  string cert_dir_;
+
   string server_key_path_;
   string server_cert_path_;
   // Used as a client certificate to invoke the VIA server registration interface
   string client_key_path_;
   string client_cert_path_;
-#elif(2==SSL_TYPE) 
+  string password_;
+#if(2==SSL_TYPE) 
   string server_sign_key_path_;
   string server_sign_cert_path_;
   string server_enc_key_path_;
@@ -153,11 +154,13 @@ struct ViaInfo {
    // 客户端连接glacier2信息
   IcePlugCfg glacier2_info;
   string server_cert_path_;
+  string ca_cert_path_;
+  string cert_dir_;
 
-  #if(1==SSL_TYPE)  
-    string client_key_path_;
-    string client_cert_path_;
-  #elif(2==SSL_TYPE)  
+  string client_key_path_;
+  string client_cert_path_;
+  string password_;
+  #if(2==SSL_TYPE)  
     string client_sign_key_path_;
     string client_sign_cert_path_;
     string client_enc_key_path_;

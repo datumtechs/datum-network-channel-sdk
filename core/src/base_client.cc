@@ -15,54 +15,6 @@ public:
     }
 };
 
-// bool BaseClient::MakeCredentials(const ViaInfo& via_info)
-// {
-// 	#if(1 == SSL_TYPE)
-// 	{
-// 		if(via_info.server_cert_path_.empty() || via_info.client_key_path_.empty() || 
-// 		   via_info.client_cert_path_.empty())
-// 		{
-// 			gpr_log(GPR_ERROR, "Invalid client openssl certificate, please check!");
-// 			return false;
-// 		}
-// 		auto str_root_crt = get_file_contents(via_info.server_cert_path_); // for verifying clients
-// 		auto str_client_key = get_file_contents(via_info.client_key_path_);
-// 		auto str_client_cert = get_file_contents(via_info.client_cert_path_);
-
-// 		grpc::SslCredentialsOptions ssl_opts;
-// 		ssl_opts.pem_root_certs  = str_root_crt.c_str();
-// 		ssl_opts.pem_private_key = str_client_key.c_str();
-// 		ssl_opts.pem_cert_chain  = str_client_cert.c_str();
-// 		creds_ = grpc::SslCredentials(ssl_opts);
-// 	}
-// 	#elif(2 == SSL_TYPE) 
-// 	{
-// 		if(via_info.server_cert_path_.empty() || via_info.client_sign_key_path_.empty() || 
-// 		via_info.client_sign_cert_path_.empty() || via_info.client_enc_key_path_.empty() ||
-// 		via_info.client_enc_cert_path_.empty())
-// 		{
-// 			gpr_log(GPR_ERROR, "Invalid client gmssl certificate, please check!");
-// 			return false;
-// 		}
-
-// 		grpc::SslCredentialsOptions ssl_opts;
-// 		ssl_opts.pem_root_certs  = via_info.server_cert_path_.c_str();
-// 		ssl_opts.pem_private_key = via_info.client_sign_key_path_.c_str();
-// 		ssl_opts.pem_cert_chain  = via_info.client_sign_cert_path_.c_str();
-// 		ssl_opts.pem_enc_private_key =  via_info.client_enc_key_path_.c_str();
-// 		ssl_opts.pem_enc_cert_chain = via_info.client_enc_cert_path_.c_str();
-
-// 		creds_ = grpc::SslCredentials(ssl_opts);
-// 	}	
-// 	#else
-// 	{
-// 		creds_ = grpc::InsecureChannelCredentials();
-// 	}
-// 	#endif
-
-// 	return true;
-// }
-
 BaseClient::~BaseClient()
 { 
 	if(ptr_communicator_) 
@@ -76,6 +28,28 @@ BaseClient::BaseClient(const ViaInfo& via_info, const string& taskid)
 	Ice::InitializationData initData;
 	initData.properties = Ice::createProperties();
 	task_id_ = taskid;
+	string protocol = "tcp";
+	bool is_ssl = false;
+	if(!via_info.ca_cert_path_.empty()) {
+		protocol = "ssl";
+		is_ssl = true;
+	}
+
+	// set ssl property
+	auto SetSSLProperty = [&initData](const ViaInfo& via_info) -> bool {
+		if(via_info.server_cert_path_.empty() || via_info.client_cert_path_.empty()) {
+			cout << "Invalid client openssl certificate, please check!" << endl;
+			return false;
+		}
+		initData.properties->setProperty("Ice.Plugin.IceSSL", "IceSSL:createIceSSL");
+        initData.properties->setProperty("IceSSL.DefaultDir", via_info.cert_dir_);
+        initData.properties->setProperty("IceSSL.CAs", via_info.ca_cert_path_);
+        initData.properties->setProperty("IceSSL.CertFile", via_info.client_cert_path_);
+        initData.properties->setProperty("IceSSL.Password", via_info.password_);
+
+		return true;
+	};
+
 	string serAddress = via_info.via_address;
 	int npos = serAddress.find(":");
 	// 服务器地址为空，走Glacier2路由
@@ -90,10 +64,15 @@ BaseClient::BaseClient(const ViaInfo& via_info, const string& taskid)
 		}
 
 		// 设置Glacier2的路由信息, app_name为Glacier2服务名称, ip和port分别为Glacier2服务监听的地址以及端口
-		string strGlacier2Cfg = app_name + "/router:tcp -p " + port + " -h " + ip;
+		string strGlacier2Cfg = app_name + "/router:" + protocol + " -p " + port + " -h " + ip;
 		// cout << "strGlacier2Cfg:" << strGlacier2Cfg << endl;
 		initData.properties->setProperty(C_Glacier2_Router_Key, strGlacier2Cfg);
-		initData.properties->setProperty("Ice.MessageSizeMax", "0");
+		initData.properties->setProperty(C_MAX_SIZE_KEY, "0");
+		if(is_ssl && !SetSSLProperty(via_info)) {
+			string strErrMsg = "Set ssl property failed, please check!";
+			cout << strErrMsg << endl;
+			throw (strErrMsg);
+		}
       	ptr_holder_ = make_shared<Ice::CommunicatorHolder>(initData);
 		ptr_communicator_ = ptr_holder_->communicator();
 		
@@ -116,9 +95,15 @@ BaseClient::BaseClient(const ViaInfo& via_info, const string& taskid)
 		string ip = serAddress.substr(0, npos);
 		string port = serAddress.substr(npos+1, serAddress.length());
 		string servantId = C_Servant_Id_Prefix + "_" + via_info.id;
-		string endpoints = servantId + ":tcp -h " + ip + " -p " + port;
+		string endpoints = servantId + ":" + protocol + " -h " + ip + " -p " + port;
 		initData.properties->setProperty(C_Server_Proxy_Key, endpoints);
-		initData.properties->setProperty("Ice.MessageSizeMax", "0");
+		initData.properties->setProperty(C_MAX_SIZE_KEY, "0");
+		if(is_ssl && !SetSSLProperty(via_info)) {
+			string strErrMsg = "Set ssl property failed, please check!";
+			cout << strErrMsg << endl;
+			throw (strErrMsg);
+		}
+
 		ptr_holder_ = make_shared<Ice::CommunicatorHolder>(initData);
 		ptr_communicator_ = ptr_holder_->communicator();
 		
@@ -164,54 +149,3 @@ bool BaseClient::CheckConnect(const uint64_t conn_timeout, const useconds_t usec
 
 	return true;
 }
-
-// BaseClient::BaseClient(const NodeInfo& node_info, const string& taskid)
-// {
-// 	task_id_ = taskid;
-// 	ViaInfo via_info;
-// 	via_info.via_address = node_info.via_address;
-	
-// 	#if(1 == SSL_TYPE)
-// 		via_info.server_cert_path_ = node_info.ca_cert_path_;
-// 		via_info.client_key_path_ = node_info.client_key_path_;
-// 		via_info.client_cert_path_ = node_info.client_cert_path_;
-// 	#elif(2 == SSL_TYPE) 
-// 		via_info.server_cert_path_ = node_info.ca_cert_path_;
-// 		via_info.client_sign_key_path_ = node_info.client_sign_key_path_;
-// 		via_info.client_sign_cert_path_ = node_info.client_sign_cert_path_;
-// 		via_info.client_enc_key_path_ = node_info.client_enc_key_path_;
-// 		via_info.client_enc_cert_path_ = node_info.client_enc_cert_path_;
-// 	#endif
-
-// 	if(!MakeCredentials(via_info)){return;}
-// 	auto channel = grpc::CreateChannel(via_info.via_address, creds_);
-// 	via_stub_ = VIAService::NewStub(channel);
-// }
-
-// bool BaseClient::SignUpToVia(const NodeInfo& server_info)
-// {
-// 	if(nullptr == via_stub_)
-// 	{
-// 		gpr_log(GPR_ERROR, "uninitialized stub to connect to the VIA service, please initialize!");
-// 		return false;
-// 	}
-
-// 	grpc::ClientContext context;
-// 	context.AddMetadata("task_id", task_id_);
-// 	context.AddMetadata("party_id", server_info.id);
-
-// 	SignupReq reg_req;
-// 	Boolean ret_code;
-// 	reg_req.set_taskid(task_id_);
-// 	reg_req.set_partyid(server_info.id);
-// 	reg_req.set_servicetype("");
-// 	reg_req.set_address(server_info.address);
-
-// 	via_stub_->Signup(&context, reg_req, &ret_code);
-// 	if (false == ret_code.result()) 
-// 	{
-// 		gpr_log(GPR_ERROR, "Signup via server failed, via server address:%s!", server_info.via_address.c_str());
-// 		return false;
-// 	}    
-// 	return true;
-// }
