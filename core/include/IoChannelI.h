@@ -12,9 +12,9 @@ class IoChannelI : public ChannelSdk::IoChannel
 {
 public:
 #ifdef ASYNC_SERVER
-   IoChannelI(unordered_map<string, WorkQueuePtr>*);
+   IoChannelI(MapWorkQueue*);
 #else
-   IoChannelI(unordered_map<string, shared_ptr<ClientConnection>>*);
+   IoChannelI(MapClientConn*);
 #endif
 
    virtual void send_async(const AMD_IoChannel_sendPtr&, const string& nodeid, 
@@ -25,9 +25,9 @@ private:
    // Each nodeID corresponds to a work queue, reducing queue query judgment,
    // The memory is created when the AsyncServer object is initialized, 
    // and this variable holds only memory Pointers.
-   unordered_map<string, WorkQueuePtr>* ptr_noide_to_wq_map_ = nullptr;
+   MapWorkQueue* ptr_noide_to_wq_map_ = nullptr;
 #else
-   unordered_map<string, shared_ptr<ClientConnection>>* ptr_client_conn_map_ = nullptr;  
+   MapClientConn* ptr_client_conn_map_ = nullptr;  
 #endif
     
 };

@@ -29,3 +29,5 @@ public:
 	condition_variable cv_;
 	unordered_map<string, shared_ptr<queue<bytes>>> map_queue_;
 };
+
+using MapClientConn = unordered_map<string, shared_ptr<ClientConnection>>;

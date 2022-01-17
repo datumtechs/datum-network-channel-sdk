@@ -67,7 +67,7 @@ class BasicIO {
 #endif
 
   unordered_map<string, shared_ptr<BaseClient>> nid_to_server_map_;
-  unordered_map<string, shared_ptr<ClientConnection>> client_conn_map;
+  MapClientConn client_conn_map;
   error_callback handler;
 
   shared_ptr<BaseServer> server_ = nullptr;
@@ -81,8 +81,7 @@ class ViaNetIO : public BasicIO {
  public:
   using BasicIO::BasicIO;
   virtual ~ViaNetIO(){}  
-  bool StartServer(const string& taskid, const NodeInfo& server_info,
-       unordered_map<string, shared_ptr<ClientConnection>>* ptr_client_conn_map);
+  bool StartServer(const string& taskid, const NodeInfo& server_info, MapClientConn* ptr_client_conn_map);
 
   bool init(const shared_ptr<ChannelConfig> config);
   ssize_t recv(const string& remote_nodeid, const char* id, char* data, uint64_t length, 

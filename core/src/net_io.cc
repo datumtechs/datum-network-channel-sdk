@@ -14,7 +14,7 @@ BasicIO::BasicIO(const NodeInfo &node_info, const vector<ViaInfo>& server_infos,
     handler(error_callback) {}
 
 bool ViaNetIO::StartServer(const string& taskid, const NodeInfo& server_info,
-    unordered_map<string, shared_ptr<ClientConnection>>* ptr_client_conn_map)
+    MapClientConn* ptr_client_conn_map)
 {
 #if ASYNC_SERVER
   cout << "start async server, address:" << server_info.address << endl;
