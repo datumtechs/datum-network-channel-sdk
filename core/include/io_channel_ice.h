@@ -93,6 +93,29 @@ static SendDataException _iceS_SendDataException_init;
 
 using bytes = ::std::vector<::Ice::Byte>;
 
+struct DataStruct
+{
+    ::std::string msgid;
+    ::std::string nodeid;
+    ::ChannelSdk::bytes data;
+
+    /**
+     * Obtains a tuple containing all of the struct's data members.
+     * @return The data members in a tuple.
+     */
+    std::tuple<const ::std::string&, const ::std::string&, const ::ChannelSdk::bytes&> ice_tuple() const
+    {
+        return std::tie(msgid, nodeid, data);
+    }
+};
+
+using Ice::operator<;
+using Ice::operator<=;
+using Ice::operator>;
+using Ice::operator>=;
+using Ice::operator==;
+using Ice::operator!=;
+
 }
 
 namespace ChannelSdk
@@ -199,6 +222,23 @@ protected:
 namespace Ice
 {
 
+template<>
+struct StreamableTraits<::ChannelSdk::DataStruct>
+{
+    static const StreamHelperCategory helper = StreamHelperCategoryStruct;
+    static const int minWireSize = 3;
+    static const bool fixedLength = false;
+};
+
+template<typename S>
+struct StreamReader<::ChannelSdk::DataStruct, S>
+{
+    static void read(S* istr, ::ChannelSdk::DataStruct& v)
+    {
+        istr->readAll(v.msgid, v.nodeid, v.data);
+    }
+};
+
 }
 /// \endcond
 
@@ -290,6 +330,13 @@ static SendDataException _iceS_SendDataException_init;
 /// \endcond
 
 typedef ::std::vector< ::Ice::Byte> bytes;
+
+struct DataStruct
+{
+    ::std::string msgid;
+    ::std::string nodeid;
+    ::ChannelSdk::bytes data;
+};
 
 }
 
@@ -510,6 +557,36 @@ template<>
 struct StreamableTraits< ::ChannelSdk::SendDataException>
 {
     static const StreamHelperCategory helper = StreamHelperCategoryUserException;
+};
+
+template<>
+struct StreamableTraits< ::ChannelSdk::DataStruct>
+{
+    static const StreamHelperCategory helper = StreamHelperCategoryStruct;
+    static const int minWireSize = 3;
+    static const bool fixedLength = false;
+};
+
+template<typename S>
+struct StreamWriter< ::ChannelSdk::DataStruct, S>
+{
+    static void write(S* ostr, const ::ChannelSdk::DataStruct& v)
+    {
+        ostr->write(v.msgid);
+        ostr->write(v.nodeid);
+        ostr->write(v.data);
+    }
+};
+
+template<typename S>
+struct StreamReader< ::ChannelSdk::DataStruct, S>
+{
+    static void read(S* istr, ::ChannelSdk::DataStruct& v)
+    {
+        istr->read(v.msgid);
+        istr->read(v.nodeid);
+        istr->read(v.data);
+    }
 };
 
 }

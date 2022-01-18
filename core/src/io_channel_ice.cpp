@@ -209,6 +209,10 @@ ChannelSdk::IoChannelPrx::ice_staticId()
     return IoChannel::ice_staticId();
 }
 
+namespace Ice
+{
+}
+
 #else // C++98 mapping
 
 namespace

@@ -23,6 +23,12 @@ IF(SERVER_TYPE)
     add_definitions(-D${SERVER_TYPE}=1)
 ENDIF()
 
+option(STATIC_CALL "" OFF)
+message(STATUS "[STATIC_CALL]: ${STATIC_CALL}")
+IF(STATIC_CALL)
+    add_definitions(-D${STATIC_CALL}=1)
+ENDIF()
+
 option(USE_CACHE "" OFF)
 message(STATUS "[USE_CACHE]: ${USE_CACHE}")
 IF(USE_CACHE)

@@ -24,10 +24,13 @@ public:
     BaseClient(const ViaInfo& via_info, const string& taskid);
     // // Create a connection between the node where the server is located and VIA to register the interface.
     // BaseClient(const NodeInfo& node_info, const string& taskid);
-    // // Register the interface where the server node resides to via
-    // bool SignUpToVia(const NodeInfo& server_info);
-
-    bool CheckConnect(const uint64_t conn_timeout=5000, const useconds_t usec=1000000);
+    // Checking connection status (static call)
+#if STATIC_CALL
+    bool CheckByStaticCall(const uint64_t conn_timeout=5000, const useconds_t usec=1000000);
+#else
+    // Checking connection status (dynamic call)
+    bool CheckByDynamicCall(const uint64_t conn_timeout=5000, const useconds_t usec=1000000);
+#endif
     void SetSendTimeOut(const uint64_t send_timeout) {
         send_timeout_ = send_timeout;
     }
