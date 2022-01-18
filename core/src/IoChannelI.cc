@@ -13,7 +13,6 @@ IoChannelI::IoChannelI(MapClientConn* ptr_client_conn_map):
 void IoChannelI::send_async(const AMD_IoChannel_sendPtr& cb, const string& nodeid, 
       const string& msgid, const bytes& data, const Ice::Current&)
 {
-  cout << "static_call===>" << endl;
   #if ASYNC_SERVER
     auto iter = ptr_noide_to_wq_map_->find(nodeid);
     if(iter != ptr_noide_to_wq_map_->end())

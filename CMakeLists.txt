@@ -26,7 +26,7 @@ ENDIF()
 option(STATIC_CALL "" OFF)
 message(STATUS "[STATIC_CALL]: ${STATIC_CALL}")
 IF(STATIC_CALL)
-    add_definitions(-D${STATIC_CALL}=1)
+    add_definitions(-DSTATIC_CALL=1)
 ENDIF()
 
 option(USE_CACHE "" OFF)
