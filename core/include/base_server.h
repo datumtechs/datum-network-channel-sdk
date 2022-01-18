@@ -44,6 +44,6 @@ protected:
 	shared_ptr<Ice::CommunicatorHolder> ptr_holder_;
 	Ice::CommunicatorPtr ptr_communicator_;
 	Ice::ObjectAdapterPtr ptr_adapter_;
-	unordered_map<string, shared_ptr<ClientConnection>>* ptr_client_conn_map_ = nullptr;
+	MapClientConn* ptr_client_conn_map_ = nullptr;
 };
 

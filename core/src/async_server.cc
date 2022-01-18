@@ -22,7 +22,7 @@ bool AsyncServer::wait()
 }
 
 AsyncServer::AsyncServer(const NodeInfo& server_info, const string& taskId, 
-    unordered_map<string, shared_ptr<ClientConnection>>* ptr_client_conn_map): BaseServer(server_info, taskId)
+    MapClientConn* ptr_client_conn_map): BaseServer(server_info, taskId)
 {
     for(auto &v : *ptr_client_conn_map)
     {

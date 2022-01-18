@@ -24,11 +24,10 @@ public:
     bool wait();
     ~AsyncServer();
 
-    AsyncServer(const NodeInfo& server_info, const string& taskId, 
-        unordered_map<string, shared_ptr<ClientConnection>>* ptr_client_conn_map);
+    AsyncServer(const NodeInfo& server_info, const string& taskId, MapClientConn* ptr_client_conn_map);
 private:
     // Each nodeID corresponds to a work queue, reducing queue query judgment.
-    unordered_map<string, WorkQueuePtr> map_noide_to_wq_;
+    MapWorkQueue map_noide_to_wq_;
 };
 #endif
 

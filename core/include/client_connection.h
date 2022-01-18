@@ -21,11 +21,16 @@ public:
 	~ClientConnection(){};
 
 	ssize_t recv(const string& msgid, char* data, uint64_t length, int64_t timeout);
-
-public:
-	string nodeid_;
 	bool write(const string& msgid, const bytes& data);
+	void SetRecvTimeOut(const uint64_t recv_timeout) {
+		recv_timeout_ = recv_timeout;
+	}
+public:
+	uint64_t recv_timeout_; // Timeout period for receive data each time, Unit:millisecond
+	string nodeid_;
 	mutex mutex_;
 	condition_variable cv_;
 	unordered_map<string, shared_ptr<queue<bytes>>> map_queue_;
 };
+
+using MapClientConn = unordered_map<string, shared_ptr<ClientConnection>>;

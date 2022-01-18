@@ -37,5 +37,6 @@ private:
 };
 
 typedef IceUtil::Handle<WorkQueue> WorkQueuePtr;
+using MapWorkQueue = unordered_map<string, WorkQueuePtr>;
 
 #endif

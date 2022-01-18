@@ -31,12 +31,12 @@ bool ClientConnection::write(const string& msgid, const bytes& data)
 
 ssize_t ClientConnection::recv(const string& msgid, char* data, uint64_t length, int64_t timeout)
 {
-  if (timeout < 0)
-    timeout = 10 * 1000000;
+  // if (timeout < 0)
+  //   timeout = 10 * 1000000;
   
   auto beg = system_clock::now();
   int64_t elapsed = 0;
-  int64_t remain_time = timeout;
+  int64_t remain_time = recv_timeout_;
   do {
     std::unique_lock<std::mutex> lck(mutex_);
     auto iter = map_queue_.find(msgid);
@@ -51,7 +51,7 @@ ssize_t ClientConnection::recv(const string& msgid, char* data, uint64_t length,
 
     auto end = system_clock::now();
     elapsed = duration_cast<duration<int64_t, std::milli>>(end - beg).count();
-    remain_time = timeout - elapsed;
+    remain_time = recv_timeout_ - elapsed;
 
     if(std::cv_status::timeout == cv_.wait_for(lck, std::chrono::milliseconds(remain_time)))
     {

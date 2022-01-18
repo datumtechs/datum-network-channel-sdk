@@ -208,7 +208,7 @@ bool ChannelConfig::parse_node_info(Document& doc)
   if (doc.HasMember("NODE_INFO") && doc["NODE_INFO"].IsArray()) 
   {
     Value& Nodes = doc["NODE_INFO"];
-
+    string ca_cert = GetString(doc, "ROOT_CERT", root_cert_.c_str(), false);
     // nodes
     for (int i = 0; i < Nodes.Size(); i++) 
     {
@@ -220,15 +220,16 @@ bool ChannelConfig::parse_node_info(Document& doc)
       cfg.node_.VIA = GetString(Node, "VIA", "", false);
       cfg.node_.GRICER2 = GetString(Node, "GRICER2", "", false);
       cfg.node_.ICEGRID = GetString(Node, "ICEGRID", "", false);
-      cfg.node_.CA_CERT_PATH = GetString(doc, "ROOT_CERT", root_cert_.c_str(), false);
-      #if(1 == SSL_TYPE)  
-      {
-        cfg.node_.SERVER_KEY_PATH = GetString(Node, "SERVER_KEY", "", false);
-        cfg.node_.SERVER_CERT_PATH = GetString(Node, "SERVER_CERT", "", false);
-        cfg.node_.CLIENT_KEY_PATH = GetString(Node, "CLIENT_KEY", "", false);
-        cfg.node_.CLIENT_CERT_PATH = GetString(Node, "CLIENT_CERT", "", false);
-      }
-      #elif(2 == SSL_TYPE)  
+      cfg.node_.CERT_DIR = GetString(Node, "CERT_DIR", "", false);
+      cfg.node_.CA_CERT_PATH = ca_cert;
+
+      cfg.node_.SERVER_KEY_PATH = GetString(Node, "SERVER_KEY", "", false);
+      cfg.node_.SERVER_CERT_PATH = GetString(Node, "SERVER_CERT", "", false);
+      cfg.node_.CLIENT_KEY_PATH = GetString(Node, "CLIENT_KEY", "", false);
+      cfg.node_.CLIENT_CERT_PATH = GetString(Node, "CLIENT_CERT", "", false);
+      cfg.node_.PASSWORD = GetString(Node, "PASSWORD", "", false);
+    
+      #if(2 == SSL_TYPE)  
       {
         cfg.node_.SERVER_SIGN_KEY_PATH = GetString(Node, "SERVER_SIGN_KEY", "", false);
         cfg.node_.SERVER_SIGN_CERT_PATH = GetString(Node, "SERVER_SIGN_CERT", "", false);
@@ -442,15 +443,14 @@ void ChannelConfig::CopyNodeInfo(NodeInfo& node_info, const Node& nodeInfo)
   node_info.id = nodeInfo.NODE_ID;
   node_info.address = nodeInfo.ADDRESS;
   node_info.ca_cert_path_ = root_cert_;
-  
-  #if(1 == SSL_TYPE)
-  {
-    node_info.server_key_path_ = nodeInfo.SERVER_KEY_PATH;
-    node_info.server_cert_path_ = nodeInfo.SERVER_CERT_PATH;
-    node_info.client_key_path_ = nodeInfo.CLIENT_KEY_PATH;
-    node_info.client_cert_path_ = nodeInfo.CLIENT_CERT_PATH;
-  }
-  #elif(2 == SSL_TYPE)
+  node_info.cert_dir_ = nodeInfo.CERT_DIR;
+  node_info.server_key_path_ = nodeInfo.SERVER_KEY_PATH;
+  node_info.server_cert_path_ = nodeInfo.SERVER_CERT_PATH;
+  node_info.client_key_path_ = nodeInfo.CLIENT_KEY_PATH;
+  node_info.client_cert_path_ = nodeInfo.CLIENT_CERT_PATH;
+  node_info.password_ = nodeInfo.PASSWORD;
+
+  #if(2 == SSL_TYPE)
   {
     node_info.server_sign_key_path_ = nodeInfo.SERVER_SIGN_KEY_PATH;
     node_info.server_sign_cert_path_ = nodeInfo.SERVER_SIGN_CERT_PATH;
@@ -478,13 +478,13 @@ bool ChannelConfig::isNodeType(const vector<NODE_TYPE>& vec_node_types, const NO
 
 void GetCertInfosFromNode(ViaInfo& viaTmp, const Node& node)
 {
-  #if(1 == SSL_TYPE)
-  {
-    viaTmp.server_cert_path_ = node.SERVER_CERT_PATH;
-    viaTmp.client_key_path_ = node.CLIENT_KEY_PATH;
-    viaTmp.client_cert_path_ = node.CLIENT_CERT_PATH;
-  }
-  #elif(2 == SSL_TYPE)
+  viaTmp.cert_dir_ = node.CERT_DIR;
+  viaTmp.ca_cert_path_ = node.CA_CERT_PATH;
+  viaTmp.server_cert_path_ = node.SERVER_CERT_PATH;
+  viaTmp.client_key_path_ = node.CLIENT_KEY_PATH;
+  viaTmp.client_cert_path_ = node.CLIENT_CERT_PATH;
+  viaTmp.password_ = node.PASSWORD;
+  #if(2 == SSL_TYPE)
   {
     viaTmp.server_cert_path_ = node.CA_CERT_PATH;
     viaTmp.client_sign_key_path_ = node.CLIENT_SIGN_KEY_PATH;
@@ -516,10 +516,9 @@ bool ChannelConfig::GetNodeInfos(vector<string>& clientNodeIds, vector<ViaInfo>&
         viaTmp.via_address = data_config_.P[i].ADDRESS;
       }
       viaTmp.glacier2_info = glacier2_to_info_[glacier2];
-    #ifdef SSL_TYPE
+
       const Node& node = node_info_config_[nid].node_;
       GetCertInfosFromNode(viaTmp, node);
-    #endif
       // cout << "id: " << nid << ", via: " << viaTmp.via << ", via_address: " << viaTmp.via_address << endl;
       serverInfos.push_back(viaTmp);
       clientNodeIds.push_back(nid);
@@ -544,10 +543,8 @@ bool ChannelConfig::GetNodeInfos(vector<string>& clientNodeIds, vector<ViaInfo>&
         viaTmp.via_address = compute_config_.P[i].ADDRESS;
       }
       viaTmp.glacier2_info = glacier2_to_info_[glacier2];
-    #ifdef SSL_TYPE
       const Node& node = node_info_config_[nid].node_;
       GetCertInfosFromNode(viaTmp, node);
-    #endif
       // cout << "id: " << nid << ", via: " << viaTmp.via << ", via_address: " << viaTmp.via_address << endl;
       serverInfos.push_back(viaTmp);
       clientNodeIds.push_back(nid);
@@ -573,10 +570,8 @@ bool ChannelConfig::GetNodeInfos(vector<string>& clientNodeIds, vector<ViaInfo>&
         viaTmp.via_address = result_config_.P[i].ADDRESS;
       }
       viaTmp.glacier2_info = glacier2_to_info_[glacier2];
-    #ifdef SSL_TYPE
       const Node& node = node_info_config_[nid].node_;
       GetCertInfosFromNode(viaTmp, node);
-    #endif
       // cout << "id: " << nid << ", via: " << viaTmp.via << ", address: " << viaTmp.via_address << endl;
       serverInfos.push_back(viaTmp);
       clientNodeIds.emplace_back(nid);
