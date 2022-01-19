@@ -30,12 +30,11 @@ ssize_t SyncClient::send(const string& self_nodeid, const string& remote_nodeid,
 #endif
 
   do {
-    int status = 0;
     try {
       // static call
     #if STATIC_CALL
       Ice::Context context;
-      status = stub_->send(self_nodeid, msg_id, vec_send_data, context);
+      stub_->send(self_nodeid, msg_id, vec_send_data, context);
     #else
       // dynamic call
       Ice::ByteSeq inParams, outParams;
@@ -44,23 +43,12 @@ ssize_t SyncClient::send(const string& self_nodeid, const string& remote_nodeid,
       out.write(sendData);
       out.endEncapsulation();
       out.finished(inParams);
-      if(!stub_->ice_invoke("send", Ice::Normal, inParams, outParams))
-      {
-          cout << "Send data to remote node:" << remote_nid_ << " failed, wait..." << endl;
-          status = 1;
-      }
+      stub_->ice_invoke("send", Ice::Normal, inParams, outParams);
     #endif
-    } catch (const Ice::Exception& ex) {
-        cerr << ex << endl;
-        status = 1;
-    }
-    
-    if (0 == status) 
-    {
       break;
-    } 
-    else 
-    {
+    } catch (const Ice::Exception& ex) {
+      cerr << ex << endl;
+      // status = 1;
       end_time = system_clock::now();
       elapsed = duration_cast<duration<int64_t, std::milli>>(end_time - start_time).count();
       if(elapsed >= send_timeout_)
@@ -69,7 +57,6 @@ ssize_t SyncClient::send(const string& self_nodeid, const string& remote_nodeid,
           " timeout, The timeout period is: " + to_string(send_timeout_) + "ms.";
         cout << strErrMsg << endl;
         throw (strErrMsg);
-        // return 0;
       }
       sleep(1);
     }
