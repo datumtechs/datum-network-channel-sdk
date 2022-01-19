@@ -105,6 +105,11 @@ struct IcePlugCfg {
   IcePlugCfg() = default;
   IcePlugCfg(const string& AppName, const string& Ip, const string& Port):
     AppName_(AppName), Ip_(Ip), Port_(Port){}
+  
+  const string GetInfo() const
+  {
+    return "AppName:" + AppName_ + ", Address:" + Ip_ + ":" + Port_;
+  }
 };
 
 struct NodeInfo {
