@@ -115,9 +115,7 @@ BaseClient::BaseClient(const ViaInfo& via_info, const string& taskid)
 	if (!stub_)
 		throw "Invalid proxy";
 }
-
-#if STATIC_CALL
-bool BaseClient::CheckByStaticCall(const uint64_t conn_timeout, const useconds_t usec)
+bool BaseClient::CheckConnStatus(const uint64_t conn_timeout, const useconds_t usec) 
 {
 	auto start_time = system_clock::now();
 	auto end_time   = start_time;
@@ -127,7 +125,12 @@ bool BaseClient::CheckByStaticCall(const uint64_t conn_timeout, const useconds_t
 		try 
 		{
 			cout << "Attempt to connect to the remote node:" << remote_nid_ << endl;
+		#if STATIC_CALL
 			stub_->ice_ping();
+		#else
+			Ice::ByteSeq inParams, outParams;
+			stub_->ice_invoke("ping", Ice::Normal, inParams, outParams);
+		#endif
 		}
 		catch (const Ice::Exception& ex) 
 		{
@@ -136,7 +139,7 @@ bool BaseClient::CheckByStaticCall(const uint64_t conn_timeout, const useconds_t
 			elapsed = duration_cast<duration<int64_t, std::milli>>(end_time - start_time).count();
 			if(elapsed >= conn_timeout)
 			{        
-				string strErrMsg = "connect to remote nodeid:" + remote_nid_ + " timeout, The timeout period is: " + 
+				string strErrMsg = "connect failed! connect to remote nodeid:" + remote_nid_ + " timeout, The timeout period is: " + 
 				to_string(conn_timeout) + "ms.";
 				cout << strErrMsg << endl;
 				throw (strErrMsg);
@@ -150,52 +153,3 @@ bool BaseClient::CheckByStaticCall(const uint64_t conn_timeout, const useconds_t
 
 	return true;
 }
-#else
-bool BaseClient::CheckByDynamicCall(const uint64_t conn_timeout, const useconds_t usec)
-{
-	auto start_time = system_clock::now();
-	auto end_time   = start_time;
-	int64_t elapsed = 0;
-	do
-	{
-		int status = 0;
-		try 
-		{
-			cout << "Attempt to connect to the remote node:" << remote_nid_ << endl;
-			Ice::ByteSeq inParams, outParams;
-			if(!stub_->ice_invoke("ping", Ice::Normal, inParams, outParams))
-			{
-				cout << "Ping to remote node:" << remote_nid_ << " failed, wait..." << endl;
-				status = 1;
-			}
-		}
-		catch (const Ice::Exception& ex) 
-		{
-			cerr << ex << endl;
-			status = 1;
-		}
-
-		if(0 == status)
-		{
-			break;
-		}
-		else 
-		{
-			end_time = system_clock::now();
-			elapsed = duration_cast<duration<int64_t, std::milli>>(end_time - start_time).count();
-			if(elapsed >= conn_timeout)
-			{        
-				string strErrMsg = "connect to remote nodeid:" + remote_nid_ + " timeout, The timeout period is: " + 
-				to_string(conn_timeout) + "ms.";
-				cout << strErrMsg << endl;
-				throw (strErrMsg);
-			}
-			usleep(usec);
-			continue;
-		}
-		
-    } while(true);
-
-	return true;
-}
-#endif
