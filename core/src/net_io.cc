@@ -44,6 +44,9 @@ bool ViaNetIO::init(const shared_ptr<ChannelConfig> config)
     {
       client_nodeid = client_nodeids_[i];
       client_conn_map[client_nodeid] = make_shared<ClientConnection>(client_nodeid);
+    #if USE_BUFFER
+      client_conn_map[client_nodeid]->SetBufferSize(config->buffer_size_); 
+    #endif
       client_conn_map[client_nodeid]->SetRecvTimeOut(config->send_timeout_*1000);
     }
 

@@ -200,8 +200,8 @@ void cycle_buffer::realloc(int32_t length) {
 
   if (remain_space_ < length) {
     int32_t new_n = n_ * ((length / n_) + 2); // at least 2x
-    cout << "buffer can not write. expected:" << length << ", actual:" << remain_space_
-              << ". will expand from " << n_ << " to " << new_n ;
+    // cout << "buffer can not write. expected:" << length << ", actual:" << remain_space_
+    //           << ". will expand from " << n_ << " to " << new_n << endl;
 
     char* newbuffer_ = new char[new_n];
     int32_t havesize = size();

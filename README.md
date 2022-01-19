@@ -138,42 +138,70 @@ Channel Sdk通过使用IceGrid进行服务注册，和Ice的Glacier2进行消息
 
   ```json
   {
-  	"TASK_ID": "task:0x0710cbc802457d4a5c228b1769c2925320a5ad3",
-  	"PING_TIME": 1,
-  	"NODE_INFO": [
-  		{
-  			"NODE_ID": "p0",
-  			"GRICER2": "VIA0",
-  			"ICEGRID": "GRID0"
-  		},
-  		{
-  			"NODE_ID": "p1",
-  			"GRICER2": "VIA0",
-  			"ICEGRID": "GRID0"
-  		},
-  		{
-  			"NODE_ID": "p2",
-  			"GRICER2": "VIA0",
-  			"ICEGRID": "GRID0"
-  		}
-  	],
-  	"GRICER2_INFO": {
-  		"VIA0": {
-  			"APPNAME": "ChannelGlacier2",
-  			"IP": "192.168.2.128",
-  			"PORT": "10031"
-  		}
-  	},
-  	"ICE_GRID_INFO": {
-  		"GRID0": {
-  			"APPNAME": "ChannelIceGrid",
-  			"IP": "192.168.2.128",
-  			"PORT": "10032"
-  		}
-  	},
-  	"DATA_NODES": ["p0","p1","p2"],
-  	"COMPUTATION_NODES": {"p0": "P0","p1": "P1","p2": "P2"},
-  	"RESULT_NODES": ["p0","p1","p2"]
+    "TASK_ID": "task:0x0710cb",
+    "PING_TIME": 1,
+    "SEND_TIMEOUT": 10.0,
+    "CONNECT_TIMEOUT": 10.0,
+    "BUFFER_SIZE": 102400,
+    "ROOT_CERT": "ca.pem",
+    "NODE_INFO": [
+      {
+        "NODE_ID": "p0",
+        "GRICER2": "VIA0",
+        "ICEGRID": "GRID0",
+        "CERT_DIR": "/home/luodahui/core/channel-sdk/ssl/openssl",
+        "SERVER_CERT": "server.pem",
+        "CLIENT_CERT": "client.pem",
+        "PASSWORD": "123456"
+      },
+      {
+        "NODE_ID": "p1",
+        "GRICER2": "VIA0",
+        "ICEGRID": "GRID0",
+        "CERT_DIR": "/home/luodahui/core/channel-sdk/ssl/openssl",
+        "SERVER_CERT": "server.pem",
+        "CLIENT_CERT": "client.pem",
+        "PASSWORD": "123456"
+      },
+      {
+        "NODE_ID": "p2",
+        "GRICER2": "VIA0",
+        "ICEGRID": "GRID0",
+        "CERT_DIR": "/home/luodahui/core/channel-sdk/ssl/openssl",
+        "SERVER_CERT": "server.pem",
+        "CLIENT_CERT": "client.pem",
+        "PASSWORD": "123456"
+      }
+    ],
+    "GRICER2_INFO": {
+      "VIA0": {
+        "APPNAME": "ChannelGlacier2",
+        "IP": "192.168.2.128",
+        "PORT": "10031"
+      }
+    },
+    "ICE_GRID_INFO": {
+      "GRID0": {
+        "APPNAME": "ChannelIceGrid",
+        "IP": "192.168.2.128",
+        "PORT": "10032"
+      }
+    },
+    "DATA_NODES": [
+      "p0",
+      "p1",
+      "p2"
+    ],
+    "COMPUTATION_NODES": {
+      "p0": "P0",
+      "p1": "P1",
+      "p2": "P2"
+    },
+    "RESULT_NODES": [
+      "p0",
+      "p1",
+      "p2"
+    ]
   }
   ```
 

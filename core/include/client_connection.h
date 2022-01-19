@@ -33,6 +33,11 @@ public:
 	condition_variable cv_;
 #if USE_BUFFER
 	unordered_map<string, shared_ptr<cycle_buffer>> mapbuffer_;
+	int32_t buffer_size_ = 1024 * 8;
+	void SetBufferSize(const int32_t buffer_size) 
+	{
+		buffer_size_ = buffer_size;
+	}
 #else
 	unordered_map<string, shared_ptr<queue<bytes>>> mapbuffer_;
 #endif

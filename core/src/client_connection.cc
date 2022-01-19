@@ -13,7 +13,7 @@ bool ClientConnection::write(const string& msgid, const bytes& data)
   if(iter == mapbuffer_.end())
   {
 #if USE_BUFFER
-     mapbuffer_.emplace(msgid, make_shared<cycle_buffer>(1024 * 8));
+    mapbuffer_.emplace(msgid, make_shared<cycle_buffer>(buffer_size_));
 #else
     mapbuffer_.emplace(msgid, make_shared<queue<bytes>>());
 #endif

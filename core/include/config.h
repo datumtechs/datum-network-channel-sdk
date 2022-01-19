@@ -214,7 +214,8 @@ class ChannelConfig {
   uint8_t log_level_ = 0; // 0:Debug, 1:Info, 2: Error
   float ping_time_ = 1.0; // Interval (unit: s) for ping the server when the client is connected to the server.  
   float send_timeout_ = 5.0;  
-  float conn_timeout_ = 5.0;  
+  float conn_timeout_ = 5.0;
+  int32_t buffer_size_ = 1024 * 8;  
  
   NODE_TYPE node_type_ = NODE_TYPE_INVALID;
   map<string, NodeInfoConfig> node_info_config_;

@@ -401,6 +401,7 @@ bool ChannelConfig::parse(Document& doc) {
   task_id_ = GetString(doc, "TASK_ID", "", false);
   root_cert_ = GetString(doc, "ROOT_CERT", "", false);
   log_level_ = GetInt(doc, "LOG_LEVEL", 2, false);
+  buffer_size_ = GetInt(doc, "BUFFER_SIZE", 8 * 1024, false);
   ping_time_ = GetFloat(doc, "PING_TIME", 1.0, false);
   send_timeout_ = GetFloat(doc, "SEND_TIMEOUT", 5.0, false);
   conn_timeout_ = GetFloat(doc, "CONNECT_TIMEOUT", 5.0, false);
