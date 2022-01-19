@@ -9,22 +9,22 @@ ClientConnection::ClientConnection(const string& nodeid):nodeid_(nodeid){}
 bool ClientConnection::write(const string& msgid, const bytes& data)
 {
   std::unique_lock<std::mutex> lck(mutex_);
-  auto iter = map_queue_.find(msgid);
-
-  if(iter == map_queue_.end())
+  auto iter = mapbuffer_.find(msgid);
+  if(iter == mapbuffer_.end())
   {
-    shared_ptr<queue<bytes>> ptr_data_queue_ = make_shared<queue<bytes>>();
-    // ptr_data_queue_->push(data);
-    // map_queue_.insert(std::pair<string, shared_ptr<queue<bytes>>>(msgid, ptr_data_queue_));
+#if USE_BUFFER
+     mapbuffer_.emplace(msgid, make_shared<cycle_buffer>(1024 * 8));
+#else
+    mapbuffer_.emplace(msgid, make_shared<queue<bytes>>());
+#endif
+  }
 
-    ptr_data_queue_->emplace(data);
-    map_queue_.emplace(msgid, ptr_data_queue_);
-  }
-  else
-  {
-    // iter->second->push(data);
-    iter->second->emplace(data);
-  }
+#if USE_BUFFER
+  mapbuffer_[msgid]->write((const char*)data.data(), data.size());
+#else
+  mapbuffer_[msgid]->emplace(data);
+#endif
+
   cv_.notify_all();
   return true;
 }
@@ -39,16 +39,23 @@ ssize_t ClientConnection::recv(const string& msgid, char* data, uint64_t length,
   int64_t remain_time = recv_timeout_;
   do {
     std::unique_lock<std::mutex> lck(mutex_);
-    auto iter = map_queue_.find(msgid);
-    if(iter != map_queue_.end() && !iter->second->empty())
-    {
+    auto iter = mapbuffer_.find(msgid);
+    if(iter != mapbuffer_.end() && !iter->second->empty()) {
+  #if USE_BUFFER
+      shared_ptr<cycle_buffer> buffer = nullptr;
+      buffer = iter->second;
+      if (buffer->can_read(length)) { // got data
+        return buffer->read(data, length);
+      }
+  #else
       const bytes& bytes_data = iter->second->front();
       uint64_t nSize = bytes_data.size();
       copy(bytes_data.begin(), bytes_data.end(), data);
       iter->second->pop();
       return nSize;
+  #endif
     }
-
+    
     auto end = system_clock::now();
     elapsed = duration_cast<duration<int64_t, std::milli>>(end - beg).count();
     remain_time = recv_timeout_ - elapsed;

@@ -117,9 +117,7 @@ BaseClient::BaseClient(const ViaInfo& via_info, const string& taskid)
 }
 bool BaseClient::CheckConnStatus(const uint64_t conn_timeout, const useconds_t usec) 
 {
-	auto start_time = system_clock::now();
-	auto end_time   = start_time;
-	int64_t elapsed = 0;
+	timer_.start();
 	do
 	{
 		try 
@@ -135,9 +133,7 @@ bool BaseClient::CheckConnStatus(const uint64_t conn_timeout, const useconds_t u
 		catch (const Ice::Exception& ex) 
 		{
 			// cerr << ex << endl;
-			end_time = system_clock::now();
-			elapsed = duration_cast<duration<int64_t, std::milli>>(end_time - start_time).count();
-			if(elapsed >= conn_timeout)
+			if(timer_.ms_elapse() >= conn_timeout)
 			{        
 				string strErrMsg = "connect failed! connect to remote nodeid:" + remote_nid_ + " timeout, The timeout period is: " + 
 				to_string(conn_timeout) + "ms.";

@@ -14,6 +14,7 @@
 #include <Ice/Ice.h>
 #include <io_channel_ice.h>
 #include <thread>
+#include "simple_timer.h"
 using namespace ChannelSdk;
 
 class BaseClient
@@ -43,5 +44,6 @@ protected:
     IoChannelPrx stub_;
     uint64_t send_timeout_; // Timeout period for sending data each time, Unit:millisecond
     string remote_nid_;
+    SimpleTimer timer_; // The sending of data and ping messages by the client timed out
 };
  

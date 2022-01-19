@@ -26,7 +26,7 @@ function show_compile_usage() {
     echo "  -h --help                         Show this usage"
     echo "     --build-type                   [Release] One of [Release,Debug]"
     echo "     --server-type                  [ASYNC] One of [ASYNC,SYNC]"
-    echo "     --use-cache                    [OFF] Asynchronous server parameters:Use the cache queue switch"
+    echo "     --use-buffer                   [ON] Whether to use circular buffer to save data. The default value is no"
     echo "     --multi-locks                  [OFF] Asynchronous server parameters:Use multi-lock switches, and nodeid mapping"
     echo "     --thread-count                 [4] Number of threads to process asynchronous server events, default to the number of CPU cores available "
     echo "     --client-type                  [SYNC] One of [ASYNC,SYNC]"
@@ -71,13 +71,13 @@ if [ "${cmd}" = "compile" ]; then
     python_version=$(python3 -c 'import sys;ver=sys.version_info;print(str(ver[0])+"."+str(ver[1]))')   
     ssl_type=0
     use_alone=OFF
-    use_cache=OFF
+    use_buffer=OFF
     static_call=OFF
     thread_count=1
     multi_locks=OFF
 
     ARGS=$(getopt -o "h" -l "help,build-type:,server-type:,client-type:,ssl-type:,static-call,
-        use-alone,use-cache,thread-count:,multi-locks, python-version:,verbose:" -n "$0" -- "$@")
+        use-alone,use-buffer,thread-count:,multi-locks, python-version:,verbose:" -n "$0" -- "$@")
     eval set -- "${ARGS}"
 
     while true; do
@@ -115,8 +115,8 @@ if [ "${cmd}" = "compile" ]; then
             use_alone=ON
             shift
             ;;
-        --use-cache)
-            use_cache=ON
+        --use-buffer)
+            use_buffer=ON
             shift
             ;;
         --static-call)

@@ -27,7 +27,7 @@ function run_compile() {
         -DCMAKE_BUILD_TYPE=${build_type} \
         -DSERVER_TYPE=${server_type} \
         -DSTATIC_CALL=${static_call} \
-        -DUSE_CACHE=${use_cache} -DMULTI_LOCKS=${multi_locks} \
+        -DUSE_BUFFER=${use_buffer} -DMULTI_LOCKS=${multi_locks} \
         -DCLIENT_TYPE=${client_type}
         # -DPYBIND11_PYTHON_VERSION=${python_version}
 

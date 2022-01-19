@@ -7,6 +7,7 @@
 #include <atomic>
 #include <memory.h>
 #include <queue>
+#include "cycle_buffer.h"
 using namespace std;
 
 typedef vector<unsigned char> bytes;
@@ -30,7 +31,11 @@ public:
 	string nodeid_;
 	mutex mutex_;
 	condition_variable cv_;
-	unordered_map<string, shared_ptr<queue<bytes>>> map_queue_;
+#if USE_BUFFER
+	unordered_map<string, shared_ptr<cycle_buffer>> mapbuffer_;
+#else
+	unordered_map<string, shared_ptr<queue<bytes>>> mapbuffer_;
+#endif
 };
 
 using MapClientConn = unordered_map<string, shared_ptr<ClientConnection>>;
