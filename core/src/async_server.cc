@@ -1,5 +1,5 @@
 // file async_server.cc
-#ifdef ASYNC_SERVER
+#if ASYNC_SERVER
 #include "async_server.h"
 
 AsyncServer::~AsyncServer()

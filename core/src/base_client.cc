@@ -2,9 +2,6 @@
 #include "base_client.h"
 #include <IceGrid/IceGrid.h>
 #include <Glacier2/Glacier2.h>
-#include <thread>
-#include <chrono>   
-using namespace chrono;
 
 class CloseCallbackI : public Ice::CloseCallback
 {

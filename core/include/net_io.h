@@ -10,7 +10,6 @@
 #include <iomanip>
 #include <mutex>
 #include <string>
-#include <thread>
 #include <vector>
 #include <functional>
 using namespace std;
@@ -34,12 +33,6 @@ class BasicIO {
  public:
   virtual ~BasicIO()
   {
-#if ASYNC_CLIENT
-    for(auto& _thread : clients_thread_)
-    {
-      _thread.detach();
-    }
-#endif
     // server_->close();
   };
 
@@ -61,10 +54,6 @@ class BasicIO {
   NodeInfo node_info_;
   vector<ViaInfo> via_server_infos_;
   vector<string> client_nodeids_;
-
-#if ASYNC_CLIENT
-  vector<thread> clients_thread_;
-#endif
 
   unordered_map<string, shared_ptr<BaseClient>> nid_to_server_map_;
   MapClientConn client_conn_map;

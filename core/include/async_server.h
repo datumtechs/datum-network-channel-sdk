@@ -1,7 +1,7 @@
 
 // file async_server.h
 #pragma once
-#ifdef ASYNC_SERVER
+#if ASYNC_SERVER
 #include "base_server.h"
 #include "config.h"
 #include "client_connection.h"

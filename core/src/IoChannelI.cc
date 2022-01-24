@@ -1,6 +1,6 @@
 #include "IoChannelI.h"
 
-#ifdef ASYNC_SERVER
+#if ASYNC_SERVER
 IoChannelI::IoChannelI(MapWorkQueue* ptr_noide_to_wq_map):
   ptr_noide_to_wq_map_(ptr_noide_to_wq_map){}
 #else

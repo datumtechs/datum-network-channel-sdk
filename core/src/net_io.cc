@@ -5,8 +5,6 @@
 #include "IChannel.h"
 #include <unistd.h>
 #include <set>
-#include <chrono>   
-using namespace chrono;
 
 BasicIO::BasicIO(const NodeInfo &node_info, const vector<ViaInfo>& server_infos,
     const vector<string>& client_nodeids, error_callback error_callback )
@@ -58,16 +56,9 @@ bool ViaNetIO::init(const shared_ptr<ChannelConfig> config)
   for (int i = 0; i < nServerSize; i++) 
   {
     string server_node_id =  via_server_infos_[i].id;
-#if ASYNC_CLIENT
-    nid_to_server_map_[server_node_id]  = make_shared<AsyncClient>(via_server_infos_[i], taskid);
-    clients_thread_.emplace_back(std::thread(&AsyncClient::AsyncCompleteRpc, nid_to_server_map_[server_node_id]));
-    // gpr_log(GPR_INFO, "init async client connect, sids: %s.", via_server_infos_[i].id.c_str()); 
-#else
     nid_to_server_map_[server_node_id] = make_shared<SyncClient>(via_server_infos_[i], taskid);
     nid_to_server_map_[server_node_id]->SetSendTimeOut(config->send_timeout_*1000);
     nid_to_server_map_[server_node_id]->CheckConnStatus(config->conn_timeout_*1000, config->ping_time_*1000000);
-#endif
-  
   }
 
   return true;
