@@ -217,6 +217,7 @@ bool ChannelConfig::parse_node_info(Document& doc)
       cfg.node_.NODE_ID = GetString(Node, "NODE_ID", "", false);
       // cout << "node info parse:" << cfg.node_.NODE_ID << endl;
       cfg.node_.ADDRESS = GetString(Node, "ADDRESS", "", false);
+      cfg.node_.PUBLIC_IP = GetString(Node, "PUBLIC_IP", "127.0.0.1", false);
       cfg.node_.VIA = GetString(Node, "VIA", "", false);
       cfg.node_.GRICER2 = GetString(Node, "GRICER2", "", false);
       cfg.node_.ICEGRID = GetString(Node, "ICEGRID", "", false);
@@ -443,6 +444,7 @@ void ChannelConfig::CopyNodeInfo(NodeInfo& node_info, const Node& nodeInfo)
 {
   node_info.id = nodeInfo.NODE_ID;
   node_info.address = nodeInfo.ADDRESS;
+  node_info.public_ip_ = nodeInfo.PUBLIC_IP;
   node_info.ca_cert_path_ = root_cert_;
   node_info.cert_dir_ = nodeInfo.CERT_DIR;
   node_info.server_key_path_ = nodeInfo.SERVER_KEY_PATH;

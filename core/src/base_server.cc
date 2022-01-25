@@ -32,10 +32,15 @@ BaseServer::BaseServer(const NodeInfo& server_info, const string& taskId)
 		// cout << "value_endpoints:" << value_endpoints << endl;
         initData.properties->setProperty(C_IceGrid_Locator_Key, value_endpoints);
         string servantAdapterId = C_Servant_Adapter_Id_Prefix + taskId_ + "_" + server_info.id;
-		if(is_ssl)
-        	initData.properties->setProperty(C_Servant_Endpoints_Key, C_Server_SSL_Local);
-		else
-			initData.properties->setProperty(C_Servant_Endpoints_Key, C_Server_TCP_Local);
+		if(server_info.public_ip_.empty()) {
+			string strErrMsg = "NodeID:" + server_info.id + 
+				", the public IP address of the server is empty, please check!";
+			cout << strErrMsg << endl;
+			throw (strErrMsg);
+		}
+
+		string servant_endpoints = protocol + " -h " + server_info.public_ip_;
+		initData.properties->setProperty(C_Servant_Endpoints_Key, servant_endpoints);
         initData.properties->setProperty(C_Servant_AdapterId_Key, servantAdapterId);
 	} else {
 		// 直连

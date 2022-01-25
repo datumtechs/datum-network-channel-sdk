@@ -19,7 +19,11 @@ bool ViaNetIO::StartServer(const string& taskid, const NodeInfo& server_info,
   // async server
   server_ = make_shared<AsyncServer>(server_info, taskid, ptr_client_conn_map);
 #else
-  cout << "start sync server, address:" << server_info.address
+  string address = "address:" + server_info.address;
+  if(server_info.address.empty()) {
+    address = "public ip:" + server_info.public_ip_;
+  }
+  cout << "start sync server, " << address
        << ", Glacier2 info: {" << server_info.glacier2_info.GetInfo() << "}" 
        << ", IceGrid info: {" << server_info.ice_grid_info.GetInfo() << "}" << endl;
   // sync server

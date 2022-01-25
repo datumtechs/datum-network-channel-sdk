@@ -9,6 +9,7 @@
 		{
 			"NODE_ID": "p0",
 			"ADDRESS": "",
+			"PUBLIC_IP": "192.168.2.128",
 			"GRICER2": "VIA0",
 			"ICEGRID": "GRID0",
 			"CERT_DIR": "/home/luodahui/core/channel-sdk/ssl/openssl",
@@ -19,6 +20,7 @@
 		{
 			"NODE_ID": "p1",
 			"ADDRESS": "",
+			"PUBLIC_IP": "192.168.2.128",
 			"GRICER2": "VIA0",
 			"ICEGRID": "GRID0",
 			"CERT_DIR": "/home/luodahui/core/channel-sdk/ssl/openssl",
@@ -29,6 +31,7 @@
 		{
 			"NODE_ID": "p2",
 			"ADDRESS": "",
+			"PUBLIC_IP": "192.168.2.128",
 			"GRICER2": "VIA0",
 			"ICEGRID": "GRID0",
 			"CERT_DIR": "/home/luodahui/core/channel-sdk/ssl/openssl",

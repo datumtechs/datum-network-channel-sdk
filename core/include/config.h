@@ -16,6 +16,7 @@ struct Node
   string NODE_ID;
   string NAME;
   string ADDRESS;
+  string PUBLIC_IP;
   string VIA;
   string GRICER2;
   string ICEGRID;
@@ -44,6 +45,7 @@ struct Node
       NODE_ID.assign(node.NODE_ID);
       NAME.assign(node.NAME);
       ADDRESS.assign(node.ADDRESS);
+      PUBLIC_IP.assign(node.PUBLIC_IP);
       VIA.assign(node.VIA);
       GRICER2.assign(node.GRICER2);
       ICEGRID.assign(node.ICEGRID);
@@ -115,6 +117,7 @@ struct IcePlugCfg {
 struct NodeInfo {
   string id;
   string address;
+  string public_ip_;
   string via_address;
   // string glacier2_address;
   // string ice_grid_address;

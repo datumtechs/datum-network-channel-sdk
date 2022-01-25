@@ -19,5 +19,7 @@ Glacier2.Client.Trace.Reject=1
 # Glacier2.Trace.Session=1
 # Glacier2.Trace.RoutingTable=1
 
+# 追踪网络连接状态
+Ice.Trace.Network=2
 Ice.Warn.Connections=1
 Ice.MessageSizeMax=0

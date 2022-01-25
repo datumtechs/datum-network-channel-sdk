@@ -147,6 +147,7 @@ Channel Sdk通过使用IceGrid进行服务注册，和Ice的Glacier2进行消息
     "NODE_INFO": [
       {
         "NODE_ID": "p0",
+        "PUBLIC_IP": "192.168.2.128",
         "GRICER2": "VIA0",
         "ICEGRID": "GRID0",
         "CERT_DIR": "/home/luodahui/core/channel-sdk/ssl/openssl",
@@ -156,6 +157,7 @@ Channel Sdk通过使用IceGrid进行服务注册，和Ice的Glacier2进行消息
       },
       {
         "NODE_ID": "p1",
+        "PUBLIC_IP": "192.168.2.128",
         "GRICER2": "VIA0",
         "ICEGRID": "GRID0",
         "CERT_DIR": "/home/luodahui/core/channel-sdk/ssl/openssl",
@@ -165,6 +167,7 @@ Channel Sdk通过使用IceGrid进行服务注册，和Ice的Glacier2进行消息
       },
       {
         "NODE_ID": "p2",
+        "PUBLIC_IP": "192.168.2.128",
         "GRICER2": "VIA0",
         "ICEGRID": "GRID0",
         "CERT_DIR": "/home/luodahui/core/channel-sdk/ssl/openssl",

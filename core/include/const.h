@@ -4,8 +4,6 @@ const std::string C_Servant_Adapter_Name = "IoChannel";
 const std::string C_Servant_Endpoints_Key = C_Servant_Adapter_Name + ".Endpoints";
 const std::string C_Servant_AdapterId_Key = C_Servant_Adapter_Name + ".AdapterId";
 const std::string C_Server_Proxy_Key = "IoChannel.Proxy";
-const std::string C_Server_TCP_Local = "tcp -h localhost";
-const std::string C_Server_SSL_Local = "ssl -h localhost";
 
 // ServantId = C_Servant_Id_Prefix + "_" + NodeId
 const std::string C_Servant_Id_Prefix = "IoChannel";

@@ -13,4 +13,7 @@ IceGrid.Registry.LMDB.MapSize=10
 IceGrid.Registry.LMDB.Path=deploy/lmdb/registry
 IceGrid.Registry.DynamicRegistration=1
 
+# 追踪网络连接状态
+Ice.Trace.Network=2
+
 Ice.MessageSizeMax=0
