@@ -33,7 +33,7 @@ ssize_t ClientConnection::recv(const string& msgid, char* data, uint64_t length,
   // if (timeout < 0)
   //   timeout = 10 * 1000000;
   
-  auto beg = system_clock::now();
+  auto beg = steady_clock::now();
   int64_t elapsed = 0;
   int64_t remain_time = recv_timeout_;
   do {
@@ -55,7 +55,7 @@ ssize_t ClientConnection::recv(const string& msgid, char* data, uint64_t length,
   #endif
     }
     
-    auto end = system_clock::now();
+    auto end = steady_clock::now();
     elapsed = duration_cast<duration<int64_t, std::milli>>(end - beg).count();
     remain_time = recv_timeout_ - elapsed;
 
