@@ -13,12 +13,6 @@ set(SSL_TYPE 0)
 message(STATUS "[SSL_TYPE]: ${SSL_TYPE}")
 add_definitions(-DSSL_TYPE=${SSL_TYPE})
 
-option(USE_ALONE "" OFF)
-message(STATUS "[USE_ALONE]: ${USE_ALONE}")
-IF(USE_ALONE)
-    add_definitions(-DUSE_ALONE=1)
-ENDIF()
-
 option(SERVER_TYPE "" OFF)
 message(STATUS "[SERVER_TYPE]: ${SERVER_TYPE}")
 IF(SERVER_TYPE)

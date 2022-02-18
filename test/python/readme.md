@@ -1,10 +1,11 @@
 ### 说明
 
-由于对外的接口单独使用时，必须要导出`IChannel`， 但是Rosetta已经导出，再导出会有冲突；所以编译时需要添加编译选项：
+Channel SDK既支持密文发送（设置到Rosetta或PSI使用）；也支持明文使用。
 
-```cmake
-cmake -DUSE_ALONE=1
-```
+- 密文发送
+参考：[rtt-linear_saver_restore.py](./linear_saver_restore/rtt-logistic_regression_reveal_ice.py)。
 
-> 如果是给rosetta用，即不用加此参数；
+- 明文发送
+参考：[client](./one_to_one/client.py)和[server](./one_to_one/server.py)。
+
 

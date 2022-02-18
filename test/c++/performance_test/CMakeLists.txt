@@ -29,12 +29,6 @@ file(GLOB_RECURSE srcs ${project_path}/core/src/*.cc)
 add_library(${LIBNAME} SHARED ${srcs})
 target_include_directories(${LIBNAME} PUBLIC ${project_path}/core/include)
 target_link_libraries(${LIBNAME} PUBLIC pthread ${_REFLECTION} ${_GRPC_GRPCPP} ${_PROTOBUF_LIBPROTOBUF})
- 
-
-option(USE_ALONE "" OFF)
-IF(USE_ALONE)
-    add_definitions(-DUSE_ALONE=1)
-ENDIF()
 
 option(ASYNC_SERVER "" OFF)
 IF(ASYNC_SERVER)

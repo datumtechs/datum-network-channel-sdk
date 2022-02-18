@@ -18,11 +18,6 @@ ELSEIF(USE_GMSSL)
     message(STATUS "[SSL_TYPE]: 2")
 ENDIF()
 
-option(USE_ALONE "" OFF)
-IF(USE_ALONE)
-    add_definitions(-DUSE_ALONE=1)
-ENDIF()
-
 option(ASYNC_SERVER "" ON)
 IF(ASYNC_SERVER)
     add_definitions(-DASYNC_SERVER=1)

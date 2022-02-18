@@ -119,10 +119,10 @@ def channel_test():
     msgid = 'test'
     for n in nodes:
         if n != node:
-            channel.send_msg(n, msgid, node + " to:" + n)
+            channel.Send(n, msgid, node + " to:" + n)
     for n in nodes:
         if n != node:
-            msg = channel.recv_msg(n, msgid, 2 * len(node) + 4)
+            msg = channel.Recv(n, msgid, 2 * len(node) + 4)
             print('get msg from ', n, " msg:", msg)
 
 

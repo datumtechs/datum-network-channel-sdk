@@ -20,7 +20,7 @@ function show_usage() {
 function show_compile_usage() {
     echo "USAGE:"
     echo "  $E compile [OPTION]"
-    echo "  e.g.: $E compile --use-alone"
+    echo "  e.g.: $E compile"
     echo ""
     echo "OPTIONS:"
     echo "  -h --help                         Show this usage"
@@ -31,7 +31,6 @@ function show_compile_usage() {
     echo "     --thread-count                 [4] Number of threads to process asynchronous server events, default to the number of CPU cores available "
     echo "     --client-type                  [SYNC] One of [ASYNC,SYNC]"
     echo "     --python-version               Python install version"
-    echo "     --use-alone                    [OFF] The compiled version is used separately"
     echo "     --static-call                  [OFF] Static call mode of RPC interface, default:OFF, which indicates dynamic invocation"
     echo "     --ssl-type                     [0] SSL Type, 0: SSL is not used; 1: using openssl;  2: using GMSSL"
     echo "     --verbose                      [OFF] Display the detailed information of the compilation process, the value is a numeric type"
@@ -70,14 +69,13 @@ if [ "${cmd}" = "compile" ]; then
     client_type=SYNC
     python_version=$(python3 -c 'import sys;ver=sys.version_info;print(str(ver[0])+"."+str(ver[1]))')   
     ssl_type=0
-    use_alone=OFF
     use_buffer=OFF
     static_call=OFF
     thread_count=1
     multi_locks=OFF
 
     ARGS=$(getopt -o "h" -l "help,build-type:,server-type:,client-type:,ssl-type:,static-call,
-        use-alone,use-buffer,thread-count:,multi-locks, python-version:,verbose:" -n "$0" -- "$@")
+        use-buffer,thread-count:,multi-locks, python-version:,verbose:" -n "$0" -- "$@")
     eval set -- "${ARGS}"
 
     while true; do
@@ -111,10 +109,6 @@ if [ "${cmd}" = "compile" ]; then
             ssl_type=${2}
             shift 2
             ;;
-        --use-alone)
-            use_alone=ON
-            shift
-            ;;
         --use-buffer)
             use_buffer=ON
             shift
@@ -146,7 +140,7 @@ if [ "${cmd}" = "compile" ]; then
     server_type=${server_type}"_SERVER"
     client_type=${client_type}"_CLIENT"
     run_compile
-    run_compile_python $use_alone $ssl_type $python_version
+    run_compile_python $ssl_type $python_version
 elif [ "${cmd}" = "ice" ]; then
     ARGS=$(getopt -o "h" -l "help" -n "$0" -- "$@")
     eval set -- "${ARGS}"

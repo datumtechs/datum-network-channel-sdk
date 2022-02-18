@@ -26,9 +26,9 @@ if __name__ == '__main__':
         # print("start send to p1========" )
         while(True):
             # print("start recv from p1========" )
-            io_channel.send_msg(remote_nodeid, msgid, data, msg_len, 0)
-            recv_msg = io_channel.recv_msg(remote_nodeid, msgid, 100, 0)
-            print("recv_msg:{}".format(recv_msg))
+            io_channel.Send(remote_nodeid, msgid, data, msg_len, 0)
+            recv_data = io_channel.Recv(remote_nodeid, msgid, 100, 0)
+            print("recv data:{}".format(recv_data))
             time.sleep(2)
 
     except Exception as e:

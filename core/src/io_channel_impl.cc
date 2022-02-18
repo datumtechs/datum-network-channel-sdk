@@ -2,24 +2,20 @@
 #include "tcp_channel.h"
 #include <set>
 
-string IoChannelImpl::recv_msg(const string& node_id, const string& msg_id, uint64_t msg_len, 
+string IoChannelImpl::Recv(const string& node_id, const string& msg_id, uint64_t msg_len, 
         uint64_t timeout) 
 {
   string str(msg_len, 0);
-  if(timeout <= 0)
-    timeout = 10 * 1000000;
   if(!io_channel_){cout << "io channel is nullptr." << endl; return "";}
   io_channel_->Recv(node_id.c_str(), msg_id.c_str(), &str[0], msg_len, timeout);
   return str;
 }
 
-ssize_t IoChannelImpl::send_msg(const string& node_id, const string& msg_id, const string& data, 
+ssize_t IoChannelImpl::Send(const string& node_id, const string& msg_id, const string& data, 
         uint64_t msg_len, uint64_t timeout)
 {
   if(msg_len > data.size())
-        msg_len = data.size();
-  if(timeout <= 0)
-    timeout = 10 * 1000000;
+      msg_len = data.size();
   if(!io_channel_){cout << "io channel is nullptr." << endl; return 0;}
   return io_channel_->Send(node_id.c_str(), msg_id.c_str(), data.c_str(), msg_len, timeout);
 }

@@ -51,9 +51,9 @@ build_ext_target = sub_dir_name + "/" + cc_module_name
 DOCLINES = __doc__.split('\n')
 __version__ = '2.0.0'
 
-build_use_alone = False
-if 'USE_ALONE' in os.environ and os.environ['USE_ALONE'] == 'ON':
-    build_use_alone = True
+# build_use_alone = False
+# if 'USE_ALONE' in os.environ and os.environ['USE_ALONE'] == 'ON':
+#     build_use_alone = True
 
 root_dir = os.path.dirname(os.path.abspath(__file__))
 include_dirs = []
@@ -76,8 +76,8 @@ library_dirs.append(save_lib_dir)
 
 # compile flags and definitions
 extra_cflags = []
-if build_use_alone:
-    extra_cflags.append('-DUSE_ALONE=1')  # USE_ALONE
+# if build_use_alone:
+#     extra_cflags.append('-DUSE_ALONE=1')  # USE_ALONE
 
 extra_cflags.append('-fPIC')  # general
 extra_cflags.append('-Wno-unused-function')  # general

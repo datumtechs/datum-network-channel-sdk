@@ -27,9 +27,9 @@ if __name__ == '__main__':
     msg_len = len(data)
     while(True):
         # print("start recv from p0========" )
-        recv_msg = io_channel.recv_msg(remote_nodeid, msgid, 100, 0)
-        print("recv_msg:{}".format(recv_msg))
+        recv_data = io_channel.Recv(remote_nodeid, msgid, 100, 0)
+        print("recv data:{}".format(recv_data))
 
         # print("start send to p0========" )
-        io_channel.send_msg(remote_nodeid, msgid, data, msg_len, 0)
+        io_channel.Send(remote_nodeid, msgid, data, msg_len, 0)
     

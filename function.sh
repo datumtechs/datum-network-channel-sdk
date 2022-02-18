@@ -23,7 +23,6 @@ function run_compile() {
     cmake .. -DCMAKE_INSTALL_PREFIX=.install -DCMAKE_PREFIX_PATH=${builddir}  \
         -DTHREAD_COUNT=${thread_count} \
         -DSSL_TYPE=${ssl_type} \
-        -DUSE_ALONE=${use_alone} \
         -DCMAKE_BUILD_TYPE=${build_type} \
         -DSERVER_TYPE=${server_type} \
         -DSTATIC_CALL=${static_call} \
@@ -63,7 +62,7 @@ function run_clean() {
 function run_compile_python() {
   echo -e "stage run_compile_python."
   cd ${curdir}
-  python_cmd=python${3}
+  python_cmd=python${2}
   package_name="channel_sdk"
 
   echo -e "python_cmd: ${python_cmd}"
@@ -74,8 +73,8 @@ function run_compile_python() {
     ${python_cmd} -m pip uninstall $package_name -y # for the current user
   fi
 
-  export USE_ALONE=$1 SSL_TYPE=$2 && ${python_cmd} setup.py build_ext
-  export USE_ALONE=$1 SSL_TYPE=$2 && ${python_cmd} setup.py bdist_wheel
+  export SSL_TYPE=$1 && ${python_cmd} setup.py build_ext
+  export SSL_TYPE=$1 && ${python_cmd} setup.py bdist_wheel
 
   cd ${curdir}
   echo -e "${GREEN}run stage run_compile_python ok.${NC}"
