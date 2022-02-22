@@ -22,14 +22,12 @@ if __name__ == '__main__':
     # 创建网络拓扑
     # 
     remote_nodeid = "p0"
-    msgid = "1"
     data = "this is test p1 server."
-    msg_len = len(data)
     while(True):
         # print("start recv from p0========" )
-        recv_data = io_channel.Recv(remote_nodeid, msgid, 100, 0)
+        recv_data = io_channel.Recv(remote_nodeid, 100)
         print("recv data:{}".format(recv_data))
 
         # print("start send to p0========" )
-        io_channel.Send(remote_nodeid, msgid, data, msg_len, 0)
+        io_channel.Send(remote_nodeid, data)
     

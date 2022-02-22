@@ -33,9 +33,8 @@ public:
     return &impl;
   }
 
-  string Recv(const string& node_id, const string& msg_id, uint64_t msg_len, uint64_t timeout=0);
-  ssize_t Send(const string& node_id, const string& msg_id, const string& data, 
-        uint64_t msg_len, uint64_t timeout=0);
+  string Recv(const string& node_id, uint64_t recv_len);
+  ssize_t Send(const string& node_id, const string& data);
   
   IChannel* CreateIoChannel(const string& node_id, const string &config_str, 
         error_callback error_cb=nullptr);

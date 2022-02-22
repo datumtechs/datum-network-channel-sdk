@@ -18,15 +18,13 @@ public:
     return IoChannelImpl::Instance()->CreateIoChannel(node_id, config_str, process_error);
   }
 
-  string Recv(const string& node_id, const string& msg_id, uint64_t msg_len, uint64_t timeout)
+  string Recv(const string& node_id, uint64_t recv_len)
   {
-    return IoChannelImpl::Instance()->Recv(node_id, msg_id, msg_len, timeout);
+    return IoChannelImpl::Instance()->Recv(node_id, recv_len);
   }
 
-  ssize_t Send(const string& node_id, const string& msg_id, const string& data, uint64_t msg_len,
-      uint64_t timeout)
+  ssize_t Send(const string& node_id, const string& data)
   {
-    return IoChannelImpl::Instance()->Send(node_id, msg_id, data, msg_len, timeout);
+    return IoChannelImpl::Instance()->Send(node_id, data);
   }
-
 };
