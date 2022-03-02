@@ -285,6 +285,12 @@ Channel Sdk通过使用IceGrid进行服务注册，和Ice的Glacier2进行消息
   ./run_restore.sh
   ```
 
+### PSI使用测试
+
+如未安装sdk，先[安装sdk](#安装)；进入`channel-sdk/test/python/psi_demo`目录，执行：
+```bash
+./run_demo_extio.sh
+```
 
 ### 使用Ice测试
 
@@ -295,4 +301,3 @@ Channel Sdk通过使用IceGrid进行服务注册，和Ice的Glacier2进行消息
 ```bash
 ./run_ice.sh
 ```
-
