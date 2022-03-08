@@ -33,6 +33,7 @@ function show_compile_usage() {
     echo "     --python-version               Python install version"
     echo "     --static-call                  [OFF] Static call mode of RPC interface, default:OFF, which indicates dynamic invocation"
     echo "     --ssl-type                     [0] SSL Type, 0: SSL is not used; 1: using openssl;  2: using GMSSL"
+    echo "     --package-ice-via              [OFF] Whether to package and install IceGrid and Glacier2 related binaries and configuration files."
     echo "     --verbose                      [OFF] Display the detailed information of the compilation process, the value is a numeric type"
     echo ""
     echo "  The default options: --build-type Release --server-type ASYNC --client-type SYNC"
@@ -73,9 +74,9 @@ if [ "${cmd}" = "compile" ]; then
     static_call=OFF
     thread_count=1
     multi_locks=OFF
-
+    package_ice_via=OFF
     ARGS=$(getopt -o "h" -l "help,build-type:,server-type:,client-type:,ssl-type:,static-call,
-        use-buffer,thread-count:,multi-locks, python-version:,verbose:" -n "$0" -- "$@")
+        use-buffer,thread-count:,multi-locks,package-ice-via,python-version:,verbose:" -n "$0" -- "$@")
     eval set -- "${ARGS}"
 
     while true; do
@@ -125,6 +126,10 @@ if [ "${cmd}" = "compile" ]; then
             multi_locks=ON
             shift
             ;;
+        --package-ice-via)
+            package_ice_via=ON
+            shift
+            ;;
         --)
             shift
             break
@@ -140,7 +145,7 @@ if [ "${cmd}" = "compile" ]; then
     server_type=${server_type}"_SERVER"
     client_type=${client_type}"_CLIENT"
     run_compile
-    run_compile_python $ssl_type $python_version
+    run_compile_python $package_ice_via $python_version
 elif [ "${cmd}" = "ice" ]; then
     ARGS=$(getopt -o "h" -l "help" -n "$0" -- "$@")
     eval set -- "${ARGS}"

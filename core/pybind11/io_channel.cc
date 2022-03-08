@@ -8,7 +8,7 @@ namespace py = pybind11;
 PYBIND11_MODULE(pyio, m) {
 
   // 导出IChannel接口; 注意：IChannel对象已经导出, 在Rosetta或PSI中不能再导出，否则会有冲突;
-  py::class_<IChannel,  shared_ptr<IChannel> >(m, "IChannel");
+  // py::class_<IChannel,  shared_ptr<IChannel> >(m, "IChannel");
 
   py::class_<APIManager>(m, "APIManager")
     .def(py::init<>())

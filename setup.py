@@ -30,21 +30,32 @@ from distutils import sysconfig
 
 dir_name = "python"
 sub_dir_name = "channel_sdk"
-save_lib_dir = dir_name + "/" + sub_dir_name + "/"
+save_root_dir = dir_name + "/" + sub_dir_name + "/"
 
 so_libs = glob.glob('build/lib/lib*.so')
 for file_name in so_libs:
-    shutil.copy(file_name, save_lib_dir)
+    shutil.copy(file_name, save_root_dir)
 
+# ice lib
 ice_so_libs = glob.glob('third_party/ice/lib/lib*.so*')
+save_lib_dir = save_root_dir + "lib/"
 for file_name in ice_so_libs:
     shutil.copy(file_name, save_lib_dir)
 
-# ice binary
-ice_binary = glob.glob('third_party/ice/bin/*')
-save_bin_dir = save_lib_dir + "bin/"
-for file_name in ice_binary:
-    shutil.copy(file_name, save_bin_dir)
+# Whether to pack ICE VIA related documents
+if 'PACKAGE_ICE_VIA' in os.environ and os.environ['PACKAGE_ICE_VIA'] == 'ON':
+    print("start to package ice via====================")
+    # ice binary(ICE via)
+    ice_binary = glob.glob('third_party/ice/bin/*')
+    save_bin_dir = save_root_dir + "bin/"
+    for file_name in ice_binary:
+        shutil.copy(file_name, save_bin_dir)
+
+    # ice config
+    ice_config = glob.glob('third_party/ice/config/*')
+    save_config_dir = save_root_dir + "config/"
+    for file_name in ice_config:
+        shutil.copy(file_name, save_config_dir)
 
 cc_module_name = "pyio"
 build_ext_target = sub_dir_name + "/" + cc_module_name
@@ -72,6 +83,7 @@ include_dirs.append(ccdir+"/third_party/pybind11/include")
 
 # libraries search path
 library_dirs = ['.']
+library_dirs.append(save_root_dir)
 library_dirs.append(save_lib_dir)
 
 # compile flags and definitions
@@ -84,9 +96,8 @@ extra_cflags.append('-Wno-unused-function')  # general
 extra_cflags.append('-Wno-sign-compare')
 extra_cflags.append('-std=c++11')  # temp c++11
 
-
 extra_lflags = []
-link_rpath = "$ORIGIN"
+link_rpath = "$ORIGIN:$ORIGIN/lib"
 extra_lflags.append('-Wl,-rpath={}'.format(link_rpath))
 
 print('extra_lflags', extra_lflags)
@@ -123,7 +134,7 @@ setup(
     author='channel sdk',
     author_email='channel-sdk@juzix.cn',
     url='https://www.platon.network/',
-    download_url='http://192.168.9.66/RosettaFlow/channel-sdk',
+    download_url='https://github.com/Metisnetwork/Metis-Channel-sdk.git',
     description=DOCLINES[0],
     long_description='\n'.join(DOCLINES[2:]),
     package_dir={'': 'python'},  # where to find package

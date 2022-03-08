@@ -73,8 +73,8 @@ function run_compile_python() {
     ${python_cmd} -m pip uninstall $package_name -y # for the current user
   fi
 
-  export SSL_TYPE=$1 && ${python_cmd} setup.py build_ext
-  export SSL_TYPE=$1 && ${python_cmd} setup.py bdist_wheel
+  export PACKAGE_ICE_VIA=$1 && ${python_cmd} setup.py build_ext
+  export PACKAGE_ICE_VIA=$1 && ${python_cmd} setup.py bdist_wheel
 
   cd ${curdir}
   echo -e "${GREEN}run stage run_compile_python ok.${NC}"

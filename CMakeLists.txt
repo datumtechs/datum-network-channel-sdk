@@ -53,7 +53,7 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/third_party/rapidjson/include)
 # threads
 find_package(Threads REQUIRED)
 
-SET(ADD_LINK_LIB_FLAGS "-Wl,--rpath=$ORIGIN../:$ORIGIN")
+SET(ADD_LINK_LIB_FLAGS "-Wl,--rpath=$ORIGIN../:$ORIGIN:$ORIGIN/lib")
 SET(CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} ${ADD_LINK_LIB_FLAGS}")
 
 # IF(SSL_TYPE MATCHES 2)

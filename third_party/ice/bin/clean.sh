@@ -6,3 +6,9 @@ ps -ef | grep -E "glacier2router|icegridregistry" | grep -v grep | awk '{print $
 
 # Kill the log listener process
 ps -ef | grep -E "glacier2|icegrid" | grep .log$ | grep -v grep | awk '{print $2}' | xargs kill -9 >/dev/null 2>&1
+
+rm -rf deploy
+script_dir=$(dirname $0)
+log_dir=${script_dir}/../logs
+rm -rf $log_dir
+

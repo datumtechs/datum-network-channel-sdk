@@ -1,2 +1,4 @@
 include python/channel_sdk/*.so*
 include python/channel_sdk/bin/*
+include python/channel_sdk/lib/*
+include python/channel_sdk/config/*
