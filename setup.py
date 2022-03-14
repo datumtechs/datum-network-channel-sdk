@@ -60,7 +60,7 @@ if 'PACKAGE_ICE_VIA' in os.environ and os.environ['PACKAGE_ICE_VIA'] == 'ON':
 cc_module_name = "pyio"
 build_ext_target = sub_dir_name + "/" + cc_module_name
 DOCLINES = __doc__.split('\n')
-__version__ = '2.0.0'
+__version__ = '2.0.1'
 
 # build_use_alone = False
 # if 'USE_ALONE' in os.environ and os.environ['USE_ALONE'] == 'ON':
