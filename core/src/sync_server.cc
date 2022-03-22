@@ -15,13 +15,19 @@ SyncServer::SyncServer(const NodeInfo& server_info, const string& taskId,
 {
 	Ice::Identity id ;
 	id.name = C_Servant_Id_Prefix + "_" + server_info.id;
-
-	//增加一个适配器
-    Ice::ObjectPtr object = new IoChannelI(ptr_client_conn_map);
-	ptr_adapter_->add(object, id);
-	//激发启动一个通信器
-	ptr_adapter_->activate();
-	//通信器在这里等待处理数据连接
-	// ptr_communicator_->waitForShutdown();
+	try 
+	{
+		//增加一个适配器
+		Ice::ObjectPtr object = new IoChannelI(ptr_client_conn_map);
+		ptr_adapter_->add(object, id);
+		//激发启动一个通信器
+		ptr_adapter_->activate();
+		//通信器在这里等待处理数据连接
+		// ptr_communicator_->waitForShutdown();
+	} 
+	catch (const Ice::Exception& e) 
+	{
+		HANDLE_EXCEPTION_EVENT(C_EVENT_CODE_START_SERVICE, taskId, server_info.id.c_str(), e.what());
+	}
 }
 #endif

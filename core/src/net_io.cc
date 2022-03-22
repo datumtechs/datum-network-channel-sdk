@@ -72,7 +72,6 @@ ssize_t ViaNetIO::recv(const string& remote_nodeid, const char* id, char* data,
       uint64_t length, int64_t timeout) 
 {
   ssize_t ret = client_conn_map[remote_nodeid]->recv(id, data, length, timeout);
-  // gpr_log(GPR_DEBUG, "recv data from %s succeed, id:%s, size:%ld.", remote_nodeid.c_str(), id, ret);
   return ret;
 }
 
@@ -81,6 +80,5 @@ ssize_t ViaNetIO::send(const string& remote_nodeid, const char* id, const char* 
 {
   ssize_t ret = nid_to_server_map_[remote_nodeid]->send(node_info_.id, remote_nodeid, 
         id, data, length, timeout);
-  // gpr_log(GPR_DEBUG, "send data to %s succeed, id:%s, size:%ld.", remote_nodeid.c_str(), id, ret);
   return ret;
 }

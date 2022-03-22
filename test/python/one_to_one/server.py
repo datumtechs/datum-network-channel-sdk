@@ -16,18 +16,21 @@ with open(config_file, 'r') as load_f:
 
 if __name__ == '__main__':
 
-   # 启动服务
-    channel = io_channel.create_channel("p1", strJson)
+    try:
+    # 启动服务
+        channel = io_channel.create_channel("p1", strJson)
 
-    # 创建网络拓扑
-    # 
-    remote_nodeid = "p0"
-    data = "this is test p1 server."
-    while(True):
-        # print("start recv from p0========" )
-        recv_data = io_channel.Recv(remote_nodeid, 100)
-        print("recv data:{}".format(recv_data))
+        # 创建网络拓扑
+        # 
+        remote_nodeid = "p0"
+        data = "this is test p1 server."
+        while(True):
+            # print("start recv from p0========" )
+            recv_data = io_channel.Recv(remote_nodeid, 100)
+            print("recv data:{}".format(recv_data))
 
-        # print("start send to p0========" )
-        io_channel.Send(remote_nodeid, data)
-    
+            # print("start send to p0========" )
+            io_channel.Send(remote_nodeid, data)
+    except Exception as e:
+        print("exception:", e)
+        print(traceback.format_exc())

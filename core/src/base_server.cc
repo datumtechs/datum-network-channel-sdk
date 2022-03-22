@@ -22,9 +22,7 @@ BaseServer::BaseServer(const NodeInfo& server_info, const string& taskId)
 		const string& port = server_info.ice_grid_info.Port_;
 		const string& app_name = server_info.ice_grid_info.AppName_;
 		if(app_name.empty() || ip.empty() || port.empty()) {
-			string strErrMsg = "The service node: " + server_info.id + " doesn't configure IceGrid address!";
-			cout << strErrMsg << endl;
-			throw (strErrMsg);
+			HANDLE_EXCEPTION_EVENT(C_EVENT_CODE_NO_ICEGRID, taskId, server_info.id.c_str());
 		}
 		// 设置IceGrid的服务信息（用于servant信息的注册; IceGrid不需要使用ssl）
         // string value_endpoints = "ChannelIceGrid/Locator:tcp -p 10032 -h 192.168.2.128";
@@ -33,10 +31,7 @@ BaseServer::BaseServer(const NodeInfo& server_info, const string& taskId)
         initData.properties->setProperty(C_IceGrid_Locator_Key, value_endpoints);
         string servantAdapterId = C_Servant_Adapter_Id_Prefix + taskId_ + "_" + server_info.id;
 		if(server_info.public_ip_.empty()) {
-			string strErrMsg = "NodeID:" + server_info.id + 
-				", the public IP address of the server is empty, please check!";
-			cout << strErrMsg << endl;
-			throw (strErrMsg);
+			HANDLE_EXCEPTION_EVENT(C_EVENT_CODE_NO_PUBLIC_IP, taskId, server_info.id.c_str());
 		}
 
 		string servant_endpoints = protocol + " -h " + server_info.public_ip_;
@@ -63,7 +58,15 @@ BaseServer::BaseServer(const NodeInfo& server_info, const string& taskId)
         initData.properties->setProperty("IceSSL.CertFile", server_info.server_cert_path_);
         initData.properties->setProperty("IceSSL.Password", server_info.password_);
 	}
-	ptr_holder_ = make_shared<Ice::CommunicatorHolder>(initData);
-	ptr_communicator_ = ptr_holder_->communicator();
-	ptr_adapter_ = ptr_communicator_->createObjectAdapter(C_Servant_Adapter_Name);
+
+	try 
+	{
+		ptr_holder_ = make_shared<Ice::CommunicatorHolder>(initData);
+		ptr_communicator_ = ptr_holder_->communicator();
+		ptr_adapter_ = ptr_communicator_->createObjectAdapter(C_Servant_Adapter_Name);
+	} 
+	catch (const Ice::Exception& e) 
+	{
+		HANDLE_EXCEPTION_EVENT(C_EVENT_CODE_START_SERVICE, taskId, server_info.id.c_str(), e.what());
+	}
 }

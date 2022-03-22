@@ -30,10 +30,13 @@ using_external_io = True
 io_channel = None
 if using_external_io:
     print("use external io=================================")
-
-    import channel_sdk.pyio as io
-    io_channel = io.APIManager()
-    channel = io_channel.create_channel(node_id_, strJson)
+    try:
+        import channel_sdk.pyio as io
+        io_channel = io.APIManager()
+        channel = io_channel.create_channel(node_id_, strJson)
+    except Exception as e:
+        print("catch event exception:", e)
+        exit(0)
 
     # 使用外部io
     print("start set==================")

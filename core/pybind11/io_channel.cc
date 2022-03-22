@@ -1,9 +1,10 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 #include <pybind11/functional.h>
-namespace py = pybind11;
 #include "api_manager.h"
+// #include "event_exception.h"
 
+namespace py = pybind11;
 // 定义模块名称(pyio)
 PYBIND11_MODULE(pyio, m) {
 
@@ -16,4 +17,6 @@ PYBIND11_MODULE(pyio, m) {
     .def("Recv", &APIManager::Recv)
     .def("Send", &APIManager::Send)
     ;
+
+  // py::register_exception<EventException>(m, "PyExp");
 }

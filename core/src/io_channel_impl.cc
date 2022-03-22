@@ -56,22 +56,7 @@ IChannel* IoChannelImpl::CreateIoChannel(const string& node_id, const string &co
   // 获取本节点对应的IceGrid地址
   string ice_grid_name = config->nodeid_to_icegrid_[node_info.id];
   node_info.ice_grid_info = config->icegrid_to_info_[ice_grid_name];
-  /*
-  if("" == node_info.via_address)
-  {
-    string strErrMsg = "The service node " + node_info.id + " does not have a VIA address!";
-    cout << strErrMsg << endl;
-    throw (strErrMsg);
-  }
-      
-  if("" == node.ADDRESS)
-  {
-    string strErrMsg = "The address corresponding to the " + node_info.id + " node server is empty!";
-    cout << strErrMsg << endl;
-    throw (strErrMsg);
-  }
-  */
-    
+  
   vector<string> clientNodeIds; 
   config->GetNodeInfos(clientNodeIds, serverInfos, node_id);
 

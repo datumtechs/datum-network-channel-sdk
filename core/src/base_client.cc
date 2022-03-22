@@ -35,7 +35,6 @@ BaseClient::BaseClient(const ViaInfo& via_info, const string& taskid)
 	// set ssl property
 	auto SetSSLProperty = [&initData](const ViaInfo& via_info) -> bool {
 		if(via_info.server_cert_path_.empty() || via_info.client_cert_path_.empty()) {
-			cout << "Invalid client openssl certificate, please check!" << endl;
 			return false;
 		}
 		initData.properties->setProperty("Ice.Plugin.IceSSL", "IceSSL:createIceSSL");
@@ -55,9 +54,7 @@ BaseClient::BaseClient(const ViaInfo& via_info, const string& taskid)
 		const string& port = via_info.glacier2_info.Port_;
 		const string& app_name = via_info.glacier2_info.AppName_;
 		if(app_name.empty() || ip.empty() || port.empty()) {
-			string strErrMsg = "The service node: " + via_info.id + " doesn't configure Glacier2 address!";
-			cout << strErrMsg << endl;
-			throw (strErrMsg);
+			HANDLE_EXCEPTION_EVENT(C_EVENT_CODE_NO_GLACIER2, taskid, via_info.id.c_str());
 		}
 
 		// 设置Glacier2的路由信息, app_name为Glacier2服务名称, ip和port分别为Glacier2服务监听的地址以及端口
@@ -66,27 +63,33 @@ BaseClient::BaseClient(const ViaInfo& via_info, const string& taskid)
 		initData.properties->setProperty(C_Glacier2_Router_Key, strGlacier2Cfg);
 		initData.properties->setProperty(C_MAX_SIZE_KEY, "0");
 		if(is_ssl && !SetSSLProperty(via_info)) {
-			string strErrMsg = "Set ssl property failed, please check!";
-			cout << strErrMsg << endl;
-			throw (strErrMsg);
+			HANDLE_EXCEPTION_EVENT(C_EVENT_CODE_INVALID_CERT, taskid, via_info.id.c_str());
 		}
-      	ptr_holder_ = make_shared<Ice::CommunicatorHolder>(initData);
-		ptr_communicator_ = ptr_holder_->communicator();
-		
-		string servantAdapterId = C_Servant_Adapter_Id_Prefix + taskid + "_" + via_info.id;
-        string servantId = C_Servant_Id_Prefix + "_" + via_info.id;
-		// 寻找方式
-        string strProxy = servantId + "@" + servantAdapterId;
-		Glacier2::RouterPrx router = Glacier2::RouterPrx::checkedCast(ptr_communicator_->getDefaultRouter());
-    	Glacier2::SessionPrx session = router->createSession("", "");
 
-		Ice::Int acmTimeout = router->getACMTimeout();
-		Ice::ConnectionPtr connection = router->ice_getCachedConnection();
-		assert(connection);
-		connection->setACM(acmTimeout, IceUtil::None, Ice::HeartbeatAlways);
-		connection->setCloseCallback(new CloseCallbackI());
+		try 
+		{
+			ptr_holder_ = make_shared<Ice::CommunicatorHolder>(initData);
+			ptr_communicator_ = ptr_holder_->communicator();
+			
+			string servantAdapterId = C_Servant_Adapter_Id_Prefix + taskid + "_" + via_info.id;
+			string servantId = C_Servant_Id_Prefix + "_" + via_info.id;
+			// 寻找方式
+			string strProxy = servantId + "@" + servantAdapterId;
+			Glacier2::RouterPrx router = Glacier2::RouterPrx::checkedCast(ptr_communicator_->getDefaultRouter());
+			Glacier2::SessionPrx session = router->createSession("", "");
 
-		stub_ = IoChannelPrx::uncheckedCast(ptr_communicator_->stringToProxy(strProxy));
+			Ice::Int acmTimeout = router->getACMTimeout();
+			Ice::ConnectionPtr connection = router->ice_getCachedConnection();
+			assert(connection);
+			connection->setACM(acmTimeout, IceUtil::None, Ice::HeartbeatAlways);
+			connection->setCloseCallback(new CloseCallbackI());
+
+			stub_ = IoChannelPrx::uncheckedCast(ptr_communicator_->stringToProxy(strProxy));
+		}
+      	catch (const Ice::Exception& e) 
+		{
+			HANDLE_EXCEPTION_EVENT(C_EVENT_CODE_CREATE_CLIENT, taskid, via_info.id.c_str(), e.what());
+		}
 	} else {
 		// 直连
 		string ip = serAddress.substr(0, npos);
@@ -96,21 +99,25 @@ BaseClient::BaseClient(const ViaInfo& via_info, const string& taskid)
 		initData.properties->setProperty(C_Server_Proxy_Key, endpoints);
 		initData.properties->setProperty(C_MAX_SIZE_KEY, "0");
 		if(is_ssl && !SetSSLProperty(via_info)) {
-			string strErrMsg = "Set ssl property failed, please check!";
-			cout << strErrMsg << endl;
-			throw (strErrMsg);
+			HANDLE_EXCEPTION_EVENT(C_EVENT_CODE_INVALID_CERT, taskid, via_info.id.c_str());
 		}
 
-		ptr_holder_ = make_shared<Ice::CommunicatorHolder>(initData);
-		ptr_communicator_ = ptr_holder_->communicator();
-		
-		// uncheckedCast 函数从不进行远程调用
-		stub_ = Ice::uncheckedCast<IoChannelPrx>(
-			ptr_communicator_->propertyToProxy(C_Server_Proxy_Key)->ice_twoway()->
-				ice_timeout(-1)->ice_secure(false));
+		try 
+		{
+			ptr_holder_ = make_shared<Ice::CommunicatorHolder>(initData);
+			ptr_communicator_ = ptr_holder_->communicator();	
+			// uncheckedCast 函数从不进行远程调用
+			stub_ = Ice::uncheckedCast<IoChannelPrx>(
+				ptr_communicator_->propertyToProxy(C_Server_Proxy_Key)->ice_twoway()->
+					ice_timeout(-1)->ice_secure(false));
+		} 
+		catch (const Ice::Exception& e) 
+		{
+			HANDLE_EXCEPTION_EVENT(C_EVENT_CODE_CREATE_CLIENT, taskid, via_info.id.c_str(), e.what());
+		}
 	}
 	if (!stub_)
-		throw "Invalid proxy";
+		HANDLE_EXCEPTION_EVENT(C_EVENT_CODE_INVALID_PROXY, taskid, via_info.id.c_str());
 }
 bool BaseClient::CheckConnStatus(const uint64_t conn_timeout, const useconds_t usec) 
 {
@@ -132,10 +139,7 @@ bool BaseClient::CheckConnStatus(const uint64_t conn_timeout, const useconds_t u
 			// cerr << ex << endl;
 			if(timer_.ms_elapse() >= conn_timeout)
 			{        
-				string strErrMsg = "connect failed! connect to remote nodeid:" + remote_nid_ + " timeout, The timeout period is: " + 
-				to_string(conn_timeout) + "ms.";
-				cout << strErrMsg << endl;
-				throw (strErrMsg);
+				HANDLE_EXCEPTION_EVENT(C_EVENT_CODE_CONNECT_TIMEOUT, task_id_, remote_nid_.c_str(), conn_timeout);
 				// return 0;
 			}
 			usleep(usec);

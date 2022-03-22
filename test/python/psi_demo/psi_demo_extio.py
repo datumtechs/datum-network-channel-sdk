@@ -216,9 +216,15 @@ def basic_usage_future(paras):
         # # IO
         iohandler = psi.IOHandler()
         print("paras.node_id:", paras.node_id, flush=True)
-        import channel_sdk.pyio as io
-        io_channel = io.APIManager()
-        channel = io_channel.create_channel(paras.node_id, cfg_json)
+        try:
+            import channel_sdk.pyio as io
+            io_channel = io.APIManager()
+            channel = io_channel.create_channel(paras.node_id, cfg_json)
+            print("create_channel succeed:", paras.node_id, flush=True)
+        except Exception as e:
+            print("catch event exception:", e)
+            exit(0)
+        
         iohandler.set_channel(self_task_id, channel)
         print("set_channel succeed:", paras.node_id, flush=True)
 

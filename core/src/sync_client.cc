@@ -7,9 +7,6 @@ using namespace chrono;
 SyncClient::SyncClient(const ViaInfo& via_info, const string& taskid):
   BaseClient(via_info, taskid){}
 
-// SyncClient::SyncClient(const NodeInfo& node_info, const string& taskid):
-//   BaseClient(node_info, taskid){}
-
 ssize_t SyncClient::send(const string& self_nodeid, const string& remote_nodeid, 
     const string& msg_id, const char* data, const size_t nLen, int64_t timeout)
 {
@@ -46,11 +43,9 @@ ssize_t SyncClient::send(const string& self_nodeid, const string& remote_nodeid,
     } catch (const Ice::Exception& ex) {
       cerr << ex << endl;
       if(timer_.ms_elapse() >= send_timeout_)
-      {        
-        string strErrMsg = "self nodeid:" + self_nodeid + " send data to nodeid:" + remote_nodeid + 
-          " timeout, The timeout period is: " + to_string(send_timeout_) + "ms.";
-        cout << strErrMsg << endl;
-        throw (strErrMsg);
+      {
+        HANDLE_EXCEPTION_EVENT(C_EVENT_CODE_SEND_DATA_TIMEOUT, task_id_, self_nodeid.c_str(), 
+            remote_nodeid.c_str(), send_timeout_);
       }
       sleep(1);
     }

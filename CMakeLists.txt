@@ -5,7 +5,7 @@ project(${LIBNAME})
 
 include(./cmake/SetCommon.cmake)
 add_definitions(-std=c++11)
-
+add_definitions(-w)
 # option
 # option(SSL_TYPE "" OFF)
 message(STATUS "[SSL_TYPE]: ${SSL_TYPE}")

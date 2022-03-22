@@ -32,16 +32,23 @@ AsyncServer::AsyncServer(const NodeInfo& server_info, const string& taskId,
 
 	Ice::Identity id ;
 	id.name = C_Servant_Id_Prefix + "_" + server_info.id;
-	//增加一个适配器
-    IoChannelPtr object = new IoChannelI(&map_noide_to_wq_);
-	ptr_adapter_->add(object, id);
-    // 启动线程池
-    for(auto &v : map_noide_to_wq_)
+    try
     {
-        v.second->start();
+        //增加一个适配器
+        IoChannelPtr object = new IoChannelI(&map_noide_to_wq_);
+        ptr_adapter_->add(object, id);
+        // 启动线程池
+        for(auto &v : map_noide_to_wq_)
+        {
+            v.second->start();
+        }
+        //激发启动一个通信器
+        ptr_adapter_->activate();
     }
-	//激发启动一个通信器
-	ptr_adapter_->activate();
+	catch (const Ice::Exception& e) 
+	{
+		HANDLE_EXCEPTION_EVENT(C_EVENT_CODE_START_SERVICE, taskId, server_info.id.c_str(), e.what());
+	}
 	//通信器在这里等待处理数据连接
 	// ptr_communicator_->waitForShutdown();
 }
