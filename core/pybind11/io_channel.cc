@@ -13,6 +13,7 @@ PYBIND11_MODULE(pyio, m) {
 
   py::class_<APIManager>(m, "APIManager")
     .def(py::init<>())
+    .def("GetPolicy", &APIManager::GetPolicy)
     .def("create_channel", &APIManager::create_channel)
     .def("Recv", &APIManager::Recv)
     .def("Send", &APIManager::Send)

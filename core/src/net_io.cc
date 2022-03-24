@@ -6,9 +6,9 @@
 #include <unistd.h>
 #include <set>
 
-BasicIO::BasicIO(const NodeInfo &node_info, const vector<ViaInfo>& server_infos,
-    const vector<string>& client_nodeids, error_callback error_callback )
-  : node_info_(node_info), via_server_infos_(server_infos), client_nodeids_(client_nodeids),
+BasicIO::BasicIO(const NodeInfo &node_info, const set<ViaInfo>& remote_server_infos,
+    const set<string>& client_nodeids, error_callback error_callback )
+  : node_info_(node_info), remote_server_infos_(remote_server_infos), client_nodeids_(client_nodeids),
     handler(error_callback) {}
 
 bool ViaNetIO::StartServer(const string& taskid, const NodeInfo& server_info,
@@ -40,45 +40,49 @@ bool ViaNetIO::init(const shared_ptr<ChannelConfig> config)
   uint32_t client_size = client_nodeids_.size();
   if(client_size > 0)
   {
-    string client_nodeid = "";
-
-    for (int i = 0; i < client_size; i++)
-    {
-      client_nodeid = client_nodeids_[i];
-      client_conn_map[client_nodeid] = make_shared<ClientConnection>(client_nodeid);
+    for(auto& iter: client_nodeids_) {
+      string client_nodeid = iter;
+      client_conn_map_[client_nodeid] = make_shared<ClientConnection>(client_nodeid);
     #if USE_BUFFER
-      client_conn_map[client_nodeid]->SetBufferSize(config->buffer_size_); 
+      client_conn_map_[client_nodeid]->SetBufferSize(config->buffer_size_); 
     #endif
-      client_conn_map[client_nodeid]->SetRecvTimeOut(config->send_timeout_*1000);
+      client_conn_map_[client_nodeid]->SetRecvTimeOut(config->send_timeout_*1000);
     }
 
     // 启动服务
-    StartServer(taskid, node_info_, &client_conn_map);
-  }
-  
-  uint32_t nServerSize = via_server_infos_.size();
-  for (int i = 0; i < nServerSize; i++) 
-  {
-    string server_node_id =  via_server_infos_[i].id;
-    nid_to_server_map_[server_node_id] = make_shared<SyncClient>(via_server_infos_[i], taskid);
-    nid_to_server_map_[server_node_id]->SetSendTimeOut(config->send_timeout_*1000);
-    nid_to_server_map_[server_node_id]->CheckConnStatus(config->conn_timeout_*1000, config->ping_time_*1000000);
+    StartServer(taskid, node_info_, &client_conn_map_);
   }
 
+  for(auto& iter: remote_server_infos_) {
+    string remote_node_id = iter.id;
+    client_obj_map_[remote_node_id] = make_shared<SyncClient>(iter, taskid);
+    client_obj_map_[remote_node_id]->SetSendTimeOut(config->send_timeout_*1000);
+    client_obj_map_[remote_node_id]->CheckConnStatus(config->conn_timeout_*1000, config->ping_time_*1000000);
+  }
+  
   return true;
 }
 
 ssize_t ViaNetIO::recv(const string& remote_nodeid, const char* id, char* data,
       uint64_t length, int64_t timeout) 
 {
-  ssize_t ret = client_conn_map[remote_nodeid]->recv(id, data, length, timeout);
+  if(client_conn_map_.find(remote_nodeid) == client_conn_map_.end()) {
+    cout << "recv data:\nnot find remote nodeid:" << remote_nodeid << endl;
+    HANDLE_EXCEPTION_EVENT(C_EVENT_CODE_NO_FIND_NID, "", remote_nodeid.c_str());
+  }
+  ssize_t ret = client_conn_map_[remote_nodeid]->recv(id, data, length, timeout);
   return ret;
 }
 
 ssize_t ViaNetIO::send(const string& remote_nodeid, const char* id, const char* data, 
       uint64_t length, int64_t timeout) 
 {
-  ssize_t ret = nid_to_server_map_[remote_nodeid]->send(node_info_.id, remote_nodeid, 
-        id, data, length, timeout);
+  if(client_obj_map_.find(remote_nodeid) == client_obj_map_.end()) {
+    cout << "send data:\nnot find remote nodeid:" << remote_nodeid << endl;
+    HANDLE_EXCEPTION_EVENT(C_EVENT_CODE_NO_FIND_NID, "", remote_nodeid.c_str());
+  }
+
+  ssize_t ret = client_obj_map_[remote_nodeid]->send(node_info_.id, remote_nodeid, 
+        id, data, length, timeout);    
   return ret;
 }

@@ -36,8 +36,8 @@ class BasicIO {
     // server_->close();
   };
 
-  BasicIO(const NodeInfo &node_info, const vector<ViaInfo>& server_infos, 
-    const vector<string>& client_nodeids,
+  BasicIO(const NodeInfo &node_info, const set<ViaInfo>& remote_server_infos, 
+    const set<string>& client_nodeids,
     error_callback error_callback=nullptr);
 
  public:
@@ -52,11 +52,11 @@ class BasicIO {
 
  protected:
   NodeInfo node_info_;
-  vector<ViaInfo> via_server_infos_;
-  vector<string> client_nodeids_;
+  set<ViaInfo> remote_server_infos_;
+  set<string> client_nodeids_;
 
-  unordered_map<string, shared_ptr<BaseClient>> nid_to_server_map_;
-  MapClientConn client_conn_map;
+  unordered_map<string, shared_ptr<BaseClient>> client_obj_map_;
+  MapClientConn client_conn_map_;
   error_callback handler;
 
   shared_ptr<BaseServer> server_ = nullptr;
@@ -70,7 +70,7 @@ class ViaNetIO : public BasicIO {
  public:
   using BasicIO::BasicIO;
   virtual ~ViaNetIO(){}  
-  bool StartServer(const string& taskid, const NodeInfo& server_info, MapClientConn* ptr_client_conn_map);
+  bool StartServer(const string& taskid, const NodeInfo& remote_server_infos, MapClientConn* ptr_client_conn_map);
 
   bool init(const shared_ptr<ChannelConfig> config);
   ssize_t recv(const string& remote_nodeid, const char* id, char* data, uint64_t length, 

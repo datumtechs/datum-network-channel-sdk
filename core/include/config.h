@@ -5,6 +5,8 @@
 #include <vector>
 #include <map>
 #include <iostream>
+#include "const.h"
+#include <set>
 using namespace std;
 
 #include <rapidjson/document.h>
@@ -119,8 +121,6 @@ struct NodeInfo {
   string address;
   string public_ip_;
   string via_address;
-  // string glacier2_address;
-  // string ice_grid_address;
   IcePlugCfg glacier2_info;
   IcePlugCfg ice_grid_info;
   string ca_cert_path_;
@@ -145,11 +145,6 @@ struct NodeInfo {
 #endif
 
   NodeInfo() = default;
-  // NodeInfo(const string& node_id, const string& addr, const string& via_addr,
-  //   const string& glacier2_addr, const string& ice_grid_addr): id(node_id), address(addr), 
-  //     via_address(via_addr), glacier2_address(glacier2_addr), ice_grid_address(ice_grid_addr),
-  //     glacier2_info(), ice_grid_info(){}
-
   NodeInfo(const string& node_id, const string& addr, const string& via_addr,
     const string& glacier2_addr, const string& ice_grid_addr): id(node_id), address(addr), 
       via_address(via_addr),glacier2_info(), ice_grid_info(){}
@@ -178,6 +173,9 @@ struct ViaInfo {
   ViaInfo() = default;
   ViaInfo(const string& node_id, const string& via_addr, const string& via_, const string& glacier2_addr) 
     : id(node_id), via_address(via_addr), via(via_), glacier2_info(){}
+  friend bool operator<(const ViaInfo& v1, const ViaInfo& v2) {
+    return v1.id < v2.id;
+  }
 };
 
 enum NODE_TYPE {
@@ -197,8 +195,8 @@ class ChannelConfig {
 
   void CopyNodeInfo(NodeInfo& node_info, const Node& nodeInfo);
   bool isNodeType(const vector<NODE_TYPE>& vec_node_types, const NODE_TYPE nodeType);
-  bool GetNodeInfos(vector<string>& clientNodeIds, vector<ViaInfo>& serverInfos, const string& node_id);
-
+  bool GetNodeInfos(set<string>& clientNodeIds, set<ViaInfo>& serverInfos, const string& node_id);
+  
  private:
   bool load(const string& node_id, const string& config_file);
   bool parse(Document& doc);
@@ -206,6 +204,9 @@ class ChannelConfig {
   bool parse_data(Document& doc);
   bool parse_compute(Document& doc);
   bool parse_result(Document& doc);
+  bool parse_policy(Document& doc);
+  bool GetAllNodeInfos(set<string>& clientNodeIds, set<ViaInfo>& serverInfos, const string& node_id);
+  bool GetInfoByNodeId(set<string>& clientNodeIds, set<ViaInfo>& serverInfos, const string& node_id);
 
  public:
   void fmt_print();
@@ -232,9 +233,13 @@ class ChannelConfig {
   vector<string> data_nodes_;
   map<string, int> compute_nodes_;
   vector<string> result_nodes_;
+  set<string> task_nodes_;
   DataNodeConfig data_config_;
   ComputeNodeConfig compute_config_;
   ResultNodeConfig result_config_;
+  // connect policy
+  string policy_type_ = "";
+  map<string, set<string>> map_policy_;
 };
 
 static string get_file_contents(const string& fpath)

@@ -33,19 +33,20 @@ public:
     return &impl;
   }
 
+  string GetPolicy(const string &config_str);
   string Recv(const string& node_id, uint64_t recv_len);
   ssize_t Send(const string& node_id, const string& data);
   
-  IChannel* CreateIoChannel(const string& node_id, const string &config_str, 
+  IChannel* CreateIoChannel(const string& self_node_id, const string &config_str, 
         error_callback error_cb=nullptr);
 
   // 等待服务器结束
   // void WaitServer(){if(server_) server_->wait();}
-public:
+private:
   IChannel* io_channel_ = nullptr;
 private:
 
-  IChannel* CreateViaChannel(const NodeInfo& node_idInfo, shared_ptr<ChannelConfig> config,
-      const vector<ViaInfo>& serverInfos, const vector<string>& clientNodeIds, 
+  IChannel* CreateViaChannel(const NodeInfo& node_Info, shared_ptr<ChannelConfig> config,
+      const set<ViaInfo>& remote_server_infos, const set<string>& clientNodeIds, 
       error_callback error_callback=nullptr);
 };

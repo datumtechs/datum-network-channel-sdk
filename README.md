@@ -204,12 +204,18 @@ Channel Sdk通过使用IceGrid进行服务注册，和Ice的Glacier2进行消息
       "p0",
       "p1",
       "p2"
-    ]
+    ],
+    "POLICY": {
+      "p0": ["p1","p2"],
+      "p1": ["p0","p2"],
+      "p2": ["p0","p1"]
+    }
   }
   ```
 
-  > 注意：此配置文件配置的Glacier2信息和IceGrid信息必须和config.glacier2，config.gridregistry配置的信息匹配，否则无法正常使用；其中`PUBLIC_IP`表示通过代理转发消息时，允许被Glacier2服务访问的节点服务器IP地址（如果在同一台机器上，可设置为127.0.0.1）；
+  > 注意：此配置文件配置的Glacier2信息和IceGrid信息必须和config.glacier2，config.gridregistry配置的信息匹配，否则无法正常使用；其中`PUBLIC_IP`表示通过代理转发消息时，允许被Glacier2服务访问的节点服务器IP地址（如果在同一台机器上，可设置为127.0.0.1）；POLICY为连接策略配置，当不配置此选项或为空时，表示全连接; 连接策略配置中的字典key为客户端节点ID，字典value为服务端节点ID列表。
 
+  
 ### 启动Glacier2
 
 执行脚本：

@@ -13,6 +13,12 @@ class APIManager
 {
 public:
   APIManager() {}
+
+  string GetPolicy(const std::string &config_str)
+  {
+    return IoChannelImpl::Instance()->GetPolicy(config_str);
+  }
+
   IChannel* create_channel(const string& node_id, const std::string &config_str) 
   {
     return IoChannelImpl::Instance()->CreateIoChannel(node_id, config_str, process_error);

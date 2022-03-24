@@ -7,7 +7,6 @@
 using namespace rapidjson;
 
 #include <algorithm>
-#include <set>
 #include <unistd.h>
 
 bool is_file_exist(const string& filepath) {
@@ -108,7 +107,7 @@ ChannelConfig::ChannelConfig(const string& node_id, const string& config_json) {
   //! @attention use node_id__ID = node_id
   bool ret = load(node_id, config_json);
   if (!ret) {
-    throw "ChannelConfig load2 config json failed!";
+    HANDLE_EXCEPTION_EVENT(C_EVENT_CODE_PARSE_FILE, "");
   }
   node_id_ = node_id;
 }
@@ -118,7 +117,7 @@ ChannelConfig::ChannelConfig(const string& config_json) {
   bool ret = load(node_id, config_json);
   if (!ret) 
   {
-    throw "ChannelConfig load3 config json failed!";
+    HANDLE_EXCEPTION_EVENT(C_EVENT_CODE_PARSE_FILE, "");
   }
 }
 
@@ -160,8 +159,8 @@ const Node& ChannelConfig::GetNode(const string& node_id) {
       return result_config_.P[i];
   //  cout << "result node id:" << result_config_.P[i].NODE_ID << endl;
   }
-  cout << "node_id: " << node_id << endl;
-  throw "can not find node in config!";
+  // cout << "node_id: " << node_id << endl;
+  HANDLE_EXCEPTION_EVENT(C_EVENT_CODE_NO_FIND_NID, task_id_, node_id.c_str());
 }
 
 bool ChannelConfig::load(const string& node_id, const string& config_file) {
@@ -334,7 +333,12 @@ bool ChannelConfig::parse_data(Document& doc) {
       if (node_info_config_.find(data_nodes_[i]) != node_info_config_.end()) {
         data_config_.P[i].copy_from(node_info_config_[data_nodes_[i]].node_);
       } else {
-        cout << "can not find node info, node id:" << data_nodes_[i] << endl;
+        // cout << "can not find node info, node id:" << data_nodes_[i] << endl;
+        HANDLE_EXCEPTION_EVENT(C_EVENT_CODE_NO_FIND_NID, task_id_, data_nodes_[i].c_str());
+      }
+      // Save the id of the node that participates in the task
+      if(task_nodes_.find(data_nodes_[i]) == task_nodes_.end()) {
+        task_nodes_.insert(data_nodes_[i]);
       }
     }
     // cout << "parse " << Nodes.Size() << " data success" << endl;
@@ -368,7 +372,12 @@ bool ChannelConfig::parse_compute(Document& doc) {
       if (node_info_config_.find(iter->first) != node_info_config_.end()) {
         compute_config_.P[i].copy_from(node_info_config_[iter->first].node_);
       } else {
-        cout << "can not find node info, node id:" << iter->first << endl;
+        // cout << "can not find node info, node id:" << iter->first << endl;
+        HANDLE_EXCEPTION_EVENT(C_EVENT_CODE_NO_FIND_NID, task_id_, iter->first.c_str());
+      }
+      // Save the id of the node that participates in the task
+      if(task_nodes_.find(iter->first) == task_nodes_.end()) {
+        task_nodes_.insert(iter->first);
       }
     }
     // cout << "parse " << " computation success" << endl;
@@ -389,10 +398,46 @@ bool ChannelConfig::parse_result(Document& doc) {
       if (node_info_config_.find(result_nodes_[i]) != node_info_config_.end()) {
         result_config_.P[i].copy_from(node_info_config_[result_nodes_[i]].node_);
       } else {
-        cout << "can not find node info, node id:" << result_nodes_[i] << endl;
+        // cout << "can not find node info, node id:" << result_nodes_[i] << endl;
+        HANDLE_EXCEPTION_EVENT(C_EVENT_CODE_NO_FIND_NID, task_id_, result_nodes_[i].c_str());
+      }
+
+      // Save the id of the node that participates in the task
+      if(task_nodes_.find(result_nodes_[i]) == task_nodes_.end()) {
+        task_nodes_.insert(result_nodes_[i]);
       }
     }
     // cout << "parse " << Nodes.Size() << " result success" << endl;
+  }
+  return true;
+}
+
+bool ChannelConfig::parse_policy(Document& doc) {
+  if (doc.HasMember("POLICY")) {
+    if(doc["POLICY"].IsString()) {
+      policy_type_ = GetString(doc, "POLICY", "all", false);
+    } else if(doc["POLICY"].IsObject()) {
+      Value& dict_policy = doc["POLICY"];
+
+      for (auto iter = dict_policy.MemberBegin(); iter != dict_policy.MemberEnd(); iter++) 
+      {
+        string nodeid = iter->name.GetString();
+        set<string> nodeids;
+        if(dict_policy[nodeid.c_str()].IsArray()) {
+
+          Value& ServerNodes = dict_policy[nodeid.c_str()];
+          // nodes
+          for (int i = 0; i < ServerNodes.Size(); i++) 
+          {
+            string strTmp;
+            Value& Node = ServerNodes[i];
+            strTmp = Node.GetString();
+            nodeids.emplace(strTmp);
+          }
+        }
+        map_policy_.emplace(nodeid, nodeids);
+      }
+    }
   }
   return true;
 }
@@ -424,6 +469,11 @@ bool ChannelConfig::parse(Document& doc) {
 
   if (!parse_result(doc)) {
     cout << "parse result error" << endl;
+    return false;
+  }
+
+  if (!parse_policy(doc)) {
+    cout << "parse connect policy error" << endl;
     return false;
   }
 
@@ -465,6 +515,17 @@ void ChannelConfig::CopyNodeInfo(NodeInfo& node_info, const Node& nodeInfo)
     node_info.client_enc_cert_path_ = nodeInfo.CLIENT_ENC_CERT_PATH;
   }
   #endif
+
+  // 获取本节点对应的via地址
+  string via_name = nodeid_to_via_[node_info.id];
+  node_info.via_address = via_to_address_[via_name];
+  // 获取本节点对应的glacier2地址
+  string glacier2_name = nodeid_to_glacier2_[node_info.id];
+  node_info.glacier2_info = glacier2_to_info_[glacier2_name];
+
+  // 获取本节点对应的IceGrid地址
+  string ice_grid_name = nodeid_to_icegrid_[node_info.id];
+  node_info.ice_grid_info = icegrid_to_info_[ice_grid_name];
 }
 
 bool ChannelConfig::isNodeType(const vector<NODE_TYPE>& vec_node_types, const NODE_TYPE nodeType)
@@ -498,88 +559,149 @@ void GetCertInfosFromNode(ViaInfo& viaTmp, const Node& node)
   #endif
 }
 
-bool ChannelConfig::GetNodeInfos(vector<string>& clientNodeIds, vector<ViaInfo>& serverInfos, 
+bool ChannelConfig::GetNodeInfos(set<string>& clientNodeIds, set<ViaInfo>& serverInfos, 
     const string& node_id)
 {
-  set<string> nodeid_set;
-  // 遍历计算节点
-  for (int i = 0; i < data_config_.P.size(); i++) 
-  {
-    // 获取计算节点的nodeid
-    string nid = data_config_.P[i].NODE_ID;
-    string via = nodeid_to_via_[nid];
-    string glacier2 = nodeid_to_glacier2_[nid];
-    if (node_id != nid && nodeid_set.find(nid) == nodeid_set.end()) 
-    {
-      ViaInfo viaTmp;
-      viaTmp.id = nid;
-      viaTmp.via = via;
-      viaTmp.via_address = via_to_address_[via];
-      if(viaTmp.via_address.empty()) {
-        viaTmp.via_address = data_config_.P[i].ADDRESS;
+  if(0 == map_policy_.size()) {
+    GetAllNodeInfos(clientNodeIds, serverInfos, node_id);
+  } else {
+    for(auto& iter_map: map_policy_) {
+      set<string> clientTmp;
+      bool isAlreadyGet = false;
+      // find self nodeid
+      if(false == isAlreadyGet && (iter_map.first == node_id) ) {
+        // get service nodeid
+        for(auto& iter_nid: iter_map.second) {
+          GetInfoByNodeId(clientTmp, serverInfos, iter_nid);
+        }
+        isAlreadyGet = true;
       }
-      viaTmp.glacier2_info = glacier2_to_info_[glacier2];
-
-      const Node& node = node_info_config_[nid].node_;
-      GetCertInfosFromNode(viaTmp, node);
-      // cout << "id: " << nid << ", via: " << viaTmp.via << ", via_address: " << viaTmp.via_address << endl;
-      serverInfos.push_back(viaTmp);
-      clientNodeIds.push_back(nid);
-      nodeid_set.insert(nid);
+      // find the client nodeid connected to self node.
+      if( (iter_map.first != node_id) && (iter_map.second.find(node_id) != iter_map.second.end()) ) {
+        clientNodeIds.emplace(iter_map.first);
+      }
     }
-  }
-
-  // 遍历计算节点
-  for (int i = 0; i < compute_config_.P.size(); i++) 
-  {
-    // 获取计算节点的nodeid
-    string nid = compute_config_.P[i].NODE_ID;
-    string via = nodeid_to_via_[nid];
-    string glacier2 = nodeid_to_glacier2_[nid];
-    if (node_id != nid && nodeid_set.find(nid) == nodeid_set.end()) 
-    {
-      ViaInfo viaTmp;
-      viaTmp.id = nid;
-      viaTmp.via = via;
-      viaTmp.via_address = via_to_address_[via];
-      if(viaTmp.via_address.empty()) {
-        viaTmp.via_address = compute_config_.P[i].ADDRESS;
-      }
-      viaTmp.glacier2_info = glacier2_to_info_[glacier2];
-      const Node& node = node_info_config_[nid].node_;
-      GetCertInfosFromNode(viaTmp, node);
-      // cout << "id: " << nid << ", via: " << viaTmp.via << ", via_address: " << viaTmp.via_address << endl;
-      serverInfos.push_back(viaTmp);
-      clientNodeIds.push_back(nid);
-      nodeid_set.insert(nid);
+    if(clientNodeIds.empty() || serverInfos.empty()) {
+      string strErrMsg = "The connection policy is not configured for the task node:" + node_id;
+      HANDLE_EXCEPTION_EVENT(C_EVENT_CODE_NO_FIND_NID, "", node_id);
     }
   }
   
-  for (int i = 0; i < result_config_.P.size(); i++) 
+  return true;
+}
+
+bool ChannelConfig::GetInfoByNodeId(set<string>& clientNodeIds, set<ViaInfo>& serverInfos, 
+    const string& node_id)
+{
+  if(node_info_config_.find(node_id) == node_info_config_.end()) {
+     HANDLE_EXCEPTION_EVENT(C_EVENT_CODE_NO_FIND_NID, task_id_, node_id.c_str());
+  }
+
+  string via = nodeid_to_via_[node_id];
+  string glacier2 = nodeid_to_glacier2_[node_id];
+  ViaInfo viaTmp;
+  viaTmp.id = node_id;
+  viaTmp.via = via;
+  viaTmp.glacier2_info = glacier2_to_info_[glacier2];
+
+  const Node& node = node_info_config_[node_id].node_;
+  viaTmp.via_address = node.ADDRESS;
+  GetCertInfosFromNode(viaTmp, node);
+  serverInfos.emplace(viaTmp);
+  clientNodeIds.emplace(node_id);
+  return true;
+}
+
+bool ChannelConfig::GetAllNodeInfos(set<string>& clientNodeIds, set<ViaInfo>& serverInfos, 
+    const string& node_id)
+{
+  // set<string> nodeid_set;
+  // // 遍历计算节点
+  // for (int i = 0; i < data_config_.P.size(); i++) 
+  // {
+  //   // 获取计算节点的nodeid
+  //   string nid = data_config_.P[i].NODE_ID;
+  //   string via = nodeid_to_via_[nid];
+  //   string glacier2 = nodeid_to_glacier2_[nid];
+  //   if (node_id != nid && nodeid_set.find(nid) == nodeid_set.end()) 
+  //   {
+  //     ViaInfo viaTmp;
+  //     viaTmp.id = nid;
+  //     viaTmp.via = via;
+  //     viaTmp.via_address = via_to_address_[via];
+  //     if(viaTmp.via_address.empty()) {
+  //       viaTmp.via_address = data_config_.P[i].ADDRESS;
+  //     }
+  //     viaTmp.glacier2_info = glacier2_to_info_[glacier2];
+
+  //     const Node& node = node_info_config_[nid].node_;
+  //     GetCertInfosFromNode(viaTmp, node);
+  //     // cout << "id: " << nid << ", via: " << viaTmp.via << ", via_address: " << viaTmp.via_address << endl;
+  //     serverInfos.push_back(viaTmp);
+  //     clientNodeIds.push_back(nid);
+  //     nodeid_set.insert(nid);
+  //   }
+  // }
+
+  // // 遍历计算节点
+  // for (int i = 0; i < compute_config_.P.size(); i++) 
+  // {
+  //   // 获取计算节点的nodeid
+  //   string nid = compute_config_.P[i].NODE_ID;
+  //   string via = nodeid_to_via_[nid];
+  //   string glacier2 = nodeid_to_glacier2_[nid];
+  //   if (node_id != nid && nodeid_set.find(nid) == nodeid_set.end()) 
+  //   {
+  //     ViaInfo viaTmp;
+  //     viaTmp.id = nid;
+  //     viaTmp.via = via;
+  //     viaTmp.via_address = via_to_address_[via];
+  //     if(viaTmp.via_address.empty()) {
+  //       viaTmp.via_address = compute_config_.P[i].ADDRESS;
+  //     }
+  //     viaTmp.glacier2_info = glacier2_to_info_[glacier2];
+  //     const Node& node = node_info_config_[nid].node_;
+  //     GetCertInfosFromNode(viaTmp, node);
+  //     // cout << "id: " << nid << ", via: " << viaTmp.via << ", via_address: " << viaTmp.via_address << endl;
+  //     serverInfos.push_back(viaTmp);
+  //     clientNodeIds.push_back(nid);
+  //     nodeid_set.insert(nid);
+  //   }
+  // }
+  
+  // for (int i = 0; i < result_config_.P.size(); i++) 
+  // {
+  //   // cout << "handle compute node" << endl;
+  //   string nid = result_config_.P[i].NODE_ID;
+  //   string via = nodeid_to_via_[nid];
+  //   string glacier2 = nodeid_to_glacier2_[nid];
+  //   if (node_id != nid && nodeid_set.find(nid) == nodeid_set.end()) 
+  //   {
+  //     ViaInfo viaTmp;
+  //     viaTmp.id = nid;
+  //     // 节点所在via
+  //     viaTmp.via = via;
+  //     // via信息
+  //     viaTmp.via_address = via_to_address_[viaTmp.via];
+  //     if(viaTmp.via_address.empty()) {
+  //       viaTmp.via_address = result_config_.P[i].ADDRESS;
+  //     }
+  //     viaTmp.glacier2_info = glacier2_to_info_[glacier2];
+  //     const Node& node = node_info_config_[nid].node_;
+  //     GetCertInfosFromNode(viaTmp, node);
+  //     // cout << "id: " << nid << ", via: " << viaTmp.via << ", address: " << viaTmp.via_address << endl;
+  //     serverInfos.push_back(viaTmp);
+  //     clientNodeIds.emplace_back(nid);
+  //     nodeid_set.emplace(nid);
+  //   }
+  // }  
+
+  for(auto& nid: task_nodes_) 
   {
-    // cout << "handle compute node" << endl;
-    string nid = result_config_.P[i].NODE_ID;
-    string via = nodeid_to_via_[nid];
-    string glacier2 = nodeid_to_glacier2_[nid];
-    if (node_id != nid && nodeid_set.find(nid) == nodeid_set.end()) 
+    if (node_id != nid) 
     {
-      ViaInfo viaTmp;
-      viaTmp.id = nid;
-      // 节点所在via
-      viaTmp.via = via;
-      // via信息
-      viaTmp.via_address = via_to_address_[viaTmp.via];
-      if(viaTmp.via_address.empty()) {
-        viaTmp.via_address = result_config_.P[i].ADDRESS;
-      }
-      viaTmp.glacier2_info = glacier2_to_info_[glacier2];
-      const Node& node = node_info_config_[nid].node_;
-      GetCertInfosFromNode(viaTmp, node);
-      // cout << "id: " << nid << ", via: " << viaTmp.via << ", address: " << viaTmp.via_address << endl;
-      serverInfos.push_back(viaTmp);
-      clientNodeIds.emplace_back(nid);
-      nodeid_set.emplace(nid);
+      GetInfoByNodeId(clientNodeIds, serverInfos, nid);
     }
-  }  
+  }
   return true;
 }

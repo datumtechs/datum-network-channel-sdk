@@ -75,21 +75,21 @@ TcpChannel::~TcpChannel()
   DestroyConnectedNodes();
 }
 
-ssize_t TcpChannel::Recv(const char* node_id, const char* id, char* data, uint64_t length, int64_t timeout) 
+ssize_t TcpChannel::Recv(const char* remote_node_id, const char* msg_id, char* data, uint64_t length, int64_t timeout) 
 {
   // return _net_io->recv(node_id, data, get_binary_string(id), timeout); 
   if(nullptr == _net_io){cout << "create io failed!" << endl; return 0;}
   if(nullptr == data){cout << "data is nullptr!" << endl; return 0;}
-  return _net_io->recv(node_id, id, data, length, timeout);
+  return _net_io->recv(remote_node_id, msg_id, data, length, timeout);
 }
 
-ssize_t TcpChannel::Send(const char* node_id, const char* id, const char* data, uint64_t length, 
+ssize_t TcpChannel::Send(const char* remote_node_id, const char* msg_id, const char* data, uint64_t length, 
         int64_t timeout) 
 {
   if(nullptr == _net_io){cout << "create io failed!" << endl; return 0;}
   // cout << "TcpChannel::Send, nodeid:" << node_id << ", msg_id:"  << id  
   //   << ", length:" << length << endl;
-  return _net_io->send(node_id, id, data, length, timeout);
+  return _net_io->send(remote_node_id, msg_id, data, length, timeout);
 }
 
 /**
