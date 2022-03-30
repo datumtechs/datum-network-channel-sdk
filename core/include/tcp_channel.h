@@ -12,6 +12,7 @@ public:
       _net_io(net_io), channel_config_(config), self_node_info_(node_info) {}
     ~TcpChannel();
     virtual void SetErrorCallback(error_callback error_cb) {}
+    virtual void Flush() {}
     virtual int64_t Recv(const char* remote_node_id, const char* msg_id, char* data, uint64_t length, int64_t timeout=-1);
     virtual int64_t Send(const char* remote_node_id, const char* msg_id, const char* data, uint64_t length, int64_t timeout=-1);
 
