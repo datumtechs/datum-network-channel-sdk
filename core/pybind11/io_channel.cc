@@ -7,10 +7,7 @@ namespace py = pybind11;
 // 定义模块名称(grpc)
 PYBIND11_MODULE(grpc, m) {
 
-#if USE_ALONE
-  // 单独使用时需要导出IChannel接口; 因为在Rosetta中IChannel对象已经导出, 所以再导出会有冲突;
-  py::class_<IChannel,  shared_ptr<IChannel> >(m, "IChannel");
-#endif
+  py::class_<IChannel,  unique_ptr<IChannel, py::nodelete> >(m, "IChannel");
 
   py::class_<APIManager>(m, "APIManager")
     .def(py::init<>())

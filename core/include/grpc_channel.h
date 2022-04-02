@@ -12,6 +12,7 @@ public:
       _net_io(net_io), channel_config_(config), self_node_info_(node_info) {}
     ~GRpcChannel();
     virtual void SetErrorCallback(error_callback error_cb) {}
+    virtual void Flush() {}
     virtual int64_t Recv(const char* node_id, const char* id, char* data, uint64_t length, int64_t timeout=-1);
     virtual int64_t Send(const char* node_id, const char* id, const char* data, uint64_t length, int64_t timeout=-1);
 
