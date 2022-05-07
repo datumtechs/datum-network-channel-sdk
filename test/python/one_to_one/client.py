@@ -24,8 +24,8 @@ if __name__ == '__main__':
         while(True):
             # print("start recv from p1========" )
             io_channel.Send(remote_nodeid, data)
-            recv_data = io_channel.Recv(remote_nodeid, 100)
-            print("recv data:{}".format(recv_data))
+            recv_data = io_channel.Recv(remote_nodeid, 16)
+            print("[client] recv bytes:{}, decode data:{}".format(recv_data, recv_data.decode()))
             time.sleep(2)
 
     except Exception as e:

@@ -12,8 +12,8 @@ const string C_Servant_Endpoints_Key = C_Servant_Adapter_Name + ".Endpoints";
 const string C_Servant_AdapterId_Key = C_Servant_Adapter_Name + ".AdapterId";
 const string C_Server_Proxy_Key = "IoChannel.Proxy";
 
-// ServantId = C_Servant_Id_Prefix + "_" + NodeId
-const string C_Servant_Id_Prefix = "IoChannel";
+// ServantId = C_Servant_Id_Prefix + NodeId
+const string C_Servant_Id_Prefix = "IoChannel_";
 // ServantApapterId = C_Servant_Adapter_Id_Prefix + TaskId + "_" + NodeId
 // 用于Glacier2寻址
 const string C_Servant_Adapter_Id_Prefix = "ChannelAdapter_";

@@ -1,5 +1,7 @@
 #pragma once
 #include "io_channel_impl.h"
+#include <pybind11/pybind11.h>
+namespace py = pybind11;
 using namespace std;
 
 void process_error(const char* current_node_id, const char* node_id, int errorno, 
@@ -24,9 +26,9 @@ public:
     return IoChannelImpl::Instance()->CreateIoChannel(node_id, config_str, process_error);
   }
 
-  string Recv(const string& node_id, uint64_t recv_len)
+  py::bytes Recv(const string& node_id, uint64_t recv_len)
   {
-    return IoChannelImpl::Instance()->Recv(node_id, recv_len);
+    return py::bytes(IoChannelImpl::Instance()->Recv(node_id, recv_len));
   }
 
   ssize_t Send(const string& node_id, const string& data)

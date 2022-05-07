@@ -15,7 +15,6 @@ with open(config_file, 'r') as load_f:
     strJson = load_f.read()
 
 if __name__ == '__main__':
-
     try:
     # 启动服务
         channel = io_channel.create_channel("p1", strJson)
@@ -23,11 +22,12 @@ if __name__ == '__main__':
         # 创建网络拓扑
         # 
         remote_nodeid = "p0"
-        data = "this is test p1 server."
+        # data = 'this is test p1 server.'
+        data = b'hello, \xe4\xbd\xa0\xe5\xa5\xbdabc'
         while(True):
             # print("start recv from p0========" )
-            recv_data = io_channel.Recv(remote_nodeid, 100)
-            print("recv data:{}".format(recv_data))
+            recv_data = io_channel.Recv(remote_nodeid, 22)
+            print("[server] recv bytes:{}, decode data:{}".format(recv_data, recv_data.decode()))
 
             # print("start send to p0========" )
             io_channel.Send(remote_nodeid, data)

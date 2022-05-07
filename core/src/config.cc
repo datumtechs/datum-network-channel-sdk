@@ -581,10 +581,11 @@ bool ChannelConfig::GetNodeInfos(set<string>& clientNodeIds, set<ViaInfo>& serve
         clientNodeIds.emplace(iter_map.first);
       }
     }
-    if(clientNodeIds.empty() || serverInfos.empty()) {
-      string strErrMsg = "The connection policy is not configured for the task node:" + node_id;
-      HANDLE_EXCEPTION_EVENT(C_EVENT_CODE_NO_FIND_NID, "", node_id);
-    }
+    // Unnecessary check
+    // if(clientNodeIds.empty() || serverInfos.empty()) {
+    //   string strErrMsg = "The connection policy is not configured for the task node:" + node_id;
+    //   HANDLE_EXCEPTION_EVENT(C_EVENT_CODE_NO_FIND_NID, "", node_id);
+    // }
   }
   
   return true;

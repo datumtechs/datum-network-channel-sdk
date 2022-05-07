@@ -14,7 +14,7 @@ SyncServer::SyncServer(const NodeInfo& server_info, const string& taskId,
 	MapClientConn* ptr_client_conn_map): BaseServer(server_info, taskId)
 {
 	Ice::Identity id ;
-	id.name = C_Servant_Id_Prefix + "_" + server_info.id;
+	id.name = C_Servant_Id_Prefix + taskId + "_" + server_info.id;
 	try 
 	{
 		//增加一个适配器
