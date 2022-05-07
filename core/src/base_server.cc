@@ -30,6 +30,7 @@ BaseServer::BaseServer(const NodeInfo& server_info, const string& taskId)
 		// cout << "value_endpoints:" << value_endpoints << endl;
         initData.properties->setProperty(C_IceGrid_Locator_Key, value_endpoints);
         string servantAdapterId = C_Servant_Adapter_Id_Prefix + server_info.id;
+		FilterIllChar(servantAdapterId);
 		if(server_info.public_ip_.empty()) {
 			HANDLE_EXCEPTION_EVENT(C_EVENT_CODE_NO_PUBLIC_IP, taskId, server_info.id.c_str());
 		}

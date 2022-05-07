@@ -72,12 +72,14 @@ BaseClient::BaseClient(const ViaInfo& via_info, const string& taskid)
 			ptr_communicator_ = ptr_holder_->communicator();
 			
 			string servantAdapterId = C_Servant_Adapter_Id_Prefix + via_info.id;
+			FilterIllChar(servantAdapterId);
 			/* 
 				添加taskid是为了多个任务连续执行时, 避免在同一个节点上的rpc接口的servantId相同; 
 				因为服务端口是自动分配，因此相同servantId会对应不同的连接，如果前面的任务进程还没有将资源回收完成，
 				后面的任务就会通过servantId找到将要关闭的连接，并提示连接拒绝相关的提示，导致任务失败)
 			*/
 			string servantId = C_Servant_Id_Prefix + taskid + "_" + via_info.id;
+			FilterIllChar(servantId);
 			// 寻找方式
 			string strProxy = servantId + "@" + servantAdapterId;
 			Glacier2::RouterPrx router = Glacier2::RouterPrx::checkedCast(ptr_communicator_->getDefaultRouter());
@@ -99,7 +101,8 @@ BaseClient::BaseClient(const ViaInfo& via_info, const string& taskid)
 		// 直连
 		string ip = serAddress.substr(0, npos);
 		string port = serAddress.substr(npos+1, serAddress.length());
-		string servantId = C_Servant_Id_Prefix + "_" + via_info.id;
+		string servantId = C_Servant_Id_Prefix + taskid + "_" + via_info.id;
+		FilterIllChar(servantId);
 		string endpoints = servantId + ":" + protocol + " -h " + ip + " -p " + port;
 		initData.properties->setProperty(C_Server_Proxy_Key, endpoints);
 		initData.properties->setProperty(C_MAX_SIZE_KEY, "0");

@@ -79,3 +79,20 @@ static void HANDLE_EXCEPTION_EVENT(const string& strEventCode, const string& tas
     throw EventException(strEventInfo);
 */
 }
+
+// 过滤非法字符串
+const string C_Illegal_Strings = ":@/";
+static void FilterIllChar(string& strSource) {
+    int nSize = strSource.size();
+    const char* p = strSource.c_str();
+    char buffer[nSize+1] = {0};
+    for(int i = 0; i < nSize; ++p, ++i) {
+        if(-1 != C_Illegal_Strings.find(*p)) {
+            buffer[i] = '_';
+        } else {
+            buffer[i] = *p;
+        }
+
+    }
+    strSource = buffer;
+}
