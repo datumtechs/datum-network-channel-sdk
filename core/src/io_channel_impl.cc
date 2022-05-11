@@ -68,7 +68,7 @@ string IoChannelImpl::GetPolicy(const string &config_str)
 IChannel* IoChannelImpl::CreateIoChannel(const string& self_node_id, const string &config_str, 
         error_callback error_cb) 
 {
-  shared_ptr<ChannelConfig> config = make_shared<ChannelConfig>(config_str);
+  shared_ptr<ChannelConfig> config = make_shared<ChannelConfig>(self_node_id, config_str);
   NodeInfo node_info;
   set<ViaInfo> remote_server_infos;
   // 根据nodeid获取数据节点或计算节点或接收结果节点信息

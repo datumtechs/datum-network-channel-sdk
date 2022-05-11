@@ -52,12 +52,11 @@ bool ViaNetIO::init(const shared_ptr<ChannelConfig> config)
     // 启动服务
     StartServer(taskid, node_info_, &client_conn_map_);
   }
-
   for(auto& iter: remote_server_infos_) {
     string remote_node_id = iter.id;
     client_obj_map_[remote_node_id] = make_shared<SyncClient>(iter, taskid);
     client_obj_map_[remote_node_id]->SetSendTimeOut(config->send_timeout_*1000);
-    client_obj_map_[remote_node_id]->CheckConnStatus(config->conn_timeout_*1000, config->ping_time_*1000000);
+    client_obj_map_[remote_node_id]->CheckConnStatus(config->node_id_, config->conn_timeout_*1000, config->ping_time_*1000000);
   }
   
   return true;

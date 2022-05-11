@@ -48,7 +48,7 @@ const map<string, string> C_MAP_EVENTS = {
     {C_EVENT_CODE_START_SERVICE, "Start the service node:%s failed, reason:%s, create io channel failed!"},
     {C_EVENT_CODE_CREATE_CLIENT, "Create the client node:%s failed, reason:%s, create io channel failed!"},
     {C_EVENT_CODE_INVALID_PROXY, "Invalid proxy, node id:%s, create io channel failed!"},
-    {C_EVENT_CODE_CONNECT_TIMEOUT, "Connect to remote nodeid:%s timeout, The timeout period is:%ldms, create io channel failed!"},
+    {C_EVENT_CODE_CONNECT_TIMEOUT, "%s connect to remote nodeid:%s timeout, The timeout period is:%ldms, create io channel failed!"},
     {C_EVENT_CODE_SEND_DATA_TIMEOUT, "Self nodeid:%s send data to nodeid:%s timeout, The timeout period is: %ldms, send data failed!"}
 };
 

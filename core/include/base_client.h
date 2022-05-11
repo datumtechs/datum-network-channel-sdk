@@ -26,7 +26,7 @@ public:
     // // Create a connection between the node where the server is located and VIA to register the interface.
     // BaseClient(const NodeInfo& node_info, const string& taskid);
     // Checking connection status (static call)
-    bool CheckConnStatus(const uint64_t conn_timeout=5000, const useconds_t usec=1000000);
+    bool CheckConnStatus(const string& nodeid, const uint64_t conn_timeout=5000, const useconds_t usec=1000000);
 
     void SetSendTimeOut(const uint64_t send_timeout) {
         send_timeout_ = send_timeout;

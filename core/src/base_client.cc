@@ -127,14 +127,15 @@ BaseClient::BaseClient(const ViaInfo& via_info, const string& taskid)
 	if (!stub_)
 		HANDLE_EXCEPTION_EVENT(C_EVENT_CODE_INVALID_PROXY, taskid, via_info.id.c_str());
 }
-bool BaseClient::CheckConnStatus(const uint64_t conn_timeout, const useconds_t usec) 
+bool BaseClient::CheckConnStatus(const string& nodeid, const uint64_t conn_timeout, const useconds_t usec) 
 {
 	timer_.start();
 	do
 	{
 		try 
 		{
-			cout << "Attempt to connect to the remote node:" << remote_nid_ << endl;
+			cout << "TaskId: " << task_id_ << ", " << nodeid 
+				 << " attempt to connect to the remote node:" << remote_nid_ << endl;
 		#if STATIC_CALL
 			stub_->ice_ping();
 		#else
@@ -147,7 +148,7 @@ bool BaseClient::CheckConnStatus(const uint64_t conn_timeout, const useconds_t u
 			// cerr << ex << endl;
 			if(timer_.ms_elapse() >= conn_timeout)
 			{        
-				HANDLE_EXCEPTION_EVENT(C_EVENT_CODE_CONNECT_TIMEOUT, task_id_, remote_nid_.c_str(), conn_timeout);
+				HANDLE_EXCEPTION_EVENT(C_EVENT_CODE_CONNECT_TIMEOUT, task_id_, nodeid.c_str(), remote_nid_.c_str(), conn_timeout);
 				// return 0;
 			}
 			usleep(usec);
