@@ -15,13 +15,7 @@ git clone -b develop http://192.168.9.66/RosettaFlow/channel-sdk.git
 ### 环境预安装
 
 ```bash
-sudo apt-get install build-essential autoconf libtool libgflags-dev libgtest-dev clang libc++-dev pkg-config unzip
-cd channel-sdk && git submodule update --init --recursive
-cd third_party/protobuf
-sudo ./autogen.sh
-sudo ./configure
-make
-sudo make install
+sudo apt-get install build-essential libtool libgflags-dev clang libc++-dev
 ```
 
 ### 编译
@@ -55,7 +49,7 @@ cd channel-sdk && ./build.sh compile
 ## 安装
 
 ```bash
-cd channel-sdk && ./build.sh install
+./build.sh install
 ```
 
 > 将dist目录下的whl安装文件安装到python的安装目录下；安装文件主要包括：
@@ -70,7 +64,7 @@ cd channel-sdk && ./build.sh install
 ## 删除卸载
 
 ```bash
-cd channel-sdk && ./build.sh clean
+./build.sh clean
 ```
 
 
@@ -142,6 +136,7 @@ Channel Sdk通过使用IceGrid进行服务注册，和Ice的Glacier2进行消息
     "PING_TIME": 1,
     "SEND_TIMEOUT": 10.0,
     "CONNECT_TIMEOUT": 10.0,
+    "CONNECT_SYNC": false,
     "BUFFER_SIZE": 102400,
     "ROOT_CERT": "ca.pem",
     "NODE_INFO": [

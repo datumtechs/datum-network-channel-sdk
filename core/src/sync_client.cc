@@ -41,7 +41,7 @@ ssize_t SyncClient::send(const string& self_nodeid, const string& remote_nodeid,
     #endif
       break;
     } catch (const Ice::Exception& ex) {
-      cerr << ex << endl;
+      // cerr << ex << endl;
       if(timer_.ms_elapse() >= send_timeout_)
       {
         HANDLE_EXCEPTION_EVENT(C_EVENT_CODE_SEND_DATA_TIMEOUT, task_id_, self_nodeid.c_str(), 

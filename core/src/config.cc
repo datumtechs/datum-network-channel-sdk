@@ -451,6 +451,8 @@ bool ChannelConfig::parse(Document& doc) {
   ping_time_ = GetFloat(doc, "PING_TIME", 1.0, false);
   send_timeout_ = GetFloat(doc, "SEND_TIMEOUT", 5.0, false);
   conn_timeout_ = GetFloat(doc, "CONNECT_TIMEOUT", 5.0, false);
+  conn_sync_ = GetBool(doc, "CONNECT_SYNC", false, false);
+  
   if(2 < log_level_)
     log_level_ = 2;
   if (!parse_node_info(doc)) {
@@ -581,11 +583,10 @@ bool ChannelConfig::GetNodeInfos(set<string>& clientNodeIds, set<ViaInfo>& serve
         clientNodeIds.emplace(iter_map.first);
       }
     }
-    // Unnecessary check
-    // if(clientNodeIds.empty() || serverInfos.empty()) {
-    //   string strErrMsg = "The connection policy is not configured for the task node:" + node_id;
-    //   HANDLE_EXCEPTION_EVENT(C_EVENT_CODE_NO_FIND_NID, "", node_id);
-    // }
+    // The node must be a client or a server
+    if(clientNodeIds.empty() && serverInfos.empty()) {
+      HANDLE_EXCEPTION_EVENT(C_EVENT_CODE_NEITHER_CLIENT_SERVER, "", node_id.c_str());
+    }
   }
   
   return true;

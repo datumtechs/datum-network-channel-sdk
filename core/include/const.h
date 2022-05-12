@@ -37,6 +37,8 @@ const string C_EVENT_CODE_CREATE_CLIENT = "0402007";
 const string C_EVENT_CODE_INVALID_PROXY = "0402008";
 const string C_EVENT_CODE_CONNECT_TIMEOUT = "0402009";
 const string C_EVENT_CODE_SEND_DATA_TIMEOUT = "0402010";
+const string C_EVENT_CODE_RECV_DATA_TIMEOUT = "0402011";
+const string C_EVENT_CODE_NEITHER_CLIENT_SERVER = "0402012";
 
 const map<string, string> C_MAP_EVENTS = {
     {C_EVENT_CODE_PARSE_FILE, "Failed to parse the configuration file, Please check!"},
@@ -49,7 +51,9 @@ const map<string, string> C_MAP_EVENTS = {
     {C_EVENT_CODE_CREATE_CLIENT, "Create the client node:%s failed, reason:%s, create io channel failed!"},
     {C_EVENT_CODE_INVALID_PROXY, "Invalid proxy, node id:%s, create io channel failed!"},
     {C_EVENT_CODE_CONNECT_TIMEOUT, "%s connect to remote nodeid:%s timeout, The timeout period is:%ldms, create io channel failed!"},
-    {C_EVENT_CODE_SEND_DATA_TIMEOUT, "Self nodeid:%s send data to nodeid:%s timeout, The timeout period is: %ldms, send data failed!"}
+    {C_EVENT_CODE_SEND_DATA_TIMEOUT, "Self nodeid:%s send data to nodeid:%s timeout, The timeout period is: %ldms, send data failed!"},
+    {C_EVENT_CODE_RECV_DATA_TIMEOUT, "Self nodeid:%s receive data from nodeid:%s timeout, The timeout period is: %ldms, receive data failed!"},
+    {C_EVENT_CODE_NEITHER_CLIENT_SERVER, "This node:%s is neither client nor server, please check connection policy!"}
 };
 
 

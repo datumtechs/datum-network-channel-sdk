@@ -219,6 +219,7 @@ class ChannelConfig {
   float ping_time_ = 1.0; // Interval (unit: s) for ping the server when the client is connected to the server.  
   float send_timeout_ = 5.0;  
   float conn_timeout_ = 5.0;
+  bool conn_sync_ = false; // Connection synchronization flag, default is no
   int32_t buffer_size_ = 1024 * 8;  
  
   NODE_TYPE node_type_ = NODE_TYPE_INVALID;

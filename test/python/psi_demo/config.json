@@ -3,6 +3,7 @@
 	"PING_TIME": 1,
 	"SEND_TIMEOUT": 10.0,
 	"CONNECT_TIMEOUT": 10.0,
+	"CONNECT_SYNC": true,
 	"ROOT_CERT": "",
 	"NODE_INFO": [
 		{
