@@ -7,7 +7,7 @@
 	"NODE_INFO": [
 		{
 			"NODE_ID": "p0",
-			"ADDRESS": "192.168.2.128:10000",
+			"ADDRESS": "127.0.0.1:10000",
 			"GRICER2": "VIA0",
 			"ICEGRID": "GRID0",
 			"CERT_DIR": "/home/luodahui/core/channel-sdk/ssl/openssl",
@@ -17,7 +17,7 @@
 		},
 		{
 			"NODE_ID": "p1",
-			"ADDRESS": "192.168.2.128:10001",
+			"ADDRESS": "127.0.0.1:10001",
 			"GRICER2": "VIA0",
 			"ICEGRID": "GRID0",
 			"CERT_DIR": "/home/luodahui/core/channel-sdk/ssl/openssl",
@@ -27,7 +27,7 @@
 		},
 		{
 			"NODE_ID": "p2",
-			"ADDRESS": "192.168.2.128:10002",
+			"ADDRESS": "127.0.0.1:10002",
 			"GRICER2": "VIA0",
 			"ICEGRID": "GRID0",
 			"CERT_DIR": "/home/luodahui/core/channel-sdk/ssl/openssl",
@@ -39,14 +39,14 @@
 	"GRICER2_INFO": {
 		"VIA0": {
 			"APPNAME": "ChannelGlacier2",
-			"IP": "192.168.2.128",
+			"IP": "127.0.0.1",
 			"PORT": "10031"
 		}
 	},
 	"ICE_GRID_INFO": {
 		"GRID0": {
 			"APPNAME": "ChannelIceGrid",
-			"IP": "192.168.2.128",
+			"IP": "127.0.0.1",
 			"PORT": "10032"
 		}
 	},

@@ -1,0 +1,10 @@
+# yaml 配置
+version: '2.3'
+services:
+  channel-sdk:
+    build:
+      network: "host"
+      context: .
+    ports:
+     - "5000:5000"
+    image: "luodahui/channel-sdk:v2.0.3"

@@ -144,7 +144,7 @@ setup(
     # Add in any packaged data.
     include_package_data=True,
     # install_requires=['numpy', 'pandas', 'sklearn'],
-    setup_requires=['pybind11>=2.4'],
+    # setup_requires=['pybind11>=2.4'],
     zip_safe=False,
     # PyPI package information.
     classifiers=[

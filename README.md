@@ -303,3 +303,13 @@ Channel Sdk通过使用IceGrid进行服务注册，和Ice的Glacier2进行消息
 ```bash
 ./run_ice.sh
 ```
+
+## 打包Docker镜像
+
+channel-sdk支持Docker化编译，执行命令：
+
+```bash
+docker-compose up --build
+```
+
+> 需要安装docker和docker-compose。
