@@ -8,6 +8,7 @@ RUN cp /etc/apt/sources.list /etc/apt/sources.list.bak
 COPY ./apt_src.ubuntu18.04 /etc/apt/sources.list
 # debconf: unable to initialize frontend: Dialog
 ENV DEBIAN_FRONTEND noninteractive
+ARG DEBCONF_NOWARNINGS="yes"
 
 RUN apt-get update
 RUN apt-get install -y --no-install-recommends \ 
@@ -31,7 +32,7 @@ RUN apt-get install -y --no-install-recommends \
 
 RUN cd /usr/bin && ln -sf python3.7 python && ln -sf python3.7 python3 \
     && ln -s pip3 pip \
-    && python -m pip install --upgrade pip
+    && python -m pip install --upgrade pip -i https://mirrors.aliyun.com/pypi/simple/
 # wheel：打包whl文件命令
 RUN pip3 install setuptools==57.5.0 wheel -i https://mirrors.aliyun.com/pypi/simple/
 
@@ -52,7 +53,14 @@ COPY function.sh .
 COPY setup.py .
 COPY CMakeLists.txt .
 COPY MANIFEST.in .
-# 编译生成whl, 然后安装
-RUN ./build.sh clean && ./build.sh compile --package-ice-via && ./build.sh install
-# 删除源码，依赖库等文件
-
+# 编译生成whl
+ARG build_args
+ENV compile_params=${build_args}
+RUN echo "compile_params============${compile_params}"
+RUN ./build.sh clean && ./build.sh compile ${compile_params}
+# RUN ./build.sh clean && ./build.sh compile --package-ice-via && ./build.sh install
+RUN mkdir -p /ChannelSDK/ice_via
+RUN cp -rf third_party/ice/bin ./ice_via && cp -rf third_party/ice/config ./ice_via
+# 删除源码，依赖库等文件(删除除了保存whl文件的dist目录)
+# RUN shopt -s extglob && rm -rf !(dist|third_party/ice/bin|third_party/ice/config)
+RUN rm -rf build cmake core python third_party ice_via/bin/deploy ice_via/logs *.*

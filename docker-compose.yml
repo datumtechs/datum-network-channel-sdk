@@ -1,10 +1,12 @@
 # yaml 配置
-version: '2.3'
+version: '2'
 services:
-  channel-sdk:
+  build_sdk:
+    image: "luodahui/channel-sdk:v2.0.3"
     build:
       network: "host"
       context: .
+      # args: 
+      #   "build_args": "--package-ice-via"
     ports:
      - "5000:5000"
-    image: "luodahui/channel-sdk:v2.0.3"
