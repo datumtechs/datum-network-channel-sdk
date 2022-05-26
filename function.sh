@@ -63,7 +63,7 @@ function run_compile_python() {
   echo -e "stage run_compile_python."
   cd ${curdir}
   python_cmd=python${2}
-  package_name="channel_sdk"
+  package_name="datum_network_channel_sdk"
 
   echo -e "python_cmd: ${python_cmd}"
 
