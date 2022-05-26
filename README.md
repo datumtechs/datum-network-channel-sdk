@@ -5,7 +5,7 @@ RosettaNet网络层sdk
 ## 源码下载
 
 ```bash
-git clone -b develop http://192.168.9.66/RosettaFlow/channel-sdk.git
+git clone -b develop https://github.com/datumtechs/datum-network-channel-sdk.git
 ```
 
 ## 源码编译
@@ -21,7 +21,7 @@ sudo apt-get install build-essential libtool libgflags-dev clang libc++-dev
 ### 编译
 
 ```bash
-cd channel-sdk && ./build.sh compile
+cd datum-network-channel-sdk && ./build.sh compile
 ```
 
 >**编译选项说明：**

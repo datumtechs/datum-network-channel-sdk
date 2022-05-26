@@ -16,7 +16,7 @@ rm python/channel_sdk.egg-info -rf
 rm dist -rf
 
 if [ "$USER" == "root" ]; then
-  sudo pip3 uninstall channel-sdk -y
+  sudo pip3 uninstall datum-network-channel-sdk -y
 else
-  python3 -m pip uninstall channel-sdk -y # for the current user
+  python3 -m pip uninstall datum-network-channel-sdk -y # for the current user
 fi

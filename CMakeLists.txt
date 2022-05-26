@@ -72,10 +72,15 @@ target_include_directories(${LIBNAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/core/in
 # ice
 set(THIRD_PARTY_DIR ${CMAKE_CURRENT_SOURCE_DIR}/third_party)
 include_directories(${THIRD_PARTY_DIR}/ice/include)
-link_directories(${THIRD_PARTY_DIR}/ice/lib)
-link_libraries(Ice Glacier2 IceGrid)
+include_directories(${THIRD_PARTY_DIR}/ice/include/generated)
+# link_directories(${THIRD_PARTY_DIR}/ice/lib)
 
-target_link_libraries(${LIBNAME} PUBLIC Ice Glacier2 IceGrid pthread)
+# Link local dynamic libraries
+link_libraries(Ice Glacier2 IceGrid)
+target_link_libraries(${LIBNAME} PUBLIC ${THIRD_PARTY_DIR}/ice/lib/libIce.so.37
+    ${THIRD_PARTY_DIR}/ice/lib/libGlacier2.so.37 
+    ${THIRD_PARTY_DIR}/ice/lib/libIceGrid.so.37
+    pthread)
 
 # Use to find the directory dependency path(libtacrypto, libtassl)
 set_target_properties(${LIBNAME} PROPERTIES FOLDER ${LIBNAME}

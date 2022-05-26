@@ -16,7 +16,7 @@
 # along with the channel sdk library. If not, see <http://www.gnu.org/licenses/>.
 # =============================================================================="
 
-"""channel sdk is a network library"""
+"""channel sdk is a datum network library"""
 
 import glob
 from posixpath import dirname
@@ -129,12 +129,12 @@ if sys.platform == 'linux' or sys.platform == "darwin":  # remove -g flags
                 '-g ', ' ')
 
 setup(
-    name='channel-sdk',
+    name='datum-network-channel-sdk',
     version=__version__,
-    author='channel sdk',
-    author_email='channel-sdk@juzix.cn',
+    author='datum network channel sdk',
+    author_email='datum-network-channel-sdk@juzix.cn',
     url='https://www.platon.network/',
-    download_url='https://github.com/Metisnetwork/Metis-Channel-sdk.git',
+    download_url='https://github.com/datumtechs/datum-network-channel-sdk.git',
     description=DOCLINES[0],
     long_description='\n'.join(DOCLINES[2:]),
     package_dir={'': 'python'},  # where to find package
@@ -144,7 +144,7 @@ setup(
     # Add in any packaged data.
     include_package_data=True,
     # install_requires=['numpy', 'pandas', 'sklearn'],
-    setup_requires=['pybind11>=2.4'],
+    # setup_requires=['pybind11>=2.4'],
     zip_safe=False,
     # PyPI package information.
     classifiers=[
