@@ -216,17 +216,17 @@ Channel Sdk通过使用IceGrid进行服务注册，和Ice的Glacier2进行消息
 执行脚本：
 
 ```bash
-./run_glacier2.sh
+./run_glacier2.sh &
 ```
 
-> 为了避免误操作将服务进程退出，Glacier2服务在后台运行，服务日志文件在当前的logs目录下；如果需要启用ssl，则执行：`./run_glacier2.sh ssl`。
+> 为了避免误操作将服务进程退出，Glacier2服务在后台运行，服务日志文件在当前的logs目录下；如果需要启用ssl，则执行：`./run_glacier2.sh ssl &`。
 
 ### 启动ICEGrid
 
 执行脚本：
 
 ```bash
-./run_icegrid.sh
+./run_icegrid.sh &
 ```
 
 > 为了避免误操作将服务进程退出，IceGrid服务在后台运行，服务日志文件在当前的logs目录下；

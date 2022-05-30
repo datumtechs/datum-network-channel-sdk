@@ -1,0 +1,62 @@
+{
+	"TASK_ID": "task:0x0710cb",
+	"PING_TIME": 1,
+	"SEND_TIMEOUT": 10.0,
+	"CONNECT_TIMEOUT": 10.0,
+	"ROOT_CERT": "",
+	"NODE_INFO": [
+		{
+			"NODE_ID": "p0",
+			"GRICER2": "VIA0",
+			"ICEGRID": "GRID0",
+			"CERT_DIR": "/home/luodahui/core/channel-sdk/ssl/openssl",
+			"SERVER_CERT": "server.pem",
+			"CLIENT_CERT": "client.pem",
+			"PASSWORD": "123456"
+		},
+		{
+			"NODE_ID": "p1",
+			"GRICER2": "VIA0",
+			"ICEGRID": "GRID0",
+			"CERT_DIR": "/home/luodahui/core/channel-sdk/ssl/openssl",
+			"SERVER_CERT": "server.pem",
+			"CLIENT_CERT": "client.pem",
+			"PASSWORD": "123456"
+		},
+		{
+			"NODE_ID": "p2",
+			"GRICER2": "VIA0",
+			"ICEGRID": "GRID0",
+			"CERT_DIR": "/home/luodahui/core/channel-sdk/ssl/openssl",
+			"SERVER_CERT": "server.pem",
+			"CLIENT_CERT": "client.pem",
+			"PASSWORD": "123456"
+		}
+	],
+	"GRICER2_INFO": {
+		"VIA0": {
+			"APPNAME": "ChannelGlacier2",
+			"IP": "192.168.2.128",
+			"PORT": "10031"
+		}
+	},
+	"ICE_GRID_INFO": {
+		"GRID0": {
+			"APPNAME": "ChannelIceGrid",
+			"IP": "192.168.2.128",
+			"PORT": "10032"
+		}
+	},
+	"DATA_NODES": [
+		"p0",
+		"p1"
+	],
+	"COMPUTATION_NODES": {
+		"p0": "P0",
+		"p1": "P1"
+	},
+	"RESULT_NODES": [
+		"p0",
+		"p1"
+	]
+}

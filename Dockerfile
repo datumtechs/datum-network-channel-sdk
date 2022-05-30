@@ -1,5 +1,5 @@
 # 基础镜像，基于gcc镜像构建--编译阶段
-FROM ubuntu:18.04
+FROM ubuntu:18.04 AS bulider
 # 作者
 MAINTAINER luodahui
 
@@ -8,20 +8,21 @@ RUN cp /etc/apt/sources.list /etc/apt/sources.list.bak
 COPY ./apt_src.ubuntu18.04 /etc/apt/sources.list
 # debconf: unable to initialize frontend: Dialog
 ENV DEBIAN_FRONTEND noninteractive
-ARG DEBCONF_NOWARNINGS="yes"
 
 RUN apt-get update
 RUN apt-get install -y --no-install-recommends \ 
     apt-utils \
-    build-essential \
     gcc \
     g++ \
+    build-essential \
     vim \
     make \
     cmake \ 
     libssl1.0.0 \
     libc-dev \
-    libbz2-dev && apt-get autoremove
+    # net-tools \
+    # iputils-ping \
+    libbz2-dev --fix-missing && apt-get autoremove
 
 # python/pip
 RUN apt-get install -y --no-install-recommends \
@@ -46,7 +47,6 @@ COPY cmake /ChannelSDK/cmake
 COPY core /ChannelSDK/core
 COPY python/channel_sdk/__init__.py ./python/channel_sdk
 COPY third_party /ChannelSDK/third_party
-COPY test/python/one_to_one /ChannelSDK/test/python/one_to_one
 COPY build.sh .
 COPY clean.sh .
 COPY function.sh .
@@ -54,13 +54,46 @@ COPY setup.py .
 COPY CMakeLists.txt .
 COPY MANIFEST.in .
 # 编译生成whl
-ARG build_args
+ARG build_args=""
 ENV compile_params=${build_args}
 RUN echo "compile_params============${compile_params}"
 RUN ./build.sh clean && ./build.sh compile ${compile_params}
-# RUN ./build.sh clean && ./build.sh compile --package-ice-via && ./build.sh install
-RUN mkdir -p /ChannelSDK/ice_via
-RUN cp -rf third_party/ice/bin ./ice_via && cp -rf third_party/ice/config ./ice_via
-# 删除源码，依赖库等文件(删除除了保存whl文件的dist目录)
-# RUN shopt -s extglob && rm -rf !(dist|third_party/ice/bin|third_party/ice/config)
-RUN rm -rf build cmake core python third_party ice_via/bin/deploy ice_via/logs *.*
+
+# 运行环境
+FROM ubuntu:18.04 AS runner
+RUN cp /etc/apt/sources.list /etc/apt/sources.list.bak
+COPY ./apt_src.ubuntu18.04 /etc/apt/sources.list
+# debconf: unable to initialize frontend: Dialog
+ENV DEBIAN_FRONTEND noninteractive
+RUN apt-get update
+RUN apt-get install -y --no-install-recommends \ 
+    libssl1.0.0 \
+    && apt-get autoremove
+
+# python/pip
+RUN apt-get install -y --no-install-recommends \
+    python3.7 \
+    python3.7-dev \ 
+    python3-distutils \
+    python3-pip && apt-get autoremove
+
+RUN cd /usr/bin && ln -sf python3.7 python && ln -sf python3.7 python3 \
+    && ln -s pip3 pip \
+    && python -m pip install --upgrade pip -i https://mirrors.aliyun.com/pypi/simple/
+# wheel：打包whl文件命令
+RUN pip3 install setuptools==57.5.0 wheel -i https://mirrors.aliyun.com/pypi/simple/
+
+WORKDIR /ChannelSDK
+# # 复制编译阶段编译出来的运行文件到目标目录
+COPY --from=bulider /ChannelSDK/dist /ChannelSDK/dist
+COPY third_party/ice/bin /ChannelSDK/ice_via/bin
+COPY third_party/ice/config /ChannelSDK/ice_via/config
+COPY third_party/ice/lib /ChannelSDK/ice_via/lib
+COPY test/python/docker /ChannelSDK/test/python/
+COPY build.sh .
+COPY clean.sh .
+COPY function.sh .
+# 是否安装
+ARG install_flag=0
+RUN if [ ${install_flag} = 1 ] ; then ./build.sh install ; fi
+RUN rm -rf build ice_via/bin/deploy ice_via/logs *.*
