@@ -1,0 +1,9 @@
+# 基础镜像，基于Ubuntu18.04镜像构建
+FROM ubuntu:18.04
+# 作者
+MAINTAINER DavidRo
+
+WORKDIR /IceVia
+COPY third_party/ice/bin ./bin 
+COPY third_party/ice/config ./config
+COPY third_party/ice/lib ./lib

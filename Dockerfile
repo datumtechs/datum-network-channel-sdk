@@ -86,14 +86,11 @@ RUN pip3 install setuptools==57.5.0 wheel -i https://mirrors.aliyun.com/pypi/sim
 WORKDIR /ChannelSDK
 # # 复制编译阶段编译出来的运行文件到目标目录
 COPY --from=bulider /ChannelSDK/dist /ChannelSDK/dist
-COPY third_party/ice/bin /ChannelSDK/ice_via/bin
-COPY third_party/ice/config /ChannelSDK/ice_via/config
-COPY third_party/ice/lib /ChannelSDK/ice_via/lib
 COPY test/python/docker /ChannelSDK/test/python/
 COPY build.sh .
 COPY clean.sh .
 COPY function.sh .
 # 是否安装
 ARG install_flag=0
-RUN if [ ${install_flag} = 1 ] ; then ./build.sh install ; fi
+RUN if [ ${install_flag} = 1 ] ; then ./build.sh install; fi
 RUN rm -rf build ice_via/bin/deploy ice_via/logs *.*

@@ -304,12 +304,165 @@ Channel Sdk通过使用IceGrid进行服务注册，和Ice的Glacier2进行消息
 ./run_ice.sh
 ```
 
-## 打包Docker镜像
+## Docker使用
 
-channel-sdk支持Docker化编译，执行命令：
+channel-sdk支持Docker化编译部署测试，由于生产环境上，Ice Via服务通常单独部署，所以channel-sdk和Ice Via的镜像分开打包；其中项目使用docker-compose工具对宿主机上的容器和镜像进行管理，相关工具安装，可执行命令：
 
 ```bash
-docker-compose up --build
+./install_docker.sh
 ```
 
-> 需要安装docker和docker-compose。
+相关docker-compose配置可参考docker-compose.yml文件，如：
+
+```yaml
+# yaml 配置
+version: '3.6'
+services:
+  build_sdk:
+    image: "luodahui/channel-sdk:v2.0.3"
+    build:
+      network: "host"
+      context: .
+      args: 
+        # "build_args": "--package-ice-via"
+        "install_flag": 1
+      dockerfile: Dockerfile
+  build_ice_via:
+    image: "luodahui/ice_via:v2.0.3"
+    build:
+      network: "host"
+      context: .
+      dockerfile: IceDockerfile
+  test_run_server:
+    image: "luodahui/channel-sdk:v2.0.3"
+    container_name: test_server
+    restart: always
+    # env_file:
+    #   - p1.env
+    volumes:
+      - ./test/python/docker/p1_server_config.json:/ChannelSDK/test/python/one_to_one.json
+    network_mode: "host"
+    # ports:
+    #   - ""192.168.2.128:10001:10001"
+    command: python3 /ChannelSDK/test/python/server.py
+  test_run_client:
+    image: "luodahui/channel-sdk:v2.0.3"
+    container_name: test_client
+    restart: always
+    # env_file:
+    #   - p0.env
+    volumes:
+      - ./test/python/docker/p0_client_config.json:/ChannelSDK/test/python/one_to_one.json
+    network_mode: "host"
+    # ports:
+    #   - "192.168.2.128:10000:10000"
+    command: python3 /ChannelSDK/test/python/client.py
+  test_run_glacier2:
+    container_name: test_glacier2
+    restart: always
+    network_mode: "host"
+    image: "luodahui/ice_via:v2.0.3"
+    volumes:
+      - ./test/python/docker/config/config.glacier2:/IceVia/config/config.glacier2
+    command: /IceVia/bin/run_glacier2.sh
+  test_run_ice_grid:
+    container_name: test_ice_grid
+    restart: always
+    network_mode: "host"
+    volumes:
+      - ./test/python/docker/config/config.gridregistry:/IceVia/config/config.gridregistry
+    image: "luodahui/ice_via:v2.0.3"
+    command: /IceVia/bin/run_icegrid.sh
+  test_run_server_via:
+    image: "luodahui/channel-sdk:v2.0.3"
+    container_name: test_server_via
+    restart: always
+    network_mode: "host"
+    command: python3 /ChannelSDK/test/python/server_via.py
+    depends_on:
+      - test_run_glacier2
+      - test_run_ice_grid
+  test_run_client_via:
+    image: "luodahui/channel-sdk:v2.0.3"
+    container_name: test_client_via
+    restart: always
+    network_mode: "host"
+    command: python3 /ChannelSDK/test/python/client_via.py
+  
+
+```
+
+> 说明：
+>
+> build_sdk：打包channel sdk镜像的命令参数配置；
+>
+> build_ice_via：打包ice via镜像的命令参数配置；
+>
+> test_run_server：测试运行容器中的服务器；
+>
+> test_run_client：测试运行容器中的客户端；
+>
+> test_run_glacier2：测试运行容器中的glacier2服务；
+>
+> test_run_ice_grid：测试运行容器中的ice_grid服务；
+>
+> test_run_server_via：测试运行容器中带ice via的服务器；
+>
+> test_run_client_via：测试运行容器中带ice via的客户端；
+
+运行命令如下：
+
+### 打包sdk镜像
+
+```bash
+docker-compose up --build build_sdk
+```
+
+### 打包Ice Via镜像
+
+```bash
+docker-compose up --build build_ice_via
+```
+
+### 普通C/S测试
+
+运行容器，进行客户端/服务器模式测试，命令如下：
+
+- 启动服务器
+
+  ```bash
+  docker-compose run test_run_server
+  ```
+
+- 启动客户端
+
+  ```bash
+  docker-compose run test_run_client
+  ```
+
+### 代理C/S测试
+
+运行容器，进行代理服务的客户端/服务器模式测试，命令如下：
+
+- 启动服务器
+
+  ```bash
+  docker-compose run test_run_server_via
+  ```
+
+  > 配置文件中指定test_run_server_via容器服务依赖于test_run_glacier2和test_run_ice_grid服务，所以启动服务端的容器服务前，会自动先启动ice via服务的容器；如果需要手动启动ice via服务，可执行如下命令：
+  >
+  > ```bash
+  > # 后台启动glacier2
+  > docker-compose run -d test_run_glacier2
+  > # 后台启动ice grid
+  > docker-compose run -d test_run_ice_grid
+  > ```
+
+- 启动客户端
+
+  ```bash
+  docker-compose run test_run_client_via
+  ```
+
+  
