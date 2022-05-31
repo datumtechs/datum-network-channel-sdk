@@ -10,8 +10,8 @@ services:
         # "build_args": "--package-ice-via"
         "install_flag": 1
       dockerfile: Dockerfile
-  build_ice_via:
-    image: "luodahui/ice_via:v2.0.3"
+  build_ice_via_consul:
+    image: "luodahui/ice_via_consul:v2.0.3"
     build:
       network: "host"
       context: .
@@ -44,18 +44,29 @@ services:
     container_name: test_glacier2
     restart: always
     network_mode: "host"
-    image: "luodahui/ice_via:v2.0.3"
+    image: "luodahui/ice_via_consul:v2.0.3"
     volumes:
-      - ./test/python/docker/config/config.glacier2:/IceVia/config/config.glacier2
-    command: /IceVia/bin/run_glacier2.sh
+      - ./test/python/docker/config/config.glacier2:/Ice_Via_Consul/ice_via/config/config.glacier2
+    command: /Ice_Via_Consul/ice_via/bin/run_glacier2.sh
   test_run_ice_grid:
     container_name: test_ice_grid
     restart: always
     network_mode: "host"
     volumes:
-      - ./test/python/docker/config/config.gridregistry:/IceVia/config/config.gridregistry
-    image: "luodahui/ice_via:v2.0.3"
-    command: /IceVia/bin/run_icegrid.sh
+      - ./test/python/docker/config/config.gridregistry:/Ice_Via_Consul/ice_via/config/config.gridregistry
+    image: "luodahui/ice_via_consul:v2.0.3"
+    command: /Ice_Via_Consul/ice_via/bin/run_icegrid.sh
+
+  test_run_consul:
+    container_name: test_consul
+    restart: always
+    network_mode: "host"
+    volumes:
+      - ./third_party/consul/consul.json:/Ice_Via_Consul/consul/consul.json
+      - /tmp/log/:/Ice_Via_Consul/consul/log/
+    image: "luodahui/ice_via_consul:v2.0.3"
+    command: /Ice_Via_Consul/consul/consul agent -config-file /Ice_Via_Consul/consul/consul.json 
+
   test_run_server_via:
     image: "luodahui/channel-sdk:v2.0.3"
     container_name: test_server_via

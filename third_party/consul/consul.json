@@ -1,0 +1,20 @@
+{
+    "datacenter": "consul_cluster",
+    "node_name": "consul_test",
+    "client_addr": "0.0.0.0",
+    "bind_addr": "0.0.0.0",
+    "advertise_addr": "192.168.2.128",
+    "data_dir": "/Ice_Via_Consul/consul/data-dir",
+    "log_file": "/Ice_Via_Consul/consul/log/",
+    "log_level": "INFO",
+    "server": true,
+    "bootstrap_expect": 1,
+    "ui": true,
+    "ports": {
+        "server": 8200,
+        "serf_lan": 8300,
+        "serf_wan": 8400,
+        "http": 8500,
+        "dns": 8600
+    }
+}
