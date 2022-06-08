@@ -71,7 +71,8 @@ BaseClient::BaseClient(const ViaInfo& via_info, const string& taskid)
 			ptr_holder_ = make_shared<Ice::CommunicatorHolder>(initData);
 			ptr_communicator_ = ptr_holder_->communicator();
 			
-			string servantAdapterId = C_Servant_Adapter_Id_Prefix + via_info.id;
+			string servantAdapterId = C_Servant_Adapter_Id_Prefix + taskid + "_" + via_info.id;
+			
 			FilterIllChar(servantAdapterId);
 			/* 
 				添加taskid是为了多个任务连续执行时, 避免在同一个节点上的rpc接口的servantId相同; 
