@@ -23,7 +23,7 @@ services:
     # env_file:
     #   - p1.env
     volumes:
-      - ./test/python/docker/p1_server_config.json:/ChannelSDK/test/python/one_to_one.json
+      - ./test/python/docker/p1_server_config.json:/ChannelSDK/test/python/p1_server_config.json
     network_mode: "host"
     # ports:
     #   - ""192.168.2.128:10001:10001"
@@ -35,7 +35,7 @@ services:
     # env_file:
     #   - p0.env
     volumes:
-      - ./test/python/docker/p0_client_config.json:/ChannelSDK/test/python/one_to_one.json
+      - ./test/python/docker/p0_client_config.json:/ChannelSDK/test/python/p0_client_config.json
     network_mode: "host"
     # ports:
     #   - "192.168.2.128:10000:10000"
