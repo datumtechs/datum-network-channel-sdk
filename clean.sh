@@ -11,6 +11,7 @@ rm -rf python/channel_sdk.egg-info
 rm -rf python/channel_sdk/bin/*
 rm -rf python/channel_sdk/config/*
 rm -rf python/channel_sdk/lib/*.so*
+rm -rf python/channel_sdk/*.so*
 
 rm python/channel_sdk.egg-info -rf
 rm dist -rf

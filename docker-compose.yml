@@ -1,0 +1,85 @@
+# yaml 配置
+version: '3.6'
+services:
+  build_sdk:
+    image: "luodahui/channel-sdk:v2.0.3"
+    build:
+      network: "host"
+      context: .
+      args: 
+        # "build_args": "--package-ice-via"
+        "install_flag": 1
+      dockerfile: Dockerfile
+  build_ice_via_consul:
+    image: "luodahui/ice_via_consul:v2.0.3"
+    build:
+      network: "host"
+      context: .
+      dockerfile: IceDockerfile
+  test_run_server:
+    image: "luodahui/channel-sdk:v2.0.3"
+    container_name: test_server
+    restart: always
+    # env_file:
+    #   - p1.env
+    volumes:
+      - ./test/python/docker/p1_server_config.json:/ChannelSDK/test/python/p1_server_config.json
+    network_mode: "host"
+    # ports:
+    #   - ""192.168.2.128:10001:10001"
+    command: python3 /ChannelSDK/test/python/server.py
+  test_run_client:
+    image: "luodahui/channel-sdk:v2.0.3"
+    container_name: test_client
+    restart: always
+    # env_file:
+    #   - p0.env
+    volumes:
+      - ./test/python/docker/p0_client_config.json:/ChannelSDK/test/python/p0_client_config.json
+    network_mode: "host"
+    # ports:
+    #   - "192.168.2.128:10000:10000"
+    command: python3 /ChannelSDK/test/python/client.py
+  test_run_glacier2:
+    container_name: test_glacier2
+    restart: always
+    network_mode: "host"
+    image: "luodahui/ice_via_consul:v2.0.3"
+    volumes:
+      - ./test/python/docker/config/config.glacier2:/Ice_Via_Consul/ice_via/config/config.glacier2
+    command: /Ice_Via_Consul/ice_via/bin/run_glacier2.sh
+  test_run_ice_grid:
+    container_name: test_ice_grid
+    restart: always
+    network_mode: "host"
+    volumes:
+      - ./test/python/docker/config/config.gridregistry:/Ice_Via_Consul/ice_via/config/config.gridregistry
+    image: "luodahui/ice_via_consul:v2.0.3"
+    command: /Ice_Via_Consul/ice_via/bin/run_icegrid.sh
+
+  test_run_consul:
+    container_name: test_consul
+    restart: always
+    network_mode: "host"
+    volumes:
+      - ./third_party/consul/consul.json:/Ice_Via_Consul/consul/consul.json
+      - /tmp/log/:/Ice_Via_Consul/consul/log/
+    image: "luodahui/ice_via_consul:v2.0.3"
+    command: /Ice_Via_Consul/consul/consul agent -config-file /Ice_Via_Consul/consul/consul.json 
+
+  test_run_server_via:
+    image: "luodahui/channel-sdk:v2.0.3"
+    container_name: test_server_via
+    restart: always
+    network_mode: "host"
+    command: python3 /ChannelSDK/test/python/server_via.py
+    depends_on:
+      - test_run_glacier2
+      - test_run_ice_grid
+  test_run_client_via:
+    image: "luodahui/channel-sdk:v2.0.3"
+    container_name: test_client_via
+    restart: always
+    network_mode: "host"
+    command: python3 /ChannelSDK/test/python/client_via.py
+  

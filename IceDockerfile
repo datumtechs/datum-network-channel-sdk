@@ -1,0 +1,13 @@
+# 基础镜像，基于Ubuntu18.04镜像构建
+FROM ubuntu:18.04
+# 作者
+MAINTAINER DavidRo
+
+WORKDIR /Ice_Via_Consul
+COPY third_party/ice/bin /Ice_Via_Consul/ice_via/bin 
+COPY third_party/ice/config /Ice_Via_Consul/ice_via/config
+COPY third_party/ice/lib /Ice_Via_Consul/ice_via/lib
+COPY third_party/consul /Ice_Via_Consul/consul
+
+RUN mkdir -p /Ice_Via_Consul/consul/log
+# RUN mkdir -p /Ice_Via_Consul/consul/data-dir

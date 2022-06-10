@@ -7,7 +7,6 @@
 	"NODE_INFO": [
 		{
 			"NODE_ID": "p0",
-			"ADDRESS": "127.0.0.1:10000",
 			"GRICER2": "VIA0",
 			"ICEGRID": "GRID0",
 			"CERT_DIR": "/home/luodahui/core/channel-sdk/ssl/openssl",
@@ -17,7 +16,6 @@
 		},
 		{
 			"NODE_ID": "p1",
-			"ADDRESS": "127.0.0.1:10001",
 			"GRICER2": "VIA0",
 			"ICEGRID": "GRID0",
 			"CERT_DIR": "/home/luodahui/core/channel-sdk/ssl/openssl",
@@ -27,7 +25,6 @@
 		},
 		{
 			"NODE_ID": "p2",
-			"ADDRESS": "127.0.0.1:10002",
 			"GRICER2": "VIA0",
 			"ICEGRID": "GRID0",
 			"CERT_DIR": "/home/luodahui/core/channel-sdk/ssl/openssl",

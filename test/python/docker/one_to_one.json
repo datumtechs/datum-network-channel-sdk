@@ -1,13 +1,13 @@
 {
 	"TASK_ID": "task:0x0710cb",
 	"PING_TIME": 1,
-	"SEND_TIMEOUT": 10.0,
-	"CONNECT_TIMEOUT": 10.0,
+	"SEND_TIMEOUT": ${SEND_TIMEOUT},
+	"CONNECT_TIMEOUT": ${CONNECT_TIMEOUT},
 	"ROOT_CERT": "",
 	"NODE_INFO": [
 		{
 			"NODE_ID": "p0",
-			"ADDRESS": "127.0.0.1:10000",
+			"ADDRESS": "${P0_ADDRESS}",
 			"GRICER2": "VIA0",
 			"ICEGRID": "GRID0",
 			"CERT_DIR": "/home/luodahui/core/channel-sdk/ssl/openssl",
@@ -17,7 +17,7 @@
 		},
 		{
 			"NODE_ID": "p1",
-			"ADDRESS": "127.0.0.1:10001",
+			"ADDRESS": "${P1_ADDRESS}",
 			"GRICER2": "VIA0",
 			"ICEGRID": "GRID0",
 			"CERT_DIR": "/home/luodahui/core/channel-sdk/ssl/openssl",
@@ -27,7 +27,7 @@
 		},
 		{
 			"NODE_ID": "p2",
-			"ADDRESS": "127.0.0.1:10002",
+			"ADDRESS": "${P2_ADDRESS}",
 			"GRICER2": "VIA0",
 			"ICEGRID": "GRID0",
 			"CERT_DIR": "/home/luodahui/core/channel-sdk/ssl/openssl",
